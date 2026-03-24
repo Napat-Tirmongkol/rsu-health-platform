@@ -1,0 +1,12 @@
+# e-campaignv2/.htaccess
+
+Options -Indexes
+
+# Enable Rewrite
+RewriteEngine On
+
+# Suppress favicon.ico 404 — return empty 204 No Content
+RewriteRule ^favicon\.ico$ - [R=204,L]
+
+# DirectoryIndex
+DirectoryIndex index.php index.html
