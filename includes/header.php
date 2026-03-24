@@ -7,6 +7,36 @@ declare(strict_types=1);
  * require_once __DIR__ . '/header.php';
  * render_header('Page Title');
  */
+
+// --- เพิ่มระบบเช็คการกรอกข้อมูลโปรไฟล์ ---
+if (session_status() === PHP_SESSION_NONE) {
+    @session_start();
+}
+
+$currentPage = basename($_SERVER['PHP_SELF']);
+$excludedPages = ['profile.php', 'save_profile.php', 'index.php', 'logout.php', 'consent.php'];
+$isUserFolder = (strpos($_SERVER['REQUEST_URI'], '/user/') !== false);
+
+if ($isUserFolder && !in_array($currentPage, $excludedPages)) {
+    $lineUserId = $_SESSION['line_user_id'] ?? '';
+    if ($lineUserId !== '') {
+        try {
+            require_once __DIR__ . '/../config/db_connect.php';
+            $pdoCheck = db();
+            $stmtCheck = $pdoCheck->prepare("SELECT full_name, student_personnel_id, citizen_id, phone_number, status FROM med_students WHERE line_user_id = :lid LIMIT 1");
+            $stmtCheck->execute([':lid' => $lineUserId]);
+            $uProf = $stmtCheck->fetch();
+
+            if (!$uProf || empty($uProf['full_name']) || empty($uProf['citizen_id']) || empty($uProf['phone_number']) || empty($uProf['status']) || ($uProf['status'] !== 'external' && empty($uProf['student_personnel_id']))) {
+                header('Location: profile.php');
+                exit;
+            }
+        } catch (Exception $e) {
+            // ปล่อยผ่านถ้า DB มีปัญหา
+        }
+    }
+}
+
 function render_header(string $title = 'E-Vax'): void {
   ?>
   <!doctype html>

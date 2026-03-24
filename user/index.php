@@ -10,7 +10,7 @@ require_once __DIR__ . '/../includes/header.php';
 if (isset($_SESSION['evax_student_id'])) {
     try {
         $pdo = db();
-        $stmt = $pdo->prepare("SELECT student_personnel_id FROM med_students WHERE id = :id LIMIT 1");
+        $stmt = $pdo->prepare("SELECT full_name, student_personnel_id, phone_number, status FROM med_students WHERE id = :id LIMIT 1");
         $stmt->execute([':id' => $_SESSION['evax_student_id']]);
         $row = $stmt->fetch();
 
@@ -21,11 +21,11 @@ if (isset($_SESSION['evax_student_id'])) {
         if ($hasBooking) {
             header('Location: my_bookings.php');
         }
-        elseif (!empty($row['student_personnel_id'])) {
+        elseif (!empty($row['full_name']) && !empty($row['student_personnel_id']) && !empty($row['phone_number']) && !empty($row['status'])) {
             header('Location: booking_campaign.php');
         }
         else {
-            header('Location: consent.php');
+            header('Location: profile.php');
         }
         exit;
     }

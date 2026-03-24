@@ -23,13 +23,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $sql = "UPDATE med_students 
                         SET full_name = :name, 
                             student_personnel_id = :studentid, 
+                            citizen_id = :citizenid,
                             phone_number = :phone,
                             status = :status 
                         WHERE id = :id";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([
                     ':name' => $fullName,
-                    ':studentid' => $studentId,
+                    ':studentid' => trim($_POST['student_personnel_id'] ?? ''),
+                    ':citizenid' => trim($_POST['citizen_id'] ?? ''),
                     ':phone' => $phone,
                     ':status' => trim($_POST['status'] ?? ''),
                     ':id' => $userId
@@ -144,7 +146,8 @@ require_once __DIR__ . '/includes/header.php';
                 <tr>
                     <th class="px-6 py-5"><i class="fa-solid fa-hashtag mr-1"></i> ID</th>
                     <th class="px-6 py-5"><i class="fa-solid fa-user mr-1"></i> ชื่อ-นามสกุล</th>
-                    <th class="px-6 py-5"><i class="fa-solid fa-id-card mr-1"></i> รหัสผู้ใช้งาน</th>
+                    <th class="px-6 py-5"><i class="fa-solid fa-id-card mr-1"></i> ID Card (13 Lak)</th>
+                    <th class="px-6 py-5"><i class="fa-solid fa-graduation-cap mr-1"></i> Student ID (7 Lak)</th>
                     <th class="px-6 py-5">สถานะ</th>
                     <th class="px-6 py-5"><i class="fa-solid fa-phone mr-1"></i> เบอร์โทรศัพท์</th>
                     <th class="px-6 py-5"><i class="fa-regular fa-calendar-check mr-1"></i> วันที่ลงทะเบียน</th>
@@ -169,6 +172,7 @@ require_once __DIR__ . '/includes/header.php';
                         // เข้ารหัสข้อมูลสำหรับส่งไปที่ Javascript
                         $jsName = htmlspecialchars($u['full_name'] ?? '', ENT_QUOTES);
                         $jsStudentId = htmlspecialchars($u['student_personnel_id'] ?? '', ENT_QUOTES);
+                        $jsCitizenId = htmlspecialchars($u['citizen_id'] ?? '', ENT_QUOTES);
                         $jsPhone = htmlspecialchars($u['phone_number'] ?? '', ENT_QUOTES);
                         $jsStatus = htmlspecialchars($u['status'] ?? '', ENT_QUOTES);
 
@@ -185,6 +189,7 @@ require_once __DIR__ . '/includes/header.php';
                             <td class="px-6 py-5">
                                 <div class="font-extrabold text-gray-900 text-base group-hover:text-[#0052CC] transition-colors"><?= htmlspecialchars($u['full_name'] ?: 'ยังไม่กรอกโปรไฟล์') ?></div>
                             </td>
+                            <td class="px-6 py-5 text-gray-600 font-bold"><span class="bg-blue-50 text-blue-700 px-2 py-1 rounded-md text-xs border border-blue-100"><?= htmlspecialchars($u['citizen_id'] ?: '-') ?></span></td>
                             <td class="px-6 py-5 text-gray-600 font-bold"><span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-md text-xs border border-gray-200"><?= htmlspecialchars($u['student_personnel_id'] ?: '-') ?></span></td>
                             <td class="px-6 py-5"><?= $statusBadge ?></td>
                             <td class="px-6 py-5 text-gray-600 font-medium"><?= htmlspecialchars($u['phone_number'] ?: '-') ?></td>
@@ -197,7 +202,7 @@ require_once __DIR__ . '/includes/header.php';
                             </td>
                             <td class="px-6 py-5 text-center">
                                 <?php if ($u['full_name']): ?>
-                                <button onclick="openEditModal(<?= $u['id'] ?>, '<?= $jsName ?>', '<?= $jsStudentId ?>', '<?= $jsPhone ?>', '<?= $jsStatus ?>')"
+                                <button onclick="openEditModal(<?= $u['id'] ?>, '<?= $jsName ?>', '<?= $jsStudentId ?>', '<?= $jsCitizenId ?>', '<?= $jsPhone ?>', '<?= $jsStatus ?>')"
                                         class="bg-amber-50 hover:bg-amber-100 border border-amber-100 text-amber-600 px-4 py-2.5 rounded-[10px] font-bold text-[11px] uppercase tracking-wider transition-colors inline-flex items-center justify-center gap-2 shadow-sm mx-auto">
                                     <i class="fa-solid fa-user-pen text-sm"></i> แก้ไข
                                 </button>
@@ -235,8 +240,13 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
                 
                 <div>
-                    <label class="block text-xs uppercase tracking-wider font-bold text-gray-500 mb-1.5">รหัสนักศึกษา / บุคลากร <span class="text-red-500">*</span></label>
-                    <input type="text" id="edit_student_id" name="student_personnel_id" required class="w-full px-4 py-3 bg-white border border-gray-200 rounded-[14px] focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 outline-none font-prompt text-gray-800 font-bold shadow-sm transition-all focus:shadow-md tracking-wider">
+                    <label class="block text-xs uppercase tracking-wider font-bold text-gray-500 mb-1.5">เลขบัตรประชาชน (13 หลัก) <span class="text-red-500">*</span></label>
+                    <input type="text" id="edit_citizen_id" name="citizen_id" required maxlength="13" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-[14px] focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 outline-none font-prompt text-gray-800 font-bold shadow-sm transition-all focus:shadow-md tracking-wider">
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase tracking-wider font-bold text-gray-500 mb-1.5">รหัสนักศึกษา / บุคลากร (7 หลัก)</label>
+                    <input type="text" id="edit_student_id" name="student_personnel_id" maxlength="7" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-[14px] focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 outline-none font-prompt text-gray-800 font-bold shadow-sm transition-all focus:shadow-md tracking-wider">
                 </div>
 
                 <div>
@@ -265,10 +275,11 @@ require_once __DIR__ . '/includes/header.php';
 
 <script>
 // ฟังก์ชันโยนข้อมูลลงในช่องตอนเปิด Modal
-function openEditModal(id, name, studentId, phone, status) {
+function openEditModal(id, name, studentId, citizenId, phone, status) {
     document.getElementById('edit_user_id').value = id;
     document.getElementById('edit_full_name').value = name;
     document.getElementById('edit_student_id').value = studentId;
+    document.getElementById('edit_citizen_id').value = citizenId;
     document.getElementById('edit_phone').value = phone;
     document.getElementById('edit_status').value = status;
     

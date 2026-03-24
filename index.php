@@ -29,24 +29,25 @@ if (!empty($_SESSION['line_user_id']) || !empty($_SESSION['evax_student_id'])) {
             $stmtCheck->execute([':sid' => $sid]);
             $hasBooking = (int)$stmtCheck->fetchColumn() > 0;
 
-            $stmtProfile = $pdo->prepare("SELECT student_personnel_id FROM med_students WHERE id = :id LIMIT 1");
+            $stmtProfile = $pdo->prepare("SELECT full_name, student_personnel_id, phone_number, status FROM med_students WHERE id = :id LIMIT 1");
             $stmtProfile->execute([':id' => $sid]);
             $profile = $stmtProfile->fetch();
 
             if ($hasBooking) {
                 header('Location: ' . USER_BASE . 'my_bookings.php', true, 302);
             }
-            elseif (!empty($profile['student_personnel_id'])) {
+            elseif (!empty($profile['full_name']) && !empty($profile['student_personnel_id']) && !empty($profile['phone_number']) && !empty($profile['status'])) {
                 header('Location: ' . USER_BASE . 'booking_campaign.php', true, 302);
             }
             else {
-                header('Location: ' . USER_BASE . 'consent.php', true, 302);
+                header('Location: ' . USER_BASE . 'profile.php', true, 302);
             }
         }
         else {
             // มี line_user_id แต่ยัง link กับ med_student ไม่ได้
-            header('Location: ' . USER_BASE . 'consent.php', true, 302);
+            header('Location: ' . USER_BASE . 'profile.php', true, 302);
         }
+        exit;
     }
     catch (PDOException $e) {
         // DB error → ล้าง session แล้ว redirect ไป login

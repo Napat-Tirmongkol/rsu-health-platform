@@ -18,19 +18,21 @@ if ($lineUserId === '') {
 $userData = [
     'full_name' => '',
     'id_number' => '',
+    'citizen_id' => '',
     'phone' => '',
     'status' => ''
 ];
 
 try {
     $pdo = db();
-    $stmt = $pdo->prepare("SELECT full_name, student_personnel_id, phone_number, status FROM med_students WHERE line_user_id = :line_id LIMIT 1");
+    $stmt = $pdo->prepare("SELECT full_name, student_personnel_id, citizen_id, phone_number, status FROM med_students WHERE line_user_id = :line_id LIMIT 1");
     $stmt->execute([':line_id' => $lineUserId]);
     $user = $stmt->fetch();
 
     if ($user) {
         $userData['full_name'] = $user['full_name'] ?? '';
         $userData['id_number'] = $user['student_personnel_id'] ?? '';
+        $userData['citizen_id'] = $user['citizen_id'] ?? '';
         $userData['phone'] = $user['phone_number'] ?? '';
         $userData['status'] = $user['status'] ?? '';
     }
@@ -83,14 +85,29 @@ render_header('ข้อมูลส่วนตัว');
         </div>
 
         <div class="space-y-1.5">
-          <label class="text-sm font-semibold text-gray-700 font-prompt" for="id_number">รหัสนักศึกษา / เลขบัตรประชาชน</label>
+          <label class="text-sm font-semibold text-gray-700 font-prompt" for="citizen_id">เลขบัตรประชาชน <span class="text-red-500">*</span></label>
+          <input
+            id="citizen_id"
+            name="citizen_id"
+            type="text"
+            required
+            maxlength="13"
+            pattern="\d{13}"
+            value="<?= htmlspecialchars($userData['citizen_id']) ?>"
+            placeholder="กรอกเลขบัตรประชาชน 13 หลัก"
+            class="w-full p-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0052CC] focus:border-transparent outline-none transition-all placeholder:text-gray-400 font-prompt"
+          />
+        </div>
+
+        <div class="space-y-1.5" id="student_id_container">
+          <label class="text-sm font-semibold text-gray-700 font-prompt" for="id_number">รหัสนักศึกษา / บุคลากร <span class="text-red-500">*</span></label>
           <input
             id="id_number"
             name="id_number"
             type="text"
-            required
+            maxlength="7"
             value="<?= htmlspecialchars($userData['id_number']) ?>"
-            placeholder="กรอกตัวเลข 13 หลัก หรือรหัสนักศึกษา"
+            placeholder="กรอกรหัสตัวเลข 7 หลัก"
             class="w-full p-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0052CC] focus:border-transparent outline-none transition-all placeholder:text-gray-400 font-prompt"
           />
         </div>
@@ -135,5 +152,31 @@ render_header('ข้อมูลส่วนตัว');
     </div>
   </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const statusInputs = document.querySelectorAll('input[name="status"]');
+    const studentIdBtn = document.getElementById('student_id_container');
+    const studentIdInput = document.getElementById('id_number');
+
+    function toggleFields() {
+        const rad = document.querySelector('input[name="status"]:checked');
+        const selectedStatus = rad ? rad.value : '';
+        if (selectedStatus === 'external') {
+            if (studentIdBtn) studentIdBtn.classList.add('hidden');
+            if (studentIdInput) studentIdInput.removeAttribute('required');
+        } else {
+            if (studentIdBtn) studentIdBtn.classList.remove('hidden');
+            if (studentIdInput) studentIdInput.setAttribute('required', 'required');
+        }
+    }
+
+    statusInputs.forEach(input => {
+        input.addEventListener('change', toggleFields);
+    });
+
+    toggleFields();
+});
+</script>
 
 <?php render_footer(); ?>

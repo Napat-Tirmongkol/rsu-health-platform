@@ -21,11 +21,18 @@ if ($lineUserId === '') {
 // 2. รับค่าและทำความสะอาดข้อมูล (Sanitize)
 $fullName    = trim((string)($_POST['full_name'] ?? ''));
 $idNumber    = trim((string)($_POST['id_number'] ?? ''));
+$citizenId   = trim((string)($_POST['citizen_id'] ?? ''));
 $phoneNumber = trim((string)($_POST['phone_number'] ?? ''));
 $status      = trim((string)($_POST['status'] ?? ''));
 
-if ($fullName === '' || $idNumber === '' || $phoneNumber === '' || $status === '') {
+if ($fullName === '' || $citizenId === '' || $phoneNumber === '' || $status === '') {
     header('Location: profile.php?error=empty', true, 303);
+    exit;
+}
+
+// ถ้าไม่ใช่ external ต้องมีรหัส 7 หลัก
+if ($status !== 'external' && $idNumber === '') {
+    header('Location: profile.php?error=empty_student', true, 303);
     exit;
 }
 
@@ -37,6 +44,7 @@ try {
     $sql = "UPDATE med_students 
             SET full_name = :name, 
                 student_personnel_id = :sid, 
+                citizen_id = :cid,
                 phone_number = :phone,
                 status = :status
             WHERE line_user_id = :line_id";
@@ -44,7 +52,8 @@ try {
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
         ':name'    => $fullName,
-        ':sid'     => $idNumber,
+        ':sid'     => ($status === 'external') ? null : $idNumber,
+        ':cid'     => $citizenId,
         ':phone'   => $phoneNumber,
         ':status'  => $status,
         ':line_id' => $lineUserId
