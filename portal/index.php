@@ -201,22 +201,21 @@ if (!isset($_SESSION['user_id']) && isset($_SESSION['admin_username'])) {
                 </div>
             </div>
 
-            <!-- E-BORROW (Deprecated/Archived) -->
-            <div class="lg:col-span-3 bg-gray-50 hover:bg-white p-8 rounded-[40px] shadow-sm border border-gray-200 border-dashed flex items-center justify-between group transition-all duration-300">
+            <!-- E-BORROW (ACTIVE) -->
+            <div class="lg:col-span-3 bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 flex items-center justify-between group transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1">
                 <div class="flex items-center gap-6">
-                    <div class="w-16 h-16 bg-gray-200 text-gray-400 rounded-3xl flex items-center justify-center text-2xl group-hover:bg-gray-800 group-hover:text-white transition-all">
+                    <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center text-2xl group-hover:bg-blue-600 group-hover:text-white transition-all">
                         <i class="fa-solid fa-toolbox"></i>
                     </div>
                     <div>
                         <div class="flex items-center gap-3">
-                            <h3 class="text-xl font-black text-gray-600 group-hover:text-gray-900 tracking-tight">e-Borrow & Inventory</h3>
-                            <span class="px-2 py-1 bg-gray-100 text-gray-400 rounded-lg text-[10px] font-bold tracking-widest border border-gray-200">DEPRECATED</span>
+                            <h3 class="text-xl font-black text-gray-900 group-hover:text-blue-600 tracking-tight">e-Borrow & Inventory</h3>
                         </div>
-                        <p class="text-gray-400 text-xs mt-1">ระบบยืม-คืนอุปกรณ์ทางการแพทย์ เดิม (ตรวจสอบข้อมูลประวัติย้อนหลังได้ที่นี่)</p>
+                        <p class="text-gray-500 text-xs mt-1">ระบบยืม-คืนอุปกรณ์ทางการแพทย์และเวชภัณฑ์ (RSU Healthcare Services)</p>
                     </div>
                 </div>
-                <a href="../archive/e_Borrow/admin/index.php" class="px-8 py-4 bg-white border border-gray-200 text-gray-600 rounded-2xl text-sm font-black hover:border-gray-900 hover:text-gray-900 transition-all">
-                    Access History
+                <a href="../archive/e_Borrow/admin/index.php" class="px-8 py-4 bg-gray-900 text-white rounded-2xl text-sm font-black hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-200 transition-all">
+                    เข้าใช้งานระบบ
                 </a>
             </div>
 

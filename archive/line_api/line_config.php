@@ -21,21 +21,22 @@ declare(strict_types = 1)
  */
 
 // ============================================================
-// Load Secrets from config/secrets.php
+// Load Secrets from config/secrets.php (Correct path to Root)
 // ============================================================
-$secretsPath = __DIR__ . '/../config/secrets.php';
+$secretsPath = __DIR__ . '/../../config/secrets.php';
 $secrets = file_exists($secretsPath) ? require $secretsPath : [];
 
-// 1. LINE Login Channel
-define('LINE_LOGIN_CHANNEL_ID', $secrets['LINE_LOGIN_CHANNEL_ID'] ?? 'YOUR_LOGIN_CHANNEL_ID');
-define('LINE_LOGIN_CHANNEL_SECRET', $secrets['LINE_LOGIN_CHANNEL_SECRET'] ?? 'YOUR_LOGIN_CHANNEL_SECRET');
+// 1. LINE Login Channel (Using the main channel ID or specific e-borrow keys)
+// Change keys to 'LINE_LOGIN_CHANNEL_ID' to use the new unified channel
+define('LINE_LOGIN_CHANNEL_ID', $secrets['LINE_LOGIN_CHANNEL_ID'] ?? '2009560824');
+define('LINE_LOGIN_CHANNEL_SECRET', $secrets['LINE_LOGIN_CHANNEL_SECRET'] ?? '50870e1645c14089b28897caaf3a1a84');
 
-// ⚠️ ต้องตรงกับ Callback URL ที่ลงทะเบียนใน LINE Developers Console เป๊ะๆ
-define('LINE_LOGIN_CALLBACK_URL', 'https://healthycampus.rsu.ac.th/e-campaignv2/line_api/callback.php');
+// ⚠️ ต้องตรงกับ Callback URL ที่ลงทะเบียนใน LINE Developers Console เป๊ะๆ (เพิ่ม /archive/)
+define('LINE_LOGIN_CALLBACK_URL', 'https://healthycampus.rsu.ac.th/e-campaignv2/archive/line_api/callback.php');
 
 // 2. LINE Messaging API Channel
-define('LINE_MESSAGING_CHANNEL_ACCESS_TOKEN', $secrets['LINE_MESSAGING_CHANNEL_ACCESS_TOKEN'] ?? 'YOUR_CHANNEL_ACCESS_TOKEN');
-define('LINE_MESSAGING_CHANNEL_SECRET', $secrets['LINE_MESSAGING_CHANNEL_SECRET'] ?? 'YOUR_MESSAGING_CHANNEL_SECRET');
+define('LINE_MESSAGING_CHANNEL_ACCESS_TOKEN', $secrets['EBORROW_LINE_MESSAGE_TOKEN'] ?? $secrets['LINE_MESSAGING_CHANNEL_ACCESS_TOKEN'] ?? '');
+define('LINE_MESSAGING_CHANNEL_SECRET', $secrets['LINE_MESSAGING_CHANNEL_SECRET'] ?? '');
 
 // 3. LIFF (LINE Front-end Framework)
-define('LINE_LIFF_ID', $secrets['LINE_LIFF_ID'] ?? 'YOUR_LIFF_ID');
+define('LINE_LIFF_ID', $secrets['LINE_LIFF_ID'] ?? '');
