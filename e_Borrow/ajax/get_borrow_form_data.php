@@ -1,6 +1,6 @@
 <?php
 // get_borrow_form_data.php
-// (อัปเดต: ดึงข้อมูลจาก med_students)
+// (อัปเดต: ดึงข้อมูลจาก sys_users)
 // ดึงข้อมูลสำหรับ Popup "ยืม" (ที่ Admin กด)
 
 // 1. "จ้างยาม" และ "เชื่อมต่อ DB"
@@ -40,8 +40,8 @@ try {
     }
     $response['equipment_type'] = $equipment_type;
 
-    // 5.2 (SQL ใหม่) ดึงรายชื่อผู้ใช้ทั้งหมดจาก med_students
-    $stmt_borrowers = $pdo->prepare("SELECT id, full_name, phone_number FROM med_students ORDER BY full_name ASC");
+    // 5.2 (SQL ใหม่) ดึงรายชื่อผู้ใช้ทั้งหมดจาก sys_users
+    $stmt_borrowers = $pdo->prepare("SELECT id, full_name, phone_number FROM sys_users ORDER BY full_name ASC");
     $stmt_borrowers->execute();
     $borrowers_list = $stmt_borrowers->fetchAll(PDO::FETCH_ASSOC);
     

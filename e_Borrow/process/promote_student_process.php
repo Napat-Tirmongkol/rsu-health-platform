@@ -41,8 +41,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // 6. ดำเนินการ "เลื่อนขั้น"
     try {
-        // 6.1 ดึง "ชื่อเต็ม" จาก med_students
-        $stmt_get = $pdo->prepare("SELECT full_name FROM med_students WHERE id = ? AND line_user_id = ?");
+        // 6.1 ดึง "ชื่อเต็ม" จาก sys_users
+        $stmt_get = $pdo->prepare("SELECT full_name FROM sys_users WHERE id = ? AND line_user_id = ?");
         $stmt_get->execute([$student_id, $line_user_id]);
         $student_full_name = $stmt_get->fetchColumn();
 
@@ -51,14 +51,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // 6.2 (เช็คซ้ำ) ตรวจสอบว่า Username นี้ถูกใช้ไปหรือยัง
-        $stmt_check_user = $pdo->prepare("SELECT id FROM med_users WHERE username = ?");
+        $stmt_check_user = $pdo->prepare("SELECT id FROM sys_staff WHERE username = ?");
         $stmt_check_user->execute([$new_username]);
         if ($stmt_check_user->fetch()) {
             throw new Exception("Username '$new_username' นี้ถูกใช้งานแล้ว");
         }
 
         // 6.3 (เช็คซ้ำ) ตรวจสอบว่า LINE ID นี้ถูกผูกไปหรือยัง
-        $stmt_check_line = $pdo->prepare("SELECT id FROM med_users WHERE linked_line_user_id = ?");
+        $stmt_check_line = $pdo->prepare("SELECT id FROM sys_staff WHERE linked_line_user_id = ?");
         $stmt_check_line->execute([$line_user_id]);
         if ($stmt_check_line->fetch()) {
             throw new Exception("LINE ID นี้ถูกเชื่อมโยงกับบัญชีพนักงานอื่นแล้ว");
@@ -67,8 +67,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // 6.4 เข้ารหัสรหัสผ่านใหม่
         $password_hash = password_hash($new_password, PASSWORD_DEFAULT);
 
-        // 6.5 (SQL) INSERT ข้อมูลเข้า med_users
-        $sql = "INSERT INTO med_users (username, password_hash, full_name, role, linked_line_user_id) 
+        // 6.5 (SQL) INSERT ข้อมูลเข้า sys_staff
+        $sql = "INSERT INTO sys_staff (username, password_hash, full_name, role, linked_line_user_id) 
                 VALUES (?, ?, ?, ?, ?)";
         
         $stmt = $pdo->prepare($sql);

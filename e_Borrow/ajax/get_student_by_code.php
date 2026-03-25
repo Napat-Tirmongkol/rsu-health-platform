@@ -18,11 +18,11 @@ if (empty($student_code) && empty($db_id)) {
 try {
     if (!empty($db_id)) {
         // ค้นหาด้วย ID (แม่นยำสุด)
-        $stmt = $pdo->prepare("SELECT id, full_name, student_personnel_id, department, status FROM med_students WHERE id = ? LIMIT 1");
+        $stmt = $pdo->prepare("SELECT id, full_name, student_personnel_id, department, status FROM sys_users WHERE id = ? LIMIT 1");
         $stmt->execute([$db_id]);
     } else {
         // Fallback ค้นหาด้วยรหัสนักศึกษา
-        $stmt = $pdo->prepare("SELECT id, full_name, student_personnel_id, department, status FROM med_students WHERE student_personnel_id = ? LIMIT 1");
+        $stmt = $pdo->prepare("SELECT id, full_name, student_personnel_id, department, status FROM sys_users WHERE student_personnel_id = ? LIMIT 1");
         $stmt->execute([$student_code]);
     }
     

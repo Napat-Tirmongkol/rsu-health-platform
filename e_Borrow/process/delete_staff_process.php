@@ -1,6 +1,6 @@
 <?php
 // [แก้ไข: process/delete_staff_process.php]
-// แก้ไขให้รับค่า user_id_to_delete และใช้ตาราง med_users
+// แก้ไขให้รับค่า user_id_to_delete และใช้ตาราง sys_staff
 
 // 1. ตั้งค่า Error Reporting
 ini_set('display_errors', 1);
@@ -39,7 +39,7 @@ try {
     // แต่ถ้าต้องการลบจริงๆ SQL จะทำงานตาม Constraint (เช่น ON DELETE SET NULL หรือ RESTRICT)
     
     // ลองลบข้อมูล
-    $sql = "DELETE FROM med_users WHERE id = :id";
+    $sql = "DELETE FROM sys_staff WHERE id = :id";
     $stmt = $pdo->prepare($sql);
     
     // ใช้ Try-Catch เฉพาะจุด Execute เพื่อดักจับ Error จาก Foreign Key (เช่น ติด Constraint)

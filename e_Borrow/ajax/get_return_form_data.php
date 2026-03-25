@@ -1,6 +1,6 @@
 <?php
 // get_return_form_data.php
-// (อัปเดต: JOIN ตาราง med_students)
+// (อัปเดต: JOIN ตาราง sys_users)
 // ดึงข้อมูลสำหรับ Popup "ยืนยันการรับคืน"
 
 // 1. "จ้างยาม" และ "เชื่อมต่อ DB"
@@ -32,20 +32,20 @@ if ($equipment_id == 0) {
 
 try {
     // 5. (SQL ใหม่) ดึงข้อมูลการยืม (Transaction) ที่ยัง "active"
-    //    (JOIN ใหม่กับ med_students)
+    //    (JOIN ใหม่กับ sys_users)
     $sql = "SELECT 
                 t.id as transaction_id, 
                 t.borrow_date, 
                 t.due_date,
                 ei.name as equipment_name, 
                 ei.serial_number as equipment_serial,
-                s.full_name as borrower_name, /* (มาจาก med_students) */
-                s.phone_number as borrower_contact /* (มาจาก med_students) */
+                s.full_name as borrower_name, /* (มาจาก sys_users) */
+                s.phone_number as borrower_contact /* (มาจาก sys_users) */
             FROM med_transactions t
             JOIN med_equipment_items ei ON t.equipment_id = ei.id
-            /* (JOIN ใหม่) ใช้ borrower_student_id เชื่อมไปยัง med_students */
+            /* (JOIN ใหม่) ใช้ borrower_student_id เชื่อมไปยัง sys_users */
            /* (JOIN ... ) */
-            LEFT JOIN med_students s ON t.borrower_student_id = s.id
+            LEFT JOIN sys_users s ON t.borrower_student_id = s.id
             WHERE t.equipment_id = ? AND t.status = 'borrowed'
               AND t.approval_status IN ('approved', 'staff_added') /* <-- เพิ่มบรรทัดนี้ */
             ORDER BY t.borrow_date DESC

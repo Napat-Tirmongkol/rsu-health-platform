@@ -36,9 +36,9 @@ if (empty($full_name) || empty($status) || ($status == 'other' && empty($status_
     die("ข้อมูลบังคับ (ชื่อ-สกุล, สถานภาพ) ไม่ครบถ้วน <a href='create_profile.php'>กลับไปกรอกใหม่</a>");
 }
 
-// 5. บันทึกลงฐานข้อมูล (med_students)
+// 5. บันทึกลงฐานข้อมูล (sys_users)
 try {
-    $sql = "INSERT INTO med_students 
+    $sql = "INSERT INTO sys_users 
                 (line_user_id, full_name, department, status, status_other, student_personnel_id, phone_number) 
             VALUES 
                 (?, ?, ?, ?, ?, ?, ?)";

@@ -30,10 +30,10 @@ try {
     if (empty($due_date)) throw new Exception('กรุณาระบุวันที่คืน');
 
     // ตรวจสอบ Staff ID
-    $stmtCheckStaff = $pdo->prepare("SELECT id FROM med_users WHERE id = ?");
+    $stmtCheckStaff = $pdo->prepare("SELECT id FROM sys_staff WHERE id = ?");
     $stmtCheckStaff->execute([$lending_staff_id]);
     if ($stmtCheckStaff->rowCount() == 0) {
-        $lending_staff_id = $pdo->query("SELECT id FROM med_users ORDER BY id ASC LIMIT 1")->fetchColumn();
+        $lending_staff_id = $pdo->query("SELECT id FROM sys_staff ORDER BY id ASC LIMIT 1")->fetchColumn();
     }
 
     // 4. เริ่ม Transaction

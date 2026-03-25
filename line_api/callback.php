@@ -81,7 +81,7 @@ try {
     $pdo = db();
 
     // 3. ตรวจสอบว่าผู้ใช้ใน LINE นี้มีอยู่ในฐานข้อมูลหรือไม่
-    $stmt = $pdo->prepare("SELECT id, full_name, line_user_id FROM med_students WHERE line_user_id = :line_user_id LIMIT 1");
+    $stmt = $pdo->prepare("SELECT id, full_name, line_user_id FROM sys_users WHERE line_user_id = :line_user_id LIMIT 1");
     $stmt->execute([':line_user_id' => $line_user_id]);
     $user = $stmt->fetch();
 
@@ -120,3 +120,4 @@ try {
 } catch (PDOException $e) {
     die("Database Error: " . $e->getMessage());
 }
+

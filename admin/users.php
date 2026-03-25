@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($userId > 0 && $fullName !== '' && $studentId !== '') {
             try {
-                $sql = "UPDATE med_students 
+                $sql = "UPDATE sys_users 
                         SET full_name = :name, 
                             student_personnel_id = :studentid, 
                             citizen_id = :citizenid,
@@ -57,7 +57,7 @@ $users = [];
 $params = [];
 
 try {
-    $sql = "SELECT * FROM med_students WHERE 1=1";
+    $sql = "SELECT * FROM sys_users WHERE 1=1";
     
     if ($search !== '') {
         // 🌟 แยกชื่อ Parameter ให้ไม่ซ้ำกัน

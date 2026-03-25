@@ -29,9 +29,9 @@ try {
         t.end_time,
         c.title AS campaign_title,
         c.description AS campaign_desc
-    FROM camp_appointments a
-    JOIN camp_time_slots t ON a.slot_id = t.id
-    JOIN campaigns c ON a.campaign_id = c.id
+    FROM camp_bookings a
+    JOIN camp_slots t ON a.slot_id = t.id
+    JOIN camp_list c ON a.campaign_id = c.id
     WHERE a.student_id = :student_id
   ";
   $stmt = $pdo->prepare($sql);

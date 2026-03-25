@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // ดึงข้อมูลจากฐานข้อมูล
     try {
         $pdo = db();
-        $stmt = $pdo->prepare("SELECT * FROM admin_users WHERE username = :uname LIMIT 1");
+        $stmt = $pdo->prepare("SELECT * FROM sys_admins WHERE username = :uname LIMIT 1");
         $stmt->execute([':uname' => $username]);
         $admin = $stmt->fetch();
 

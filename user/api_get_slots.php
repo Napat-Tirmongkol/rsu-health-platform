@@ -18,8 +18,8 @@ try {
     $sql = "
         SELECT 
             t.id, t.max_capacity,
-            (SELECT COUNT(*) FROM camp_appointments a WHERE a.slot_id = t.id AND a.status IN ('booked', 'confirmed')) as booked_count
-        FROM camp_time_slots t
+            (SELECT COUNT(*) FROM camp_bookings a WHERE a.slot_id = t.id AND a.status IN ('booked', 'confirmed')) as booked_count
+        FROM camp_slots t
         WHERE t.slot_date = :date AND t.campaign_id = :cid
     ";
     $stmt = $pdo->prepare($sql);

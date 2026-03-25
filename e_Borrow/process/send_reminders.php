@@ -33,7 +33,7 @@ try {
                 t.id as transaction_id, s.full_name as student_name,
                 s.line_user_id, ei.name as item_name, et.name as type_name
             FROM med_transactions t
-            JOIN med_students s ON t.borrower_student_id = s.id
+            JOIN sys_users s ON t.borrower_student_id = s.id
             JOIN med_equipment_items ei ON t.item_id = ei.id
             JOIN med_equipment_types et ON t.type_id = et.id
             WHERE t.status = 'borrowed'
@@ -97,7 +97,7 @@ try {
                 t.id as transaction_id, s.full_name as student_name,
                 s.line_user_id, ei.name as item_name, et.name as type_name
             FROM med_transactions t
-            JOIN med_students s ON t.borrower_student_id = s.id
+            JOIN sys_users s ON t.borrower_student_id = s.id
             JOIN med_equipment_items ei ON t.item_id = ei.id
             JOIN med_equipment_types et ON t.type_id = et.id
             WHERE t.status = 'borrowed'

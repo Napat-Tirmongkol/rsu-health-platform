@@ -13,7 +13,7 @@ try {
     $pdo = db();
 
     // ข้อมูลนักศึกษา
-    $stmt = $pdo->prepare("SELECT student_personnel_id, full_name FROM med_students WHERE id = ? LIMIT 1");
+    $stmt = $pdo->prepare("SELECT student_personnel_id, full_name FROM sys_users WHERE id = ? LIMIT 1");
     $stmt->execute([$student_id]);
     $student_data = $stmt->fetch();
 

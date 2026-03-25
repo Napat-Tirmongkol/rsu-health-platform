@@ -19,13 +19,13 @@ try {
 
     // (3. Query ประวัติการยืม)
     // เราจะดึงข้อมูลจาก med_transactions ที่ตรงกับ item_id นี้
-    // และ JOIN กับ med_students เพื่อเอาชื่อผู้ยืม
+    // และ JOIN กับ sys_users เพื่อเอาชื่อผู้ยืม
     $sql = "SELECT 
                 t.borrow_date, 
                 t.return_date,
                 s.full_name AS borrower_name
             FROM med_transactions t
-            JOIN med_students s ON t.borrower_student_id = s.id
+            JOIN sys_users s ON t.borrower_student_id = s.id
             WHERE t.item_id = ?
             ORDER BY t.borrow_date DESC"; // (เรียงจากล่าสุดไปเก่าสุด)
     

@@ -42,7 +42,7 @@ try {
                     t.borrow_date, t.due_date
                   FROM med_equipment_items i
                   LEFT JOIN med_transactions t ON i.id = t.item_id AND t.status = 'borrowed'
-                  LEFT JOIN med_students s ON t.borrower_student_id = s.id
+                  LEFT JOIN sys_users s ON t.borrower_student_id = s.id
                   WHERE i.type_id = ?
                   ORDER BY i.status ASC, i.id ASC";
     $stmt_items = $pdo->prepare($sql_items);

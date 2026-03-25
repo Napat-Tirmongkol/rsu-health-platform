@@ -25,7 +25,7 @@ $userData = [
 
 try {
     $pdo = db();
-    $stmt = $pdo->prepare("SELECT full_name, student_personnel_id, citizen_id, phone_number, status FROM med_students WHERE line_user_id = :line_id LIMIT 1");
+    $stmt = $pdo->prepare("SELECT full_name, student_personnel_id, citizen_id, phone_number, status FROM sys_users WHERE line_user_id = :line_id LIMIT 1");
     $stmt->execute([':line_id' => $lineUserId]);
     $user = $stmt->fetch();
 

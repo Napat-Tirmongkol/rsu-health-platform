@@ -48,8 +48,8 @@ if (!empty($start_date)) { $date_condition .= " AND DATE(l.timestamp) >= ?"; $da
 if (!empty($end_date)) { $date_condition .= " AND DATE(l.timestamp) <= ?"; $date_params[] = $end_date; }
 
 $base_where = ($log_type == 'signin') ? "WHERE l.action IN ('login_password', 'login_line')" : "WHERE l.action NOT IN ('login_password', 'login_line')";
-$sql_count = "SELECT COUNT(*) FROM med_logs l $base_where $date_condition";
-$sql_data = "SELECT l.*, u.full_name as admin_name FROM med_logs l LEFT JOIN med_users u ON l.user_id = u.id $base_where $date_condition ORDER BY l.timestamp DESC LIMIT $limit OFFSET $offset";
+$sql_count = "SELECT COUNT(*) FROM sys_activity_logs l $base_where $date_condition";
+$sql_data = "SELECT l.*, u.full_name as admin_name FROM sys_activity_logs l LEFT JOIN sys_staff u ON l.user_id = u.id $base_where $date_condition ORDER BY l.timestamp DESC LIMIT $limit OFFSET $offset";
 
 if (isset($_GET['ajax_update']) && $_GET['ajax_update'] == '1') {
     try {

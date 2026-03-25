@@ -69,7 +69,7 @@ if (!$email) {
 }
 
 // 4. ตรวจสอบสิทธิ์ในฐานข้อมูล
-$stmt = $pdo->prepare("SELECT * FROM admin_users WHERE email = :email LIMIT 1");
+$stmt = $pdo->prepare("SELECT * FROM sys_admins WHERE email = :email LIMIT 1");
 $stmt->execute([':email' => $email]);
 $admin = $stmt->fetch();
 
@@ -90,3 +90,4 @@ if ($admin) {
     header("Location: login.php");
     exit;
 }
+

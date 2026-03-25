@@ -10,7 +10,7 @@ $response = ['status' => 'error', 'staff' => []];
 
 try {
     // ดึงเฉพาะ Admin และ Employee (เจ้าหน้าที่)
-    $stmt = $pdo->prepare("SELECT id, full_name FROM med_users WHERE role IN ('admin', 'employee') ORDER BY full_name ASC");
+    $stmt = $pdo->prepare("SELECT id, full_name FROM sys_staff WHERE role IN ('admin', 'employee') ORDER BY full_name ASC");
     $stmt->execute();
     $staff_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

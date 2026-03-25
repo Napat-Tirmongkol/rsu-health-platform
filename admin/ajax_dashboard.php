@@ -12,17 +12,17 @@ try {
     $stmt = $pdo->query("
         SELECT 
             COUNT(*) as total_campaigns,
-            (SELECT COUNT(*) FROM camp_appointments WHERE status = 'booked') as pending_count,
-            (SELECT COUNT(*) FROM camp_appointments WHERE status = 'confirmed') as confirmed_count
-        FROM campaigns WHERE status = 'active'
+            (SELECT COUNT(*) FROM camp_bookings WHERE status = 'booked') as pending_count,
+            (SELECT COUNT(*) FROM camp_bookings WHERE status = 'confirmed') as confirmed_count
+        FROM camp_list WHERE status = 'active'
     ");
     $stats = $stmt->fetch(PDO::FETCH_ASSOC);
 
     // 2. ดึง 5 แคมเปญยอดฮิต
     $popular_stmt = $pdo->query("
         SELECT c.title, COUNT(a.id) as booking_count
-        FROM campaigns c
-        LEFT JOIN camp_appointments a ON c.id = a.campaign_id AND a.status IN ('booked', 'confirmed')
+        FROM camp_list c
+        LEFT JOIN camp_bookings a ON c.id = a.campaign_id AND a.status IN ('booked', 'confirmed')
         GROUP BY c.id
         ORDER BY booking_count DESC
         LIMIT 5

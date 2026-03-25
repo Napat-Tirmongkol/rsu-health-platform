@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // 6. ดำเนินการ UPDATE
     try {
         // 6.1 ดึงข้อมูลเดิม
-        $stmt_get = $pdo->prepare("SELECT username, full_name, role, linked_line_user_id FROM med_users WHERE id = ?");
+        $stmt_get = $pdo->prepare("SELECT username, full_name, role, linked_line_user_id FROM sys_staff WHERE id = ?");
         $stmt_get->execute([$user_id]);
         $current_data = $stmt_get->fetch(PDO::FETCH_ASSOC);
 
@@ -47,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // 6.2 ตรวจสอบ Username ซ้ำ
         if ($current_data['username'] != $username) {
-            $stmt_check = $pdo->prepare("SELECT id FROM med_users WHERE username = ?");
+            $stmt_check = $pdo->prepare("SELECT id FROM sys_staff WHERE username = ?");
             $stmt_check->execute([$username]);
             if ($stmt_check->fetch()) {
                 throw new Exception("Username '$username' นี้ถูกใช้งานแล้ว");
@@ -56,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // 6.3 (ตรรกะ) ถ้าเป็นบัญชีที่ผูกกับ LINE
         if ($current_data['linked_line_user_id']) {
-            $sql = "UPDATE med_users SET username = ?";
+            $sql = "UPDATE sys_staff SET username = ?";
             $params = [$username];
         } 
         // (ถ้าเป็นบัญชีปกติ)
@@ -64,7 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
            	if (!in_array($role, ['admin', 'employee', 'editor'])) {
                 throw new Exception("สิทธิ์ (Role) ที่ส่งมาไม่ถูกต้อง");
             }
-            $sql = "UPDATE med_users SET username = ?, full_name = ?, role = ?";
+            $sql = "UPDATE sys_staff SET username = ?, full_name = ?, role = ?";
             $params = [$username, $full_name, $role];
         }
         

@@ -10,13 +10,13 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
     exit;
 }
 
-// 3. (Query ที่ 1) ดึงข้อมูลผู้ใช้งาน (med_students)
+// 3. (Query ที่ 1) ดึงข้อมูลผู้ใช้งาน (sys_users)
 try {
     $sql_students = "SELECT 
                 s.*, 
                 u.id as linked_user_id 
-            FROM med_students s
-            LEFT JOIN med_users u ON s.line_user_id = u.linked_line_user_id
+            FROM sys_users s
+            LEFT JOIN sys_staff u ON s.line_user_id = u.linked_line_user_id
             ORDER BY s.full_name ASC";
     $stmt_students = $pdo->prepare($sql_students);
     $stmt_students->execute();
@@ -26,13 +26,13 @@ try {
     $students = [];
 }
 
-// 4. (Query ที่ 2) ดึงข้อมูลพนักงาน (med_users)
+// 4. (Query ที่ 2) ดึงข้อมูลพนักงาน (sys_staff)
 try {
     $sql_staff = "SELECT 
                 u.id, u.username, u.full_name, u.role, u.linked_line_user_id, u.account_status,
                 s.full_name as linked_student_name
-              FROM med_users u
-                  LEFT JOIN med_students s ON u.linked_line_user_id = s.line_user_id
+              FROM sys_staff u
+                  LEFT JOIN sys_users s ON u.linked_line_user_id = s.line_user_id
                   ORDER BY u.role ASC, u.username ASC";
     $stmt_staff = $pdo->prepare($sql_staff);
     $stmt_staff->execute();

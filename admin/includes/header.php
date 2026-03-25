@@ -48,7 +48,7 @@
             <div class="mt-6 mb-2 px-6">
                 <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Campaign Management</p>
                 <div class="space-y-1">
-                    <a href="campaigns.php" class="flex items-center gap-3 p-3 rounded-xl <?= basename($_SERVER['PHP_SELF']) == 'campaigns.php' ? 'bg-blue-50 text-[#0052CC] font-semibold' : 'text-gray-600 hover:bg-gray-50' ?> transition-colors">
+                    <a href="camp_list.php" class="flex items-center gap-3 p-3 rounded-xl <?= basename($_SERVER['PHP_SELF']) == 'camp_list.php' ? 'bg-blue-50 text-[#0052CC] font-semibold' : 'text-gray-600 hover:bg-gray-50' ?> transition-colors">
     <i class="fa-solid fa-layer-group w-5 text-center"></i> จัดการแคมเปญ
 </a>
                     <a href="time_slots.php" class="flex items-center gap-3 p-3 rounded-xl <?= basename($_SERVER['PHP_SELF']) == 'time_slots.php' ? 'bg-blue-50 text-[#0052CC] font-semibold' : 'text-gray-600 hover:bg-gray-50' ?> transition-colors">
@@ -91,7 +91,7 @@
 
     <main class="flex-1 flex flex-col h-screen overflow-hidden">
         <header class="bg-white shadow-sm p-4 flex justify-between items-center border-b border-gray-100 z-10">
-            <h2 class="text-lg font-bold text-gray-700 md:hidden flex items-center gap-2"><i class="fa-solid fa-bullhorn text-[#0052CC]"></i> Campaigns</h2>
+            <h2 class="text-lg font-bold text-gray-700 md:hidden flex items-center gap-2"><i class="fa-solid fa-bullhorn text-[#0052CC]"></i> camp_list</h2>
             <div class="hidden md:block"></div>
             <div class="flex items-center gap-3">
                 <span class="text-sm text-gray-600">ยินดีต้อนรับ, <b><?= htmlspecialchars($_SESSION['admin_username'] ?? 'Admin') ?></b></span>

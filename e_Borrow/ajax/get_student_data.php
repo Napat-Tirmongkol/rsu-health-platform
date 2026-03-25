@@ -1,6 +1,6 @@
 <?php
 // get_student_data.php
-// ดึงข้อมูลผู้ใช้งาน (med_students) สำหรับ Popup แก้ไข
+// ดึงข้อมูลผู้ใช้งาน (sys_users) สำหรับ Popup แก้ไข
 
 // 1. "จ้างยาม" และ "เชื่อมต่อ DB"
 include('../includes/check_session_ajax.php');
@@ -30,8 +30,8 @@ if ($student_id == 0) {
 }
 
 try {
-    // 5. (SQL) ดึงข้อมูลจาก med_students
-    $stmt = $pdo->prepare("SELECT * FROM med_students WHERE id = ?");
+    // 5. (SQL) ดึงข้อมูลจาก sys_users
+    $stmt = $pdo->prepare("SELECT * FROM sys_users WHERE id = ?");
     $stmt->execute([$student_id]);
     $student = $stmt->fetch(PDO::FETCH_ASSOC);
 

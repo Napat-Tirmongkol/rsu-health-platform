@@ -30,9 +30,9 @@ if ($user_id == 0) {
 }
 
 try {
-    // 5. (SQL) ดึงข้อมูลจาก med_users
+    // 5. (SQL) ดึงข้อมูลจาก sys_staff
     // (เราไม่ดึง password_hash มา)
-    $stmt = $pdo->prepare("SELECT id, username, full_name, role, linked_line_user_id FROM med_users WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT id, username, full_name, role, linked_line_user_id FROM sys_staff WHERE id = ?");
     $stmt->execute([$user_id]);
     $staff = $stmt->fetch(PDO::FETCH_ASSOC);
 

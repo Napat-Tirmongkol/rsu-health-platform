@@ -12,15 +12,15 @@ $pdo = db();
 $today = date('Y-m-d');
 $sql = "
     SELECT c.*, 
-           (SELECT COUNT(*) FROM camp_appointments a WHERE a.campaign_id = c.id AND a.status IN ('booked', 'confirmed')) as used_seats
-    FROM campaigns c
+           (SELECT COUNT(*) FROM camp_bookings a WHERE a.campaign_id = c.id AND a.status IN ('booked', 'confirmed')) as used_seats
+    FROM camp_list c
     WHERE c.status = 'active' 
     AND (c.available_until IS NULL OR c.available_until >= :today)
     ORDER BY c.created_at DESC
 ";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([':today' => $today]);
-$campaigns = $stmt->fetchAll();
+$camp_list = $stmt->fetchAll();
 
 // ฟังก์ชันช่วยแสดงผลประเภทกิจกรรม
 function getBadge($type) {
@@ -42,14 +42,14 @@ render_header('เลือกแคมเปญ - E-Campaign');
         <p class="text-gray-500 mt-2 text-sm">เลือกกิจกรรมด้านล่างเพื่อทำการจองรอบเวลา</p>
     </div>
 
-    <?php if (count($campaigns) === 0): ?>
+    <?php if (count($camp_list) === 0): ?>
         <div class="bg-gray-50 rounded-3xl p-10 text-center border-2 border-dashed border-gray-200">
             <div class="text-4xl mb-4 text-gray-300"><i class="fa-solid fa-calendar-xmark"></i></div>
             <p class="text-gray-500 font-medium">ขออภัย ขณะนี้ยังไม่มี <br> แคมเปญที่เปิดรับลงทะเบียน</p>
         </div>
     <?php else: ?>
         <div class="grid gap-5">
-            <?php foreach ($campaigns as $c): 
+            <?php foreach ($camp_list as $c): 
                 $badge = getBadge($c['type']);
                 $remaining = $c['total_capacity'] - $c['used_seats'];
                 $isFull = ($remaining <= 0);

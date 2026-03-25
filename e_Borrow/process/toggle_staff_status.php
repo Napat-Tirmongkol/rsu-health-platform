@@ -43,8 +43,8 @@ try {
     // admin_app.js ส่งค่ามาเป็น 'active' หรือ 'disabled' ตรงๆ อยู่แล้ว
     $final_status = ($target_status === 'disabled') ? 'disabled' : 'active';
 
-    // 7. อัปเดตข้อมูล (ใช้ med_users และ account_status)
-    $sql = "UPDATE med_users SET account_status = :status WHERE id = :id";
+    // 7. อัปเดตข้อมูล (ใช้ sys_staff และ account_status)
+    $sql = "UPDATE sys_staff SET account_status = :status WHERE id = :id";
     $stmt = $pdo->prepare($sql);
     $result = $stmt->execute([
         ':status' => $final_status,

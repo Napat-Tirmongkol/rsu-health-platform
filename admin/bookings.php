@@ -44,10 +44,10 @@ try {
             t.start_time, 
             t.end_time,
             c.title AS campaign_title
-        FROM camp_appointments a
-        JOIN med_students s ON a.student_id = s.id
-        JOIN camp_time_slots t ON a.slot_id = t.id
-        JOIN campaigns c ON a.campaign_id = c.id
+        FROM camp_bookings a
+        JOIN sys_users s ON a.student_id = s.id
+        JOIN camp_slots t ON a.slot_id = t.id
+        JOIN camp_list c ON a.campaign_id = c.id
         WHERE t.slot_date >= :start 
           AND t.slot_date <= :end
           AND a.status IN ('booked', 'confirmed') 
@@ -66,9 +66,9 @@ try {
 // ==========================================
 $campaignsList = $pdo->query("
     SELECT DISTINCT c.id, c.title
-    FROM campaigns c
-    INNER JOIN camp_appointments a ON a.campaign_id = c.id
-    INNER JOIN camp_time_slots t ON t.id = a.slot_id
+    FROM camp_list c
+    INNER JOIN camp_bookings a ON a.campaign_id = c.id
+    INNER JOIN camp_slots t ON t.id = a.slot_id
     WHERE t.slot_date >= '$startDate' AND t.slot_date <= '$endDate'
       AND a.status IN ('booked','confirmed','cancelled','cancelled_by_admin')
     ORDER BY c.title

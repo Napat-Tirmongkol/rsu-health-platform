@@ -1,5 +1,5 @@
 <?php
-// admin/campaigns.php
+// admin/camp_list.php
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/includes/auth.php';
 
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // 1. สร้างแคมเปญใหม่
     if ($action === 'add' && $title && $capacity >= 0) {
         try {
-            $sql = "INSERT INTO campaigns (title, type, description, total_capacity, available_until, status, is_auto_approve) 
+            $sql = "INSERT INTO camp_list (title, type, description, total_capacity, available_until, status, is_auto_approve) 
                     VALUES (:title, :type, :description, :capacity, :until, :status, :auto_approve)";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = (int)($_POST['campaign_id'] ?? 0);
         if ($id > 0 && $title && $capacity >= 0) {
             try {
-                $check = $pdo->prepare("SELECT COUNT(*) FROM camp_appointments WHERE campaign_id = :id AND status IN ('booked', 'confirmed')");
+                $check = $pdo->prepare("SELECT COUNT(*) FROM camp_bookings WHERE campaign_id = :id AND status IN ('booked', 'confirmed')");
                 $check->execute([':id' => $id]);
                 $used = (int)$check->fetchColumn();
 
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $message = "จำนวนโควต้ารวม ต้องไม่น้อยกว่าจำนวนผู้ที่ลงทะเบียนไปแล้ว ({$used} คน)";
                     $messageType = "error";
                 } else {
-                    $sql = "UPDATE campaigns SET title = :title, type = :type, description = :description, 
+                    $sql = "UPDATE camp_list SET title = :title, type = :type, description = :description, 
                             total_capacity = :capacity, available_until = :until, status = :status, is_auto_approve = :auto_approve WHERE id = :id";
                     $stmt = $pdo->prepare($sql);
                     $stmt->execute([
@@ -77,13 +77,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = (int)($_POST['campaign_id'] ?? 0);
         if ($id > 0) {
             try {
-                $check = $pdo->prepare("SELECT COUNT(*) FROM camp_appointments WHERE campaign_id = :id");
+                $check = $pdo->prepare("SELECT COUNT(*) FROM camp_bookings WHERE campaign_id = :id");
                 $check->execute([':id' => $id]);
                 if ((int)$check->fetchColumn() > 0) {
                     $message = "ไม่สามารถลบได้ เนื่องจากมีประวัติลงทะเบียนในแคมเปญนี้แล้ว (แนะนำให้เปลี่ยนสถานะเป็นปิดชั่วคราวแทน)";
                     $messageType = "error";
                 } else {
-                    $stmt = $pdo->prepare("DELETE FROM campaigns WHERE id = :id");
+                    $stmt = $pdo->prepare("DELETE FROM camp_list WHERE id = :id");
                     $stmt->execute([':id' => $id]);
                     $message = "ลบแคมเปญสำเร็จ!";
                     $messageType = "success";
@@ -99,17 +99,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // ==========================================
 // ดึงข้อมูลแคมเปญทั้งหมด
 // ==========================================
-$campaigns = [];
+$camp_list = [];
 try {
     $sql = "
         SELECT 
             c.*,
-            (SELECT COUNT(*) FROM camp_appointments a WHERE a.campaign_id = c.id AND a.status IN ('booked', 'confirmed')) AS used_capacity
-        FROM campaigns c
+            (SELECT COUNT(*) FROM camp_bookings a WHERE a.campaign_id = c.id AND a.status IN ('booked', 'confirmed')) AS used_capacity
+        FROM camp_list c
         ORDER BY c.status ASC, c.created_at DESC
     ";
     $stmt = $pdo->query($sql);
-    $campaigns = $stmt->fetchAll();
+    $camp_list = $stmt->fetchAll();
 } catch (PDOException $e) {
     $message = "ไม่พบตารางข้อมูล กรุณาตรวจสอบ Database";
     $messageType = "error";
@@ -174,7 +174,7 @@ require_once __DIR__ . '/includes/header.php';
 <div class="mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4 animate-slide-up">
     <div>
         <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-3">
-            จัดการแคมเปญ (Campaigns)
+            จัดการแคมเปญ (camp_list)
         </h1>
         <p class="text-gray-500 text-sm mt-1 font-medium">สร้างแคมเปญใหม่, กำหนดโควต้า, และตั้งเวลารับลงทะเบียน</p>
     </div>
@@ -204,7 +204,7 @@ require_once __DIR__ . '/includes/header.php';
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-50">
-            <?php if (count($campaigns) === 0): ?>
+            <?php if (count($camp_list) === 0): ?>
                 <tr>
                     <td colspan="5" class="px-6 py-16 text-center">
                         <div class="inline-flex flex-col items-center justify-center text-gray-400">
@@ -217,7 +217,7 @@ require_once __DIR__ . '/includes/header.php';
                     </td>
                 </tr>
             <?php else: ?>
-                <?php foreach ($campaigns as $c): 
+                <?php foreach ($camp_list as $c): 
                     $remaining = $c['total_capacity'] - $c['used_capacity'];
                     $isLow = ($remaining <= 10 && $c['total_capacity'] > 0);
                     $typeDetails = getCampaignTypeDetails($c['type']);

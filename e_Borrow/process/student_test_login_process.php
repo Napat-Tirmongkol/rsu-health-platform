@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         // 3. รหัสถูก! -> ดึงข้อมูลนักศึกษาจาก DB
         try {
-            $stmt = $pdo->prepare("SELECT * FROM med_students WHERE id = ?");
+            $stmt = $pdo->prepare("SELECT * FROM sys_users WHERE id = ?");
             $stmt->execute([$TEST_STUDENT_ID_TO_USE]);
             $student = $stmt->fetch(PDO::FETCH_ASSOC);
 

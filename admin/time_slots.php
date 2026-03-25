@@ -5,7 +5,7 @@ require_once __DIR__ . '/includes/auth.php';
 
 $pdo = db();
 
-$activeCampaigns = $pdo->query("SELECT id, title FROM campaigns WHERE status = 'active' ORDER BY title ASC")->fetchAll();
+$activeCampaigns = $pdo->query("SELECT id, title FROM camp_list WHERE status = 'active' ORDER BY title ASC")->fetchAll();
 
 $colors = [
     ['bg' => 'bg-blue-50', 'border' => 'border-blue-100', 'text' => 'text-blue-700', 'badge' => 'text-blue-500'],
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // หารเฉลี่ยที่นั่งต่อรอบ
                 $base_capacity = floor($max / $valid_slots_count);
                 
-                $stmt = $pdo->prepare("INSERT INTO camp_time_slots (campaign_id, slot_date, start_time, end_time, max_capacity) VALUES (?, ?, ?, ?, ?)");
+                $stmt = $pdo->prepare("INSERT INTO camp_slots (campaign_id, slot_date, start_time, end_time, max_capacity) VALUES (?, ?, ?, ?, ?)");
                 
                 foreach ($dates_array as $date) {
                     $date = trim($date);
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($id > 0 && $campaign_id > 0 && $start_time && $end_time && $max >= 0) {
             // เช็คว่าคนที่จองเกินโควต้าใหม่ไหม
-            $check = $pdo->prepare("SELECT COUNT(*) FROM camp_appointments WHERE slot_id = ? AND status IN ('booked', 'confirmed')");
+            $check = $pdo->prepare("SELECT COUNT(*) FROM camp_bookings WHERE slot_id = ? AND status IN ('booked', 'confirmed')");
             $check->execute([$id]);
             $used = (int)$check->fetchColumn();
 
@@ -102,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
 
-            $pdo->prepare("UPDATE camp_time_slots SET campaign_id = ?, start_time = ?, end_time = ?, max_capacity = ? WHERE id = ?")
+            $pdo->prepare("UPDATE camp_slots SET campaign_id = ?, start_time = ?, end_time = ?, max_capacity = ? WHERE id = ?")
                 ->execute([$campaign_id, $start_time, $end_time, $max, $id]);
 
             echo json_encode(['status' => 'success', 'message' => 'แก้ไขรอบเวลาเรียบร้อยแล้ว']);
@@ -113,12 +113,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'delete_slot') {
         $id = (int)$_POST['slot_id'];
         // เช็คว่ามีคนจองรอบนี้หรือยัง
-        $check = $pdo->prepare("SELECT COUNT(*) FROM camp_appointments WHERE slot_id = ? AND status != 'cancelled'");
+        $check = $pdo->prepare("SELECT COUNT(*) FROM camp_bookings WHERE slot_id = ? AND status != 'cancelled'");
         $check->execute([$id]);
         if ($check->fetchColumn() > 0) {
             echo json_encode(['status' => 'error', 'message' => 'ไม่สามารถลบได้ เนื่องจากมีคนลงทะเบียนในรอบนี้แล้ว']);
         } else {
-            $pdo->prepare("DELETE FROM camp_time_slots WHERE id = ?")->execute([$id]);
+            $pdo->prepare("DELETE FROM camp_slots WHERE id = ?")->execute([$id]);
             echo json_encode(['status' => 'success']);
         }
         exit;
@@ -138,12 +138,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = (int)$id;
             if ($id <= 0) continue;
             
-            $check = $pdo->prepare("SELECT COUNT(*) FROM camp_appointments WHERE slot_id = ? AND status != 'cancelled'");
+            $check = $pdo->prepare("SELECT COUNT(*) FROM camp_bookings WHERE slot_id = ? AND status != 'cancelled'");
             $check->execute([$id]);
             if ($check->fetchColumn() > 0) {
                 $failedCount++;
             } else {
-                $pdo->prepare("DELETE FROM camp_time_slots WHERE id = ?")->execute([$id]);
+                $pdo->prepare("DELETE FROM camp_slots WHERE id = ?")->execute([$id]);
                 $deletedCount++;
             }
         }
@@ -169,9 +169,9 @@ $year = $_GET['year'] ?? date('Y');
 
 $stmt = $pdo->prepare("
     SELECT ts.*, c.title as campaign_title,
-           (SELECT COUNT(*) FROM camp_appointments a WHERE a.slot_id = ts.id AND a.status IN ('booked', 'confirmed')) as booked_count
-    FROM camp_time_slots ts 
-    JOIN campaigns c ON ts.campaign_id = c.id 
+           (SELECT COUNT(*) FROM camp_bookings a WHERE a.slot_id = ts.id AND a.status IN ('booked', 'confirmed')) as booked_count
+    FROM camp_slots ts 
+    JOIN camp_list c ON ts.campaign_id = c.id 
     WHERE MONTH(ts.slot_date) = ? AND YEAR(ts.slot_date) = ?
     ORDER BY ts.slot_date, ts.start_time
 ");

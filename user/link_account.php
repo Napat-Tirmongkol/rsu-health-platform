@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         try {
             $pdo = db();
-            $stmt = $pdo->prepare("SELECT id, full_name FROM med_students WHERE student_personnel_id = :st_id AND phone_number = :phone LIMIT 1");
+            $stmt = $pdo->prepare("SELECT id, full_name FROM sys_users WHERE student_personnel_id = :st_id AND phone_number = :phone LIMIT 1");
             $stmt->execute([
                 ':st_id' => $student_personnel_id,
                 ':phone' => $phone_number
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($user) {
                 // Update new LINE ID mapping
-                $updateStmt = $pdo->prepare("UPDATE med_students SET line_user_id = :line_id WHERE id = :id");
+                $updateStmt = $pdo->prepare("UPDATE sys_users SET line_user_id = :line_id WHERE id = :id");
                 $updateStmt->execute([
                     ':line_id' => $_SESSION['pending_line_id'],
                     ':id' => $user['id']
@@ -179,3 +179,4 @@ document.addEventListener('DOMContentLoaded', function() {
 <?php endif; ?>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; render_footer(); ?>
+

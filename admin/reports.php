@@ -6,9 +6,9 @@ require_once __DIR__ . '/includes/auth.php';
 $pdo = db();
 
 // 1. ดึงรายชื่อแคมเปญทั้งหมดมาทำ Dropdown ให้เลือก
-$campaigns = $pdo->query("SELECT id, title FROM campaigns ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
+$camp_list = $pdo->query("SELECT id, title FROM camp_list ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
 
-$campaignId = isset($_GET['campaign_id']) ? (int)$_GET['campaign_id'] : (count($campaigns) > 0 ? $campaigns[0]['id'] : 0);
+$campaignId = isset($_GET['campaign_id']) ? (int)$_GET['campaign_id'] : (count($camp_list) > 0 ? $camp_list[0]['id'] : 0);
 
 $stats = ['total' => 0, 'attended' => 0, 'absent' => 0, 'upcoming' => 0, 'cancelled' => 0];
 $participants = [];
@@ -17,7 +17,7 @@ $selectedCampaignTitle = '';
 // 2. ถ้ามีการเลือกแคมเปญ ให้ดึงข้อมูลสถิติและรายชื่อ
 if ($campaignId > 0) {
     // หาชื่อแคมเปญ
-    foreach ($campaigns as $c) {
+    foreach ($camp_list as $c) {
         if ($c['id'] == $campaignId) {
             $selectedCampaignTitle = $c['title'];
             break;
@@ -38,9 +38,9 @@ if ($campaignId > 0) {
             t.slot_date, 
             t.start_time, 
             t.end_time
-        FROM camp_appointments a
-        JOIN med_students s ON a.student_id = s.id
-        JOIN camp_time_slots t ON a.slot_id = t.id
+        FROM camp_bookings a
+        JOIN sys_users s ON a.student_id = s.id
+        JOIN camp_slots t ON a.slot_id = t.id
         WHERE a.campaign_id = :cid
         ORDER BY t.slot_date DESC, t.start_time DESC
     ";
@@ -129,10 +129,10 @@ require_once __DIR__ . '/includes/header.php';
             <label class="block text-sm font-semibold text-gray-700 mb-2">เลือกกิจกรรมที่ต้องการดูรายงาน</label>
             <div class="relative">
                 <select name="campaign_id" onchange="this.form.submit()" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0052CC] outline-none font-prompt text-gray-700 appearance-none bg-white font-medium cursor-pointer">
-                    <?php if (count($campaigns) === 0): ?>
+                    <?php if (count($camp_list) === 0): ?>
                         <option value="0">-- ไม่มีกิจกรรมในระบบ --</option>
                     <?php else: ?>
-                        <?php foreach ($campaigns as $c): ?>
+                        <?php foreach ($camp_list as $c): ?>
                             <option value="<?= $c['id'] ?>" <?= $c['id'] == $campaignId ? 'selected' : '' ?>>
                                 <?= htmlspecialchars($c['title']) ?>
                             </option>

@@ -12,7 +12,7 @@ $pdo = db();
 
 // ดึงข้อมูล User
 try {
-    $stmtUser = $pdo->prepare("SELECT * FROM med_students WHERE id = :id LIMIT 1");
+    $stmtUser = $pdo->prepare("SELECT * FROM sys_users WHERE id = :id LIMIT 1");
     $stmtUser->execute([':id' => $userId]);
     $user = $stmtUser->fetch();
     if (!$user) {
@@ -36,9 +36,9 @@ try {
             t.end_time,
             c.title         AS campaign_title,
             c.description   AS campaign_desc
-        FROM camp_appointments a
-        JOIN camp_time_slots t ON a.slot_id = t.id
-        JOIN campaigns c       ON a.campaign_id = c.id
+        FROM camp_bookings a
+        JOIN camp_slots t ON a.slot_id = t.id
+        JOIN camp_list c       ON a.campaign_id = c.id
         WHERE a.student_id = :uid
         ORDER BY a.created_at DESC
     ";
@@ -190,3 +190,4 @@ function statusBadge(array $b): string {
 </div>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
+

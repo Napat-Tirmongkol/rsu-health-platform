@@ -68,10 +68,10 @@ try {
     die_with_error('ไม่สามารถถอดรหัส ID Token ได้: ' . $e->getMessage()); // ◀️ (แก้ไข)
 }
 
-// 5. ค้นหาในฐานข้อมูล (เริ่มจาก 'med_users' ก่อน)
+// 5. ค้นหาในฐานข้อมูล (เริ่มจาก 'sys_staff' ก่อน)
 try {
     // 5.1 (เช็คที่ 1) คนนี้เป็น "พนักงาน" ที่ผูก LINE ไว้หรือไม่?
-    $stmt_user = $pdo->prepare("SELECT * FROM med_users WHERE linked_line_user_id = ?");
+    $stmt_user = $pdo->prepare("SELECT * FROM sys_staff WHERE linked_line_user_id = ?");
     $stmt_user->execute([$line_user_id]);
     $staff_user = $stmt_user->fetch(PDO::FETCH_ASSOC);
 
@@ -94,7 +94,7 @@ try {
     }
     
     // 5.2 (เช็คที่ 2) ถ้าไม่ใช่พนักงาน, เป็น "ผู้ใช้งาน" ที่เคยลงทะเบียนหรือยัง?
-    $stmt_student = $pdo->prepare("SELECT * FROM med_students WHERE line_user_id = ?");
+    $stmt_student = $pdo->prepare("SELECT * FROM sys_users WHERE line_user_id = ?");
     $stmt_student->execute([$line_user_id]);
     $student = $stmt_student->fetch(PDO::FETCH_ASSOC);
 

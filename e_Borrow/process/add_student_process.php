@@ -33,9 +33,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     if (empty($phone_number)) $phone_number = null;
 
-    // 6. (SQL ใหม่) ดำเนินการ INSERT ลง med_students
+    // 6. (SQL ใหม่) ดำเนินการ INSERT ลง sys_users
     try {
-        $sql = "INSERT INTO med_students (full_name, phone_number, status, line_user_id, student_personnel_id) 
+        $sql = "INSERT INTO sys_users (full_name, phone_number, status, line_user_id, student_personnel_id) 
                 VALUES (?, ?, 'other', NULL, '(Staff-Added)')";
         
         $stmt = $pdo->prepare($sql);

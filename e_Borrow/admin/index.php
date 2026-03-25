@@ -31,8 +31,8 @@ try {
                     FROM med_transactions t
                     JOIN med_equipment_types et ON t.type_id = et.id 
                     LEFT JOIN med_equipment_items ei ON t.equipment_id = ei.id 
-                    LEFT JOIN med_students s ON t.borrower_student_id = s.id
-                    LEFT JOIN med_users u ON t.lending_staff_id = u.id
+                    LEFT JOIN sys_users s ON t.borrower_student_id = s.id
+                    LEFT JOIN sys_staff u ON t.lending_staff_id = u.id
                     WHERE t.approval_status = 'pending'
                     ORDER BY t.borrow_date ASC";
     
@@ -53,7 +53,7 @@ try {
                         DATEDIFF(CURDATE(), t.due_date) AS days_overdue
                     FROM med_transactions t
                     JOIN med_equipment_items ei ON t.equipment_id = ei.id
-                    LEFT JOIN med_students s ON t.borrower_student_id = s.id
+                    LEFT JOIN sys_users s ON t.borrower_student_id = s.id
                     WHERE t.status = 'borrowed' 
                       AND t.approval_status IN ('approved', 'staff_added') 
                       AND t.due_date < CURDATE()
@@ -75,7 +75,7 @@ try {
                         s.full_name as student_name
                     FROM med_transactions t
                     JOIN med_equipment_types et ON t.type_id = et.id
-                    LEFT JOIN med_students s ON t.borrower_student_id = s.id
+                    LEFT JOIN sys_users s ON t.borrower_student_id = s.id
                     ORDER BY t.id DESC
                     LIMIT 5";
     $stmt_activity = $pdo->prepare($sql_activity);

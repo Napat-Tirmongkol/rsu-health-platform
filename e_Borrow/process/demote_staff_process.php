@@ -1,6 +1,6 @@
 <?php
 // demote_staff_process.php
-// รับ ID พนักงาน (med_users) มาเพื่อลบ
+// รับ ID พนักงาน (sys_staff) มาเพื่อลบ
 
 // 1. "จ้างยาม" และ "เชื่อมต่อ DB"
 include('includes/check_session_ajax.php');
@@ -49,14 +49,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // ◀️ --- (เพิ่มส่วน Log) --- ◀️
         // (ดึงข้อมูลพนักงาน "ก่อน" ที่จะลบ)
-        $stmt_get = $pdo->prepare("SELECT username, full_name FROM med_users WHERE id = ?");
+        $stmt_get = $pdo->prepare("SELECT username, full_name FROM sys_staff WHERE id = ?");
         $stmt_get->execute([$user_id]);
         $staff_info = $stmt_get->fetch(PDO::FETCH_ASSOC);
         $staff_name_for_log = $staff_info ? "{$staff_info['full_name']} (Username: {$staff_info['username']})" : "ID: {$user_id}";
         // ◀️ --- (จบส่วนดึงข้อมูล Log) --- ◀️
 
-        // 8. ถ้าไม่มีประวัติ -> ดำเนินการลบจาก med_users
-        $sql_delete = "DELETE FROM med_users WHERE id = ?";
+        // 8. ถ้าไม่มีประวัติ -> ดำเนินการลบจาก sys_staff
+        $sql_delete = "DELETE FROM sys_staff WHERE id = ?";
         $stmt_delete = $pdo->prepare($sql_delete);
         $stmt_delete->execute([$user_id]);
 

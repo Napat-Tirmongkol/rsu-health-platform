@@ -20,7 +20,7 @@ if ($studentId <= 0 || $campaignId <= 0) {
 // 2. เช็ค 1 คน 1 คิว (เฉพาะแคมเปญนี้)
 try {
     $pdo = db();
-    $checkSql = "SELECT COUNT(*) FROM camp_appointments WHERE student_id = :sid AND campaign_id = :cid AND status IN ('confirmed', 'booked')";
+    $checkSql = "SELECT COUNT(*) FROM camp_bookings WHERE student_id = :sid AND campaign_id = :cid AND status IN ('confirmed', 'booked')";
     $stmtCheck = $pdo->prepare($checkSql);
     $stmtCheck->execute([':sid' => $studentId, ':cid' => $campaignId]);
     
@@ -54,7 +54,7 @@ try {
     // หา Capacity รวมของแต่ละวัน (แยกตามแคมเปญ)
     $sqlTotal = "
         SELECT DAY(ts.slot_date) AS day_num, COALESCE(SUM(ts.max_capacity), 0) AS total_capacity
-        FROM camp_time_slots ts
+        FROM camp_slots ts
         WHERE ts.slot_date >= :startDate AND ts.slot_date < :endDate
           AND ts.campaign_id = :cid
         GROUP BY DAY(ts.slot_date)
@@ -66,8 +66,8 @@ try {
     // หาจำนวนคนที่จองแล้วในแต่ละวัน (แยกตามแคมเปญ)
     $sqlBooked = "
         SELECT DAY(ts.slot_date) AS day_num, COUNT(*) AS booked_count
-        FROM camp_appointments ap
-        INNER JOIN camp_time_slots ts ON ts.id = ap.slot_id
+        FROM camp_bookings ap
+        INNER JOIN camp_slots ts ON ts.id = ap.slot_id
         WHERE ts.slot_date >= :startDate AND ts.slot_date < :endDate
           AND ap.campaign_id = :cid
           AND ap.status IN ('confirmed', 'booked')

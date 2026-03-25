@@ -33,7 +33,7 @@ try {
     $pdo = db();
     
     // 3. เช็คว่าเคยกดจองกิจกรรมนี้ไปแล้วหรือยัง
-    $checkSql = "SELECT COUNT(*) FROM camp_appointments WHERE student_id = :sid AND campaign_id = :cid AND status IN ('confirmed', 'booked')";
+    $checkSql = "SELECT COUNT(*) FROM camp_bookings WHERE student_id = :sid AND campaign_id = :cid AND status IN ('confirmed', 'booked')";
     $stmtCheck = $pdo->prepare($checkSql);
     $stmtCheck->execute([':sid' => $studentId, ':cid' => $campaignId]);
     if ((int)$stmtCheck->fetchColumn() > 0) {
@@ -44,8 +44,8 @@ try {
     // 4. เช็คโควต้ารวมของแคมเปญ และ "ดึงค่าการตั้งค่าอนุมัติอัตโนมัติ" (is_auto_approve) มาด้วย
     $sqlCamp = "
         SELECT total_capacity, is_auto_approve,
-        (SELECT COUNT(*) FROM camp_appointments WHERE campaign_id = c.id AND status IN ('booked', 'confirmed')) as used
-        FROM campaigns c 
+        (SELECT COUNT(*) FROM camp_bookings WHERE campaign_id = c.id AND status IN ('booked', 'confirmed')) as used
+        FROM camp_list c 
         WHERE id = :cid AND status = 'active' 
           AND (available_until IS NULL OR available_until >= :booking_date)
     ";
@@ -61,8 +61,8 @@ try {
     // 5. เช็คโควต้าของรอบเวลา (Slot)
     $sqlSlot = "
         SELECT max_capacity,
-        (SELECT COUNT(*) FROM camp_appointments WHERE slot_id = t.id AND status IN ('booked', 'confirmed')) as slot_used
-        FROM camp_time_slots t
+        (SELECT COUNT(*) FROM camp_bookings WHERE slot_id = t.id AND status IN ('booked', 'confirmed')) as slot_used
+        FROM camp_slots t
         WHERE id = :slot_id
     ";
     $stmtSlot = $pdo->prepare($sqlSlot);
@@ -79,7 +79,7 @@ try {
     $bookingStatus = ($campData['is_auto_approve'] == 1) ? 'confirmed' : 'booked';
 
     // 7. บันทึกข้อมูลลงฐานข้อมูล
-    $insertSql = "INSERT INTO camp_appointments (student_id, campaign_id, slot_id, status) VALUES (:sid, :cid, :slot, :status)";
+    $insertSql = "INSERT INTO camp_bookings (student_id, campaign_id, slot_id, status) VALUES (:sid, :cid, :slot, :status)";
     $stmtInsert = $pdo->prepare($insertSql);
     $stmtInsert->execute([
         ':sid' => $studentId, 

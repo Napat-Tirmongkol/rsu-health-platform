@@ -29,7 +29,7 @@ try {
                 ei.name as item_name
             FROM med_payments p
             JOIN med_fines f ON p.fine_id = f.id
-            JOIN med_students s ON f.student_id = s.id
+            JOIN sys_users s ON f.student_id = s.id
             JOIN med_transactions t ON f.transaction_id = t.id
             JOIN med_equipment_items ei ON t.equipment_id = ei.id
             WHERE p.id = ?";

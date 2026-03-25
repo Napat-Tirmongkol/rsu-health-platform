@@ -24,7 +24,7 @@ $sql = "SELECT
         FROM med_transactions t
         LEFT JOIN med_equipment_types et ON t.type_id = et.id
         LEFT JOIN med_equipment_items ei ON t.item_id = ei.id
-        LEFT JOIN med_students s ON t.borrower_student_id = s.id
+        LEFT JOIN sys_users s ON t.borrower_student_id = s.id
         LEFT JOIN med_fines f ON t.id = f.transaction_id
         WHERE 1=1 ";
 

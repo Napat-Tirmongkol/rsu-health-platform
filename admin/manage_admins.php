@@ -26,19 +26,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 if ($action === 'add') {
                     // ตรวจสอบ Username ซ้ำ
-                    $check = $pdo->prepare("SELECT id FROM admin_users WHERE username = ? OR email = ?");
+                    $check = $pdo->prepare("SELECT id FROM sys_admins WHERE username = ? OR email = ?");
                     $check->execute([$username, $email]);
                     if ($check->fetch()) {
                         $error = "ชื่อผู้ใช้ หรือ อีเมล นี้มีในระบบแล้ว";
                     } else {
                         $hashed = password_hash($password ?: '1234', PASSWORD_DEFAULT);
-                        $stmt = $pdo->prepare("INSERT INTO admin_users (full_name, username, email, password, role) VALUES (?, ?, ?, ?, ?)");
+                        $stmt = $pdo->prepare("INSERT INTO sys_admins (full_name, username, email, password, role) VALUES (?, ?, ?, ?, ?)");
                         $stmt->execute([$fullName, $username, $email, $hashed, $role]);
                         $success = "เพิ่มผู้ดูแลระบบเรียบร้อยแล้ว (รหัสผ่านเริ่มต้น: 1234)";
                     }
                 } else {
                     // Edit
-                    $sql = "UPDATE admin_users SET full_name = ?, username = ?, email = ?, role = ? WHERE id = ?";
+                    $sql = "UPDATE sys_admins SET full_name = ?, username = ?, email = ?, role = ? WHERE id = ?";
                     $params = [$fullName, $username, $email, $role, $adminId];
                     $stmt = $pdo->prepare($sql);
                     $stmt->execute($params);
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // ถ้ามีการกรอกรหัสผ่านใหม่
                     if (!empty($password)) {
                         $hashed = password_hash($password, PASSWORD_DEFAULT);
-                        $pdo->prepare("UPDATE admin_users SET password = ? WHERE id = ?")->execute([$hashed, $adminId]);
+                        $pdo->prepare("UPDATE sys_admins SET password = ? WHERE id = ?")->execute([$hashed, $adminId]);
                     }
                     $success = "แก้ไขข้อมูลเรียบร้อยแล้ว";
                 }
@@ -63,14 +63,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($adminId == $_SESSION['admin_id']) {
             $error = "ไม่สามารถลบบัญชีที่กำลังใช้งานอยู่ได้";
         } else {
-            $pdo->prepare("DELETE FROM admin_users WHERE id = ?")->execute([$adminId]);
+            $pdo->prepare("DELETE FROM sys_admins WHERE id = ?")->execute([$adminId]);
             $success = "ลบผู้ดูแลระบบเรียบร้อยแล้ว";
         }
     }
 }
 
 // 2. ดึงข้อมูล Admin ทั้งหมด
-$admins = $pdo->query("SELECT * FROM admin_users ORDER BY id DESC")->fetchAll();
+$admins = $pdo->query("SELECT * FROM sys_admins ORDER BY id DESC")->fetchAll();
 
 require_once __DIR__ . '/includes/header.php';
 ?>
@@ -279,3 +279,4 @@ require_once __DIR__ . '/includes/header.php';
 </script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
+

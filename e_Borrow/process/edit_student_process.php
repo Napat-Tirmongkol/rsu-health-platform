@@ -52,9 +52,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($status != 'other') $status_other = null;
 
 
-    // 6. (SQL ใหม่) ดำเนินการ UPDATE ตาราง med_students
+    // 6. (SQL ใหม่) ดำเนินการ UPDATE ตาราง sys_users
     try {
-        $sql = "UPDATE med_students 
+        $sql = "UPDATE sys_users 
                 SET full_name = ?, 
                     phone_number = ?, 
                     student_personnel_id = ?,

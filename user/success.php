@@ -27,9 +27,9 @@ try {
             t.slot_date, 
             t.start_time, 
             t.end_time
-        FROM camp_appointments a
-        JOIN campaigns c ON a.campaign_id = c.id
-        JOIN camp_time_slots t ON a.slot_id = t.id
+        FROM camp_bookings a
+        JOIN camp_list c ON a.campaign_id = c.id
+        JOIN camp_slots t ON a.slot_id = t.id
         WHERE a.student_id = :sid
         ORDER BY a.created_at DESC
         LIMIT 1

@@ -37,8 +37,8 @@ try {
         throw new Exception('กรุณากรอกข้อมูลให้ครบถ้วน (Username, Password, ชื่อ-สกุล)');
     }
 
-    // 7. เช็ค Username ซ้ำ (ตาราง med_users)
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM med_users WHERE username = ?");
+    // 7. เช็ค Username ซ้ำ (ตาราง sys_staff)
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM sys_staff WHERE username = ?");
     $stmt->execute([$username]);
     if ($stmt->fetchColumn() > 0) {
         throw new Exception("Username '$username' มีผู้ใช้งานแล้ว กรุณาใช้ชื่ออื่น");
@@ -50,7 +50,7 @@ try {
     // 9. บันทึกข้อมูล (แก้ไขชื่อคอลัมน์ให้ตรงกับ SQL)
     // - เปลี่ยน password เป็น password_hash
     // - ลบ created_at ออก (เพราะในตารางไม่มี)
-    $sql = "INSERT INTO med_users (username, password_hash, full_name, role) 
+    $sql = "INSERT INTO sys_staff (username, password_hash, full_name, role) 
             VALUES (:username, :password, :full_name, :role)";
     
     $stmt = $pdo->prepare($sql);

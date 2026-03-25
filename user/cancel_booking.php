@@ -23,9 +23,9 @@ if ($studentId <= 0 || $appointmentId <= 0) {
 try {
   $pdo = db();
   
-  // อัปเดตสถานะเป็น cancelled ในตารางใหม่ (camp_appointments)
+  // อัปเดตสถานะเป็น cancelled ในตารางใหม่ (camp_bookings)
   $sql = "
-    UPDATE camp_appointments 
+    UPDATE camp_bookings 
     SET status = 'cancelled' 
     WHERE id = :appointment_id AND student_id = :student_id
   ";

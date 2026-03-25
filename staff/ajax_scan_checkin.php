@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($appointmentId > 0) {
         try {
             $pdo = db();
-            $sql = "SELECT a.*, c.title as campaign_title, s.full_name FROM camp_appointments a JOIN campaigns c ON a.campaign_id = c.id JOIN med_students s ON a.student_id = s.id WHERE a.id = :id";
+            $sql = "SELECT a.*, c.title as campaign_title, s.full_name FROM camp_bookings a JOIN camp_list c ON a.campaign_id = c.id JOIN sys_users s ON a.student_id = s.id WHERE a.id = :id";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([':id' => $appointmentId]);
             $booking = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             // ผ่านเงื่อนไขทั้งหมด -> บันทึกเวลาเข้างาน
-            $pdo->prepare("UPDATE camp_appointments SET attended_at = NOW() WHERE id = :id")->execute([':id' => $appointmentId]);
+            $pdo->prepare("UPDATE camp_bookings SET attended_at = NOW() WHERE id = :id")->execute([':id' => $appointmentId]);
             
             echo json_encode(['status' => 'success', 'data' => ['name' => $booking['full_name'], 'campaign' => $booking['campaign_title']]]);
 

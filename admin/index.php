@@ -9,16 +9,16 @@ $pdo = db();
 $stmt = $pdo->query("
     SELECT 
         COUNT(*) as total_campaigns,
-        (SELECT COUNT(*) FROM camp_appointments WHERE status = 'booked') as pending_count,
-        (SELECT COUNT(*) FROM camp_appointments WHERE status = 'confirmed') as confirmed_count
-    FROM campaigns WHERE status = 'active'
+        (SELECT COUNT(*) FROM camp_bookings WHERE status = 'booked') as pending_count,
+        (SELECT COUNT(*) FROM camp_bookings WHERE status = 'confirmed') as confirmed_count
+    FROM camp_list WHERE status = 'active'
 ");
 $stats = $stmt->fetch();
 
 $popular_stmt = $pdo->query("
     SELECT c.title, COUNT(a.id) as booking_count
-    FROM campaigns c
-    LEFT JOIN camp_appointments a ON c.id = a.campaign_id AND a.status IN ('booked', 'confirmed')
+    FROM camp_list c
+    LEFT JOIN camp_bookings a ON c.id = a.campaign_id AND a.status IN ('booked', 'confirmed')
     GROUP BY c.id
     ORDER BY booking_count DESC
     LIMIT 5
@@ -118,7 +118,7 @@ require_once __DIR__ . '/includes/header.php';
 <!-- BOTTOM GRID -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-slide-up delay-200">
     
-    <!-- POPULAR CAMPAIGNS -->
+    <!-- POPULAR camp_list -->
     <div class="bg-white rounded-[24px] shadow-sm border border-gray-100 flex flex-col">
         <div class="p-6 border-b border-gray-50 flex justify-between items-center">
             <div>
@@ -131,7 +131,7 @@ require_once __DIR__ . '/includes/header.php';
         </div>
         
         <div class="p-4 flex-1 custom-scrollbar" style="max-height: 320px; overflow-y: auto;">
-            <div id="popular-campaigns-container" class="space-y-3">
+            <div id="popular-camp_list-container" class="space-y-3">
                 <?php if(empty($popular_campaigns)): ?>
                     <div class="text-center py-10">
                         <i class="fa-solid fa-inbox text-4xl text-gray-300 mb-3"></i>
@@ -162,7 +162,7 @@ require_once __DIR__ . '/includes/header.php';
     <!-- QUICK ACTIONS -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6 flex-1">
         
-        <a href="campaigns.php" class="relative overflow-hidden bg-gradient-to-br from-[#0052CC] to-[#0043a8] text-white p-8 rounded-[24px] flex flex-col justify-between hover:shadow-xl hover:shadow-blue-900/20 hover:-translate-y-1 transition-all group">
+        <a href="camp_list.php" class="relative overflow-hidden bg-gradient-to-br from-[#0052CC] to-[#0043a8] text-white p-8 rounded-[24px] flex flex-col justify-between hover:shadow-xl hover:shadow-blue-900/20 hover:-translate-y-1 transition-all group">
             <div class="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-bl-full transition-transform duration-500 group-hover:scale-110"></div>
             <div class="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mb-6 shadow-inner">
                 <i class="fa-solid fa-bullhorn text-2xl"></i>
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     updateWithFlash('stat-pending', data.stats.pending);
                     updateWithFlash('stat-confirmed', data.stats.confirmed);
                     
-                    const container = document.getElementById('popular-campaigns-container');
+                    const container = document.getElementById('popular-camp_list-container');
                     if (container && data.popular_html) {
                         // Very simple check to prevent unnecessary DOM redraws
                         if(container.innerHTML.trim() !== data.popular_html.trim()){

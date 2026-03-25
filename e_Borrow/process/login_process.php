@@ -16,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     try {
         // 5. เตรียมคำสั่ง SQL
-        $stmt = $pdo->prepare("SELECT * FROM med_users WHERE username = :username");
+        $stmt = $pdo->prepare("SELECT * FROM sys_staff WHERE username = :username");
         $stmt->bindParam(':username', $username);
         $stmt->execute();
 

@@ -33,10 +33,10 @@ try {
             t.start_time, 
             t.end_time,
             c.title AS campaign_title
-        FROM camp_appointments a
-        JOIN med_students s ON a.student_id = s.id
-        JOIN camp_time_slots t ON a.slot_id = t.id
-        JOIN campaigns c ON a.campaign_id = c.id
+        FROM camp_bookings a
+        JOIN sys_users s ON a.student_id = s.id
+        JOIN camp_slots t ON a.slot_id = t.id
+        JOIN camp_list c ON a.campaign_id = c.id
         WHERE t.slot_date >= :start 
           AND t.slot_date <= :end
           AND a.status IN ('booked', 'confirmed') 

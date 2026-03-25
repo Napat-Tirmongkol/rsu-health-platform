@@ -41,7 +41,7 @@ try {
     
     // 3. อัปเดตข้อมูลนักศึกษาลงใน Record ที่มี line_user_id ตรงกับ Session
     // (ซึ่ง Record นี้ถูกสร้างไว้แล้วตั้งแต่หน้า index.php)
-    $sql = "UPDATE med_students 
+    $sql = "UPDATE sys_users 
             SET full_name = :name, 
                 student_personnel_id = :sid, 
                 citizen_id = :cid,
@@ -60,7 +60,7 @@ try {
     ]);
 
     // 4. ดึง ID (PK) ของนักศึกษาเก็บใส่ Session เพื่อใช้งานในหน้าถัดไป
-    $stmtGetId = $pdo->prepare("SELECT id FROM med_students WHERE line_user_id = :line_id LIMIT 1");
+    $stmtGetId = $pdo->prepare("SELECT id FROM sys_users WHERE line_user_id = :line_id LIMIT 1");
     $stmtGetId->execute([':line_id' => $lineUserId]);
     $user = $stmtGetId->fetch();
     

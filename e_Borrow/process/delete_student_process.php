@@ -40,7 +40,7 @@ try {
 
     // ◀️ --- (ใหม่: ส่วน Log) --- ◀️
     // (ดึงข้อมูลผู้ใช้ "ก่อน" ที่จะลบ)
-    $stmt_get = $pdo->prepare("SELECT full_name, line_user_id FROM med_students WHERE id = ?");
+    $stmt_get = $pdo->prepare("SELECT full_name, line_user_id FROM sys_users WHERE id = ?");
     $stmt_get->execute([$student_id]);
     $student_info = $stmt_get->fetch(PDO::FETCH_ASSOC);
     $student_name_for_log = $student_info ? $student_info['full_name'] : "ID: {$student_id}";
@@ -49,7 +49,7 @@ try {
     // ◀️ --- (จบส่วนดึงข้อมูล Log) --- ◀️
 
     // 6. ดำเนินการลบ
-    $sql_delete = "DELETE FROM med_students WHERE id = ?";
+    $sql_delete = "DELETE FROM sys_users WHERE id = ?";
     $stmt_delete = $pdo->prepare($sql_delete);
     $stmt_delete->execute([$student_id]);
 

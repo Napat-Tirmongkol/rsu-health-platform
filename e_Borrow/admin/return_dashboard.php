@@ -32,7 +32,7 @@ try {
                 DATEDIFF(CURDATE(), t.due_date) AS days_overdue
             FROM med_transactions t
             JOIN med_equipment_items ei ON t.equipment_id = ei.id
-            LEFT JOIN med_students s ON t.borrower_student_id = s.id
+            LEFT JOIN sys_users s ON t.borrower_student_id = s.id
             WHERE t.status = 'borrowed'
               AND t.approval_status IN ('approved', 'staff_added') 
             ORDER BY t.due_date ASC";

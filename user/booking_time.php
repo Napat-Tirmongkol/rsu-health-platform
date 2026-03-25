@@ -32,7 +32,7 @@ $pdo = db();
 // 1. ดึงข้อมูลแคมเปญ
 $campaign = null;
 try {
-    $stmtCamp = $pdo->prepare("SELECT id, title FROM campaigns WHERE id = :id");
+    $stmtCamp = $pdo->prepare("SELECT id, title FROM camp_list WHERE id = :id");
     $stmtCamp->execute([':id' => $campaignId]);
     $campaign = $stmtCamp->fetch(PDO::FETCH_ASSOC);
     if (!$campaign) {
@@ -49,8 +49,8 @@ try {
     $sqlSlots = "
         SELECT 
             t.id, t.start_time, t.end_time, t.max_capacity,
-            (SELECT COUNT(*) FROM camp_appointments a WHERE a.slot_id = t.id AND a.status IN ('booked', 'confirmed')) as booked_count
-        FROM camp_time_slots t
+            (SELECT COUNT(*) FROM camp_bookings a WHERE a.slot_id = t.id AND a.status IN ('booked', 'confirmed')) as booked_count
+        FROM camp_slots t
         WHERE t.slot_date = :date AND t.campaign_id = :cid
         ORDER BY t.start_time ASC
     ";

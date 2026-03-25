@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $pdo = db();
             // เปลี่ยนจากตาราง vac_ เป็น camp_ 
-            $sql = "UPDATE camp_appointments SET status = 'confirmed' WHERE id = :id AND status = 'booked'";
+            $sql = "UPDATE camp_bookings SET status = 'confirmed' WHERE id = :id AND status = 'booked'";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([':id' => $appointmentId]);
 

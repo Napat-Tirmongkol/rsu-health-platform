@@ -34,10 +34,10 @@ try {
             c.title AS campaign_title,
             t.slot_date,
             t.start_time
-        FROM camp_appointments a
-        JOIN med_students s ON a.student_id = s.id
-        JOIN campaigns c ON a.campaign_id = c.id
-        JOIN camp_time_slots t ON a.slot_id = t.id
+        FROM camp_bookings a
+        JOIN sys_users s ON a.student_id = s.id
+        JOIN camp_list c ON a.campaign_id = c.id
+        JOIN camp_slots t ON a.slot_id = t.id
         WHERE a.id = :id
     ");
     $stmt->execute([':id' => $appointmentId]);
@@ -56,18 +56,18 @@ try {
     }
 
     // 2. Change status to 'cancelled_by_admin'
-    $updateStmt = $pdo->prepare("UPDATE camp_appointments SET status = 'cancelled_by_admin' WHERE id = :id");
+    $updateStmt = $pdo->prepare("UPDATE camp_bookings SET status = 'cancelled_by_admin' WHERE id = :id");
     $updateStmt->execute([':id' => $appointmentId]);
 
     // Note: The slot booked count calculation in time_slots.php uses:
-    // "SELECT COUNT(*) FROM camp_appointments WHERE slot_id = ts.id AND status IN ('booked', 'confirmed')"
+    // "SELECT COUNT(*) FROM camp_bookings WHERE slot_id = ts.id AND status IN ('booked', 'confirmed')"
     // Since we changed status to 'cancelled_by_admin', the booked count drops automatically.
-    // There is no `booked` column in `camp_time_slots` in this schema, the count is dynamic!
+    // There is no `booked` column in `camp_slots` in this schema, the count is dynamic!
     // Wait, let's verify if `booked` column exists.
     // The user's prompt said:
-    // "Decrease the booked count in the camp_time_slots table."
+    // "Decrease the booked count in the camp_slots table."
     // But in the code:
-    // (SELECT COUNT(*) FROM camp_appointments a WHERE a.slot_id = ts.id AND a.status IN ('booked', 'confirmed')) as booked_count
+    // (SELECT COUNT(*) FROM camp_bookings a WHERE a.slot_id = ts.id AND a.status IN ('booked', 'confirmed')) as booked_count
     // It seems they don't have a `booked` column. It's computed on the fly. So changing status handles the seat automatically!
     
     // 3. Send LINE Message (Messaging API)
@@ -163,3 +163,4 @@ try {
     }
     echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
 }
+

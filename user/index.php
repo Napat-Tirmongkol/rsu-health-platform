@@ -10,11 +10,11 @@ require_once __DIR__ . '/../includes/header.php';
 if (isset($_SESSION['evax_student_id'])) {
     try {
         $pdo = db();
-        $stmt = $pdo->prepare("SELECT full_name, student_personnel_id, phone_number, status FROM med_students WHERE id = :id LIMIT 1");
+        $stmt = $pdo->prepare("SELECT full_name, student_personnel_id, phone_number, status FROM sys_users WHERE id = :id LIMIT 1");
         $stmt->execute([':id' => $_SESSION['evax_student_id']]);
         $row = $stmt->fetch();
 
-        $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM camp_appointments WHERE student_id = :sid AND status IN ('confirmed', 'booked')");
+        $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM camp_bookings WHERE student_id = :sid AND status IN ('confirmed', 'booked')");
         $stmtCheck->execute([':sid' => $_SESSION['evax_student_id']]);
         $hasBooking = (int)$stmtCheck->fetchColumn() > 0;
 

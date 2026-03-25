@@ -25,8 +25,8 @@ if ($student_id == 0 || empty($message)) {
 }
 
 try {
-    // 1. ดึง LINE User ID จากตาราง med_students
-    $stmt = $pdo->prepare("SELECT line_user_id, full_name FROM med_students WHERE id = ?");
+    // 1. ดึง LINE User ID จากตาราง sys_users
+    $stmt = $pdo->prepare("SELECT line_user_id, full_name FROM sys_users WHERE id = ?");
     $stmt->execute([$student_id]);
     $student = $stmt->fetch(PDO::FETCH_ASSOC);
 

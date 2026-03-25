@@ -108,7 +108,7 @@ exit;
 // Helper Function
 function sendLineReceipt($pdo, $transaction_id, $student_id, $payment_id, $amount, $method) {
     $sql = "SELECT s.line_user_id, s.full_name, ei.name as item_name 
-            FROM med_students s
+            FROM sys_users s
             JOIN med_transactions t ON t.borrower_student_id = s.id
             JOIN med_equipment_items ei ON t.item_id = ei.id
             WHERE s.id = ? AND t.id = ?";

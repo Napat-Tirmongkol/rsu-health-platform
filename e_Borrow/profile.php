@@ -4,7 +4,7 @@ declare(strict_types=1);
 @session_start();
 include('includes/check_student_session.php');
 
-// ใช้ DB กลางของ e-campaignv2 (ตาราง med_students เดียวกัน)
+// ใช้ DB กลางของ e-campaignv2 (ตาราง sys_users เดียวกัน)
 require_once __DIR__ . '/../config/db_connect.php';
 
 $student_id = (int)$_SESSION['student_id'];
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $pdo = db();
             $stmt = $pdo->prepare(
-                "UPDATE med_students
+                "UPDATE sys_users
                  SET full_name = :full_name,
                      department = :dept,
                      student_personnel_id = :sid,
@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // ---- ดึงข้อมูลปัจจุบัน ----
 try {
     $pdo  = db();
-    $stmt = $pdo->prepare("SELECT * FROM med_students WHERE id = :id LIMIT 1");
+    $stmt = $pdo->prepare("SELECT * FROM sys_users WHERE id = :id LIMIT 1");
     $stmt->execute([':id' => $student_id]);
     $user = $stmt->fetch();
     if (!$user) { header("Location: logout.php"); exit; }
