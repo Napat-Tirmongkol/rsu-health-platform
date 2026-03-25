@@ -1,7 +1,9 @@
 <?php
-// admin/admin_log.php
+// admin/admin_log.php (แก้ไข V3.4 - กู้ชีพหน้า Log ด้วยโครงสร้าง V2)
 include('../includes/check_session.php'); 
 require_once(__DIR__ . '/../../../config/db_connect.php');
+
+$pdo = db();
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
     header("Location: index.php");
@@ -12,189 +14,130 @@ $start_date = $_GET['start_date'] ?? null;
 $end_date = $_GET['end_date'] ?? null;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $log_type = $_GET['log_type'] ?? 'signin';
-$limit = 10; 
+$limit = 20; 
 if ($page < 1) $page = 1;
 $offset = ($page - 1) * $limit;
 
+// ฟังก์ชัน Render หัวตาราง
 function renderTableHeaders($type) {
     if ($type == 'signin') {
-        return '<tr><th style="width: 180px;">เวลา</th><th style="width: 200px;">ผู้เข้าใช้งาน</th><th style="width: 150px;">ประเภทการเข้าสู่ระบบ</th><th>รายละเอียด IP / สถานะ</th></tr>';
+        return '<tr><th>เวลา</th><th>ผู้เข้าใช้งาน</th><th>ประเภท</th><th>IP / รายละเอียด</th></tr>';
     } else {
-        return '<tr><th style="width: 180px;">เวลา</th><th style="width: 200px;">ผู้ดำเนินการ (Admin)</th><th style="width: 150px;">การกระทำ (Action)</th><th>รายละเอียดการเปลี่ยนแปลง</th></tr>';
+        return '<tr><th>เวลา</th><th>ผู้ดำเนินการ</th><th>Action</th><th>รายละเอียด</th></tr>';
     }
 }
 
+// ฟังก์ชัน Render แถวข้อมูล (เปลี่ยน timestamp เป็น created_at)
 function renderTableRows($data, $type) {
     if (empty($data)) return '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #999;">ไม่พบข้อมูลในช่วงเวลานี้</td></tr>';
     $html = '';
     foreach ($data as $log) {
-        $badge = ($type == 'signin') 
-            ? (($log['action'] == 'login_line') ? '<span class="status-badge" style="background-color: #06c755; color: white;"><i class="fab fa-line"></i> LINE Login</span>' : '<span class="status-badge" style="background-color: #6c757d; color: white;"><i class="fas fa-key"></i> Password</span>')
-            : '<span class="status-badge grey">'.htmlspecialchars($log['action']).'</span>';
-        $html .= '<tr><td>'.date('d/m/Y H:i:s', strtotime($log['timestamp'])).'</td><td>'.htmlspecialchars($log['admin_name'] ?? 'Unknown').'</td><td>'.$badge.'</td><td style="white-space: pre-wrap; text-align: left;">'.htmlspecialchars($log['description']).'</td></tr>';
+        $badge_color = ($log['action'] == 'login_line') ? '#06c755' : '#6c757d';
+        $badge = '<span class="badge" style="background:'.$badge_color.'; color:white; padding:4px 8px; border-radius:4px;">'.htmlspecialchars($log['action']).'</span>';
+        
+        $html .= '<tr>
+            <td>'.date('d/m/Y H:i:s', strtotime($log['created_at'])).'</td>
+            <td>'.htmlspecialchars($log['admin_name'] ?? 'System').'</td>
+            <td>'.$badge.'</td>
+            <td style="font-size: 0.9em; color: #555;">'.htmlspecialchars($log['description'] ?? '-').'</td>
+        </tr>';
     }
     return $html;
 }
 
+// ฟังก์ชันจัดหน้า (Pagination)
 function renderPagination($current_page, $total_pages) {
     if ($total_pages <= 1) return '';
-    $prev_disabled = ($current_page <= 1) ? 'disabled' : '';
-    $next_disabled = ($current_page >= $total_pages) ? 'disabled' : '';
-    return '<span class="pagination-info">หน้า '.$current_page.' จาก '.$total_pages.'</span><div><button type="button" class="btn btn-secondary '.$prev_disabled.'" onclick="changePage('.($current_page - 1).')"><i class="fas fa-chevron-left"></i> ก่อนหน้า</button><button type="button" class="btn btn-secondary '.$next_disabled.'" onclick="changePage('.($current_page + 1).')">ถัดไป <i class="fas fa-chevron-right"></i></button></div>';
+    $html = '<div class="d-flex justify-content-between align-items-center mt-3">';
+    $html .= '<span>หน้า '.$current_page.' / '.$total_pages.'</span>';
+    $html .= '<div class="btn-group">';
+    if($current_page > 1) $html .= '<button class="btn btn-outline-primary btn-sm" onclick="changePage('.($current_page-1).')">ก่อนหน้า</button>';
+    if($current_page < $total_pages) $html .= '<button class="btn btn-outline-primary btn-sm" onclick="changePage('.($current_page+1).')">ถัดไป</button>';
+    $html .= '</div></div>';
+    return $html;
 }
 
-$date_condition = ""; $date_params = [];
-if (!empty($start_date)) { $date_condition .= " AND DATE(l.timestamp) >= ?"; $date_params[] = $start_date; }
-if (!empty($end_date)) { $date_condition .= " AND DATE(l.timestamp) <= ?"; $date_params[] = $end_date; }
+// สร้าง Query (เปลี่ยน timestamp เป็น created_at)
+$date_condition = ""; 
+$date_params = [];
+if (!empty($start_date)) { $date_condition .= " AND DATE(l.created_at) >= ?"; $date_params[] = $start_date; }
+if (!empty($end_date)) { $date_condition .= " AND DATE(l.created_at) <= ?"; $date_params[] = $end_date; }
 
-$base_where = ($log_type == 'signin') ? "WHERE l.action IN ('login_password', 'login_line')" : "WHERE l.action NOT IN ('login_password', 'login_line')";
+$base_where = ($log_type == 'signin') ? "WHERE l.action LIKE 'login%'" : "WHERE l.action NOT LIKE 'login%'";
+
 $sql_count = "SELECT COUNT(*) FROM sys_activity_logs l $base_where $date_condition";
-$sql_data = "SELECT l.*, u.full_name as admin_name FROM sys_activity_logs l LEFT JOIN sys_staff u ON l.user_id = u.id $base_where $date_condition ORDER BY l.timestamp DESC LIMIT $limit OFFSET $offset";
+$sql_data = "SELECT l.*, COALESCE(u.full_name, 'System') as admin_name 
+             FROM sys_activity_logs l 
+             LEFT JOIN sys_staff u ON l.user_id = u.id 
+             $base_where $date_condition 
+             ORDER BY l.created_at DESC LIMIT ? OFFSET ?";
 
-if (isset($_GET['ajax_update']) && $_GET['ajax_update'] == '1') {
-    try {
-        $stmt_count = $pdo->prepare($sql_count); $stmt_count->execute($date_params); $total_logs = $stmt_count->fetchColumn(); $total_pages = ceil($total_logs / $limit);
-        $stmt_data = $pdo->prepare($sql_data); $stmt_data->execute($date_params); $logs_data = $stmt_data->fetchAll(PDO::FETCH_ASSOC);
-        echo json_encode(['status' => 'success', 'headers_html' => renderTableHeaders($log_type), 'body_html' => renderTableRows($logs_data, $log_type), 'pagination_html' => renderPagination($page, $total_pages)]);
-    } catch (Exception $e) { echo json_encode(['status' => 'error', 'message' => $e->getMessage()]); }
+// AJAX Handler
+if (isset($_GET['ajax_update'])) {
+    $stmt_count = $pdo->prepare($sql_count); 
+    $stmt_count->execute($date_params); 
+    $total_logs = $stmt_count->fetchColumn(); 
+    $total_pages = ceil($total_logs / $limit);
+
+    $stmt_data = $pdo->prepare($sql_data);
+    $data_params = array_merge($date_params, [$limit, $offset]);
+    $stmt_data->execute($data_params); 
+    $logs_data = $stmt_data->fetchAll(PDO::FETCH_ASSOC);
+
+    header('Content-Type: application/json');
+    echo json_encode([
+        'headers_html' => renderTableHeaders($log_type),
+        'body_html' => renderTableRows($logs_data, $log_type),
+        'pagination_html' => renderPagination($page, $total_pages)
+    ]);
     exit;
 }
-
-try {
-    $stmt_count = $pdo->prepare($sql_count); $stmt_count->execute($date_params); $total_logs = $stmt_count->fetchColumn(); $total_pages = ceil($total_logs / $limit);
-    $stmt_data = $pdo->prepare($sql_data); $stmt_data->execute($date_params); $initial_logs = $stmt_data->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) { $log_error = "Database Error: " . $e->getMessage(); }
 
 $page_title = "บันทึก Log (Admin)";
 $current_page = "admin_log"; 
 include('../includes/header.php');
 ?>
-<style>
-    .time-filter-group { display: flex; align-items: center; background-color: #1e1e1e; padding: 6px 15px; border-radius: 8px; gap: 15px; color: #e0e0e0; font-size: 0.9rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); flex-wrap: wrap; }
-    .time-filter-btn { background: none; border: none; color: #4dabf7; cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 4px 8px; transition: all 0.2s; border-radius: 4px; font-family: 'RSU', sans-serif; font-weight: bold; font-size: 1rem; }
-    .time-filter-btn:hover { background-color: rgba(255,255,255,0.1); color: #fff; }
-    .time-filter-select { background-color: transparent !important; color: #fff !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; border-radius: 4px; cursor: pointer; font-family: 'RSU', sans-serif; font-size: 0.95rem; outline: none; padding: 4px 8px; box-shadow: none !important; }
-    .time-filter-select option { color: #333; background: #fff; }
-    .toolbar-separator { width: 1px; height: 20px; background-color: #555; display: inline-block; }
-    .data-section-wrapper { position: relative; min-height: 200px; }
-    .loading-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.7); z-index: 10; display: none; justify-content: center; align-items: flex-start; padding-top: 100px; border-radius: var(--border-radius-main); }
-    body.dark-mode .loading-overlay { background: rgba(45, 55, 72, 0.8); }
-    .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--color-primary); border-radius: 50%; animation: spin 1s linear infinite; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-</style>
 
-<div class="header-row" style="flex-wrap: wrap; gap: 15px; align-items: center;">
-    <h2><i class="fas fa-history"></i> 📜 บันทึก Log (Admin)</h2>
-    <div class="time-filter-group">
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-filter" style="color: #4dabf7;"></i>
-            <select class="time-filter-select" id="logTypeSelect" onchange="refreshLogData(1)" style="font-weight: bold; min-width: 180px;">
-                <option value="signin">ประวัติการเข้าสู่ระบบ</option>
-                <option value="actions">บันทึกการดำเนินการอื่นๆ</option>
+<div class="admin-wrap" style="padding:20px;">
+    <div class="header-row" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2><i class="fas fa-history"></i> บันทึก Log การใช้งาน</h2>
+        <div style="display:flex; gap:10px;">
+            <select class="form-select form-select-sm" id="logTypeSelect" onchange="refreshLogData(1)">
+                <option value="signin">การเข้าสู่ระบบ</option>
+                <option value="actions">การปฏิบัติงาน</option>
             </select>
+            <button onclick="refreshLogData(1)" class="btn btn-outline-secondary btn-sm"><i class="fas fa-sync"></i></button>
         </div>
-        <span class="toolbar-separator"></span>
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <i class="far fa-clock" style="color: #aaa;"></i>
-            <select class="time-filter-select" id="timeRangeSelect" onchange="handleTimeRangeChange(this.value)">
-                <option value="" disabled selected>เลือกช่วงเวลา</option>
-                <option value="today">วันนี้ (Today)</option>
-                <option value="48h">2 วันย้อนหลัง</option>
-                <option value="7d">7 วันย้อนหลัง</option>
-                <option value="30d">30 วันย้อนหลัง</option>
-                <option value="custom">กำหนดเอง (Custom range)...</option>
-            </select>
-        </div>
-        <span class="toolbar-separator"></span>
-        <button type="button" class="time-filter-btn" onclick="refreshLogData(1)"><i class="fas fa-sync-alt"></i> Refresh</button>
     </div>
+
+    <div class="card" style="border-radius:12px; border:none; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" style="margin-bottom:0;">
+                <thead class="table-light">
+                    <tbody id="logTableHead"><?php echo renderTableHeaders($log_type); ?></tbody>
+                </thead>
+                <tbody id="logTableBody">
+                    <!-- ข้อมูลโหลดผ่าน AJAX -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div id="paginationContainer"></div>
 </div>
 
-<?php if (isset($log_error)) echo "<p style='color: red;'>$log_error</p>"; ?>
-
-<input type="hidden" id="hidden_start_date" value="">
-<input type="hidden" id="hidden_end_date" value="">
-<input type="hidden" id="hidden_current_page" value="1">
-
-<div class="data-section-wrapper">
-    <div id="mainLoader" class="loading-overlay"><div class="spinner"></div></div>
-    <div class="table-container">
-        <table>
-            <thead id="logTableHead"><?php echo renderTableHeaders($log_type); ?></thead>
-            <tbody id="logTableBody"><?php echo renderTableRows($initial_logs, $log_type); ?></tbody>
-        </table>
-    </div>
-    <div id="paginationContainer" class="pagination-container"><?php echo renderPagination($page, $total_pages); ?></div>
-</div>
-
-<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-function formatDate(date) {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
+function refreshLogData(page = 1) {
+    const type = document.getElementById('logTypeSelect').value;
+    fetch(`admin/admin_log.php?ajax_update=1&page=${page}&log_type=${type}`)
+        .then(r => r.json())
+        .then(d => {
+            document.getElementById('logTableHead').innerHTML = d.headers_html;
+            document.getElementById('logTableBody').innerHTML = d.body_html;
+            document.getElementById('paginationContainer').innerHTML = d.pagination_html;
+        });
 }
-function refreshLogData(page = 1, customStart = null, customEnd = null) {
-    let start = customStart || document.getElementById('hidden_start_date').value;
-    let end = customEnd || document.getElementById('hidden_end_date').value;
-    let logType = document.getElementById('logTypeSelect').value;
-    const loader = document.getElementById('mainLoader');
-    loader.style.display = 'flex';
-    const params = new URLSearchParams({ ajax_update: '1', page: page, start_date: start, end_date: end, log_type: logType });
-    fetch(`admin/admin_log.php?${params.toString()}`).then(r => r.json()).then(d => {
-        if(d.status === 'success') {
-            setTimeout(() => {
-                document.getElementById('logTableHead').innerHTML = d.headers_html;
-                document.getElementById('logTableBody').innerHTML = d.body_html;
-                document.getElementById('paginationContainer').innerHTML = d.pagination_html;
-                if(customStart) document.getElementById('hidden_start_date').value = customStart;
-                if(customEnd) document.getElementById('hidden_end_date').value = customEnd;
-                document.getElementById('hidden_current_page').value = page;
-                loader.style.display = 'none';
-            }, 300);
-        } else { throw new Error(d.message); }
-    }).catch(e => { console.error(e); loader.style.display = 'none'; Swal.fire('Error', 'ไม่สามารถโหลดข้อมูลได้', 'error'); });
-}
-function changePage(newPage) { refreshLogData(newPage); }
-function handleTimeRangeChange(value) {
-    const today = new Date();
-    let start = new Date();
-    let end = new Date(); 
-    if (value === 'custom') { openCustomRangePopup(); document.getElementById('timeRangeSelect').value = ""; return; }
-    switch(value) {
-        case 'today': break;
-        case '48h': start.setDate(today.getDate() - 1); break;
-        case '7d': start.setDate(today.getDate() - 7); break;
-        case '30d': start.setDate(today.getDate() - 30); break;
-        default: return;
-    }
-    refreshLogData(1, formatDate(start), formatDate(end));
-}
-function openCustomRangePopup() {
-    Swal.fire({
-        title: '<span style="font-size: 1.1rem;">Select a custom date range</span>',
-        background: '#222', color: '#fff',
-        html: `
-            <div style="text-align: left; padding: 0 10px;">
-                <div style="margin-bottom: 15px;">
-                    <label style="display:block; margin-bottom: 5px; font-size: 0.9rem; color: #ccc;">From:</label>
-                    <input type="date" id="swal-start-date" class="swal2-input" style="width: 100%; margin: 0; background: #333; color: #fff; border: 1px solid #555;">
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <label style="display:block; margin-bottom: 5px; font-size: 0.9rem; color: #ccc;">To:</label>
-                    <input type="date" id="swal-end-date" class="swal2-input" style="width: 100%; margin: 0; background: #333; color: #fff; border: 1px solid #555;">
-                </div>
-            </div>`,
-        showCancelButton: true, confirmButtonText: 'OK', confirmButtonColor: '#0078d4', cancelButtonText: 'Cancel', cancelButtonColor: '#333',
-        preConfirm: () => {
-            const s = document.getElementById('swal-start-date').value;
-            const e = document.getElementById('swal-end-date').value;
-            if (!s || !e) { Swal.showValidationMessage('กรุณาเลือกวันที่ให้ครบถ้วน'); return false; }
-            if (s > e) { Swal.showValidationMessage('วันที่เริ่มต้น ต้องไม่มากกว่าวันที่สิ้นสุด'); return false; }
-            return { start: s, end: e };
-        }
-    }).then((result) => { if (result.isConfirmed) refreshLogData(1, result.value.start, result.value.end); });
-}
+function changePage(p) { refreshLogData(p); }
+document.addEventListener('DOMContentLoaded', () => refreshLogData(1));
 </script>
+
 <?php include('../includes/footer.php'); ?>
