@@ -42,7 +42,7 @@ $no_layout = isset($_GET['layout']) && $_GET['layout'] === 'none';
         
         <nav class="flex-1 py-4 overflow-y-auto">
             <div class="px-6 mb-2">
-                <a href="index.php" class="flex items-center gap-3 p-3 rounded-xl <?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'bg-blue-50 text-[#0052CC] font-semibold' : 'text-gray-600 hover:bg-gray-50' ?> transition-colors">
+                <a href="../admin/index.php" class="flex items-center gap-3 p-3 rounded-xl <?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'bg-blue-50 text-[#0052CC] font-semibold' : 'text-gray-600 hover:bg-gray-50' ?> transition-colors">
                     <i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard
                 </a>
             </div>
@@ -50,16 +50,16 @@ $no_layout = isset($_GET['layout']) && $_GET['layout'] === 'none';
             <div class="mt-6 mb-2 px-6">
                 <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Campaign Management</p>
                 <div class="space-y-1">
-                    <a href="campaigns.php" class="flex items-center gap-3 p-3 rounded-xl <?= basename($_SERVER['PHP_SELF']) == 'campaigns.php' ? 'bg-blue-50 text-[#0052CC] font-semibold' : 'text-gray-600 hover:bg-gray-50' ?> transition-colors">
-    <i class="fa-solid fa-layer-group w-5 text-center"></i> จัดการแคมเปญ
-</a>
-                    <a href="time_slots.php" class="flex items-center gap-3 p-3 rounded-xl <?= basename($_SERVER['PHP_SELF']) == 'time_slots.php' ? 'bg-blue-50 text-[#0052CC] font-semibold' : 'text-gray-600 hover:bg-gray-50' ?> transition-colors">
+                    <a href="../admin/campaigns.php" class="flex items-center gap-3 p-3 rounded-xl <?= basename($_SERVER['PHP_SELF']) == 'campaigns.php' ? 'bg-blue-50 text-[#0052CC] font-semibold' : 'text-gray-600 hover:bg-gray-50' ?> transition-colors">
+                        <i class="fa-solid fa-layer-group w-5 text-center"></i> จัดการแคมเปญ
+                    </a>
+                    <a href="../admin/time_slots.php" class="flex items-center gap-3 p-3 rounded-xl <?= basename($_SERVER['PHP_SELF']) == 'time_slots.php' ? 'bg-blue-50 text-[#0052CC] font-semibold' : 'text-gray-600 hover:bg-gray-50' ?> transition-colors">
                         <i class="fa-solid fa-calendar-alt w-5 text-center"></i> จัดการรอบเวลาแคมเปญ
                     </a>
-                    <a href="bookings.php" class="flex items-center gap-3 p-3 rounded-xl <?= basename($_SERVER['PHP_SELF']) == 'bookings.php' ? 'bg-blue-50 text-[#0052CC] font-semibold' : 'text-gray-600 hover:bg-gray-50' ?> transition-colors">
+                    <a href="../admin/bookings.php" class="flex items-center gap-3 p-3 rounded-xl <?= basename($_SERVER['PHP_SELF']) == 'bookings.php' ? 'bg-blue-50 text-[#0052CC] font-semibold' : 'text-gray-600 hover:bg-gray-50' ?> transition-colors">
                         <i class="fa-solid fa-clipboard-check w-5 text-center"></i> รายชื่อผู้เข้าร่วมแคมเปญ
                     </a>
-					    <a href="reports.php" class="flex items-center gap-3 p-3 rounded-xl <?= basename($_SERVER['PHP_SELF']) == 'bookings.php' ? 'bg-blue-50 text-[#0052CC] font-semibold' : 'text-gray-600 hover:bg-gray-50' ?> transition-colors">
+					    <a href="../admin/reports.php" class="flex items-center gap-3 p-3 rounded-xl <?= basename($_SERVER['PHP_SELF']) == 'bookings.php' ? 'bg-blue-50 text-[#0052CC] font-semibold' : 'text-gray-600 hover:bg-gray-50' ?> transition-colors">
                         <i class="fa-solid fa-clipboard-check w-5 text-center"></i> รายงาน/สถิติ
                     </a>
                 </div>
@@ -68,20 +68,18 @@ $no_layout = isset($_GET['layout']) && $_GET['layout'] === 'none';
             <div class="mt-6 mb-2 px-6">
                 <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">User Management</p>
                 <div class="space-y-1">
-                    <a href="users.php" class="flex items-center gap-3 p-3 rounded-xl <?= basename($_SERVER['PHP_SELF']) == 'users.php' ? 'bg-blue-50 text-[#0052CC] font-semibold' : 'text-gray-600 hover:bg-gray-50' ?> transition-colors">
-                        <i class="fa-solid fa-users w-5 text-center"></i> จัดการรายชื่อนักศึกษา
-                    </a>
+                    <a href="../sys_admin/users.php" class="flex-1 text-center bg-gray-50 hover:bg-gray-100 py-4 rounded-2xl text-sm font-black text-gray-700 transition-all active:scale-95">Users</a>
                 </div>
             </div>
             <div class="mt-6 mb-2 px-6 text-xs uppercase tracking-[0.15em] font-extrabold text-gray-400 opacity-60">System Settings</div>
             <div class="px-6 space-y-1">
-                <a href="manage_admins.php" class="flex items-center gap-3 p-3 rounded-xl <?= basename($_SERVER['PHP_SELF']) == 'manage_admins.php' ? 'bg-blue-50 text-[#0052CC] font-bold shadow-sm' : 'text-gray-500 hover:bg-gray-50' ?> transition-all group">
+                <a href="../sys_admin/manage_admins.php" class="flex items-center gap-3 p-3 rounded-xl <?= basename($_SERVER['PHP_SELF']) == 'manage_admins.php' ? 'bg-blue-50 text-[#0052CC] font-bold shadow-sm' : 'text-gray-500 hover:bg-gray-50' ?> transition-all group">
                     <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 <?= basename($_SERVER['PHP_SELF']) == 'manage_admins.php' ? 'bg-blue-100' : 'bg-gray-50 group-hover:bg-blue-50' ?> transition-colors">
                         <i class="fa-solid fa-user-shield text-[13px]"></i>
                     </div>
                     <span class="text-sm">จัดการผู้ดูแลระบบ</span>
                 </a>
-                <a href="activity_logs.php" class="flex items-center gap-3 p-3 rounded-xl <?= basename($_SERVER['PHP_SELF']) == 'activity_logs.php' ? 'bg-blue-50 text-[#0052CC] font-bold shadow-sm' : 'text-gray-500 hover:bg-gray-50' ?> transition-all group">
+                <a href="../admin/activity_logs.php" class="flex items-center gap-3 p-3 rounded-xl <?= basename($_SERVER['PHP_SELF']) == 'activity_logs.php' ? 'bg-blue-50 text-[#0052CC] font-bold shadow-sm' : 'text-gray-500 hover:bg-gray-50' ?> transition-all group">
                     <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 <?= basename($_SERVER['PHP_SELF']) == 'activity_logs.php' ? 'bg-blue-100' : 'bg-gray-50 group-hover:bg-blue-50' ?> transition-colors">
                         <i class="fa-solid fa-file-lines text-[13px]"></i>
                     </div>
@@ -91,7 +89,7 @@ $no_layout = isset($_GET['layout']) && $_GET['layout'] === 'none';
         </nav>
 
         <div class="p-4 border-t border-gray-50">
-            <a href="logout.php" class="flex items-center justify-center gap-2 w-full p-3 rounded-xl text-red-500 hover:bg-red-50 transition-colors font-semibold">
+            <a href="../admin/logout.php" class="flex items-center justify-center gap-2 w-full p-3 rounded-xl text-red-500 hover:bg-red-50 transition-colors font-semibold">
                 <i class="fa-solid fa-sign-out-alt"></i> ออกจากระบบ
             </a>
         </div>
