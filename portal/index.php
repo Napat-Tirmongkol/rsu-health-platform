@@ -1,7 +1,7 @@
 <?php
 /**
- * portal/index.php (v2.0 Premium Re-design)
- * Central Hub Dashboard สำหรับการจัดการระบบทั้งหมด
+ * portal/index.php (v3.0 Dynamic & Scalable Edition)
+ * Central Hub Dashboard สำหรับการจัดการระบบที่รองรับการขยายโปรเจกต์ในอนาคต
  */
 declare(strict_types=1);
 session_start();
@@ -9,73 +9,124 @@ require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/includes/auth.php'; // ตรวจสอบความปลอดภัย
 
 $pdo = db();
+$adminRole = $_SESSION['admin_role'] ?? 'admin'; // ตัวแปรบทบาทสำหรับเช็คสิทธิ์ (Mock role)
 
 /**
- * 📊 (1) LIVE DATA AGGREGATION
- * ดึงสถิติจริงจากทุกโมดูล (พร้อมระบบป้องกัน Error กรณีตารางยังไม่ถูกสร้าง)
+ * 📊 (1) LIVE DATA & ROBUST STATS
+ * ดึงสถิจริง พร้อมระบบป้องกันถ้าตารางในอนาคตยังไม่พร้อม
  */
-$stats = [
-    'users'    => 0,
-    'admins'   => 0,
-    'camps'    => 0,
-    'borrows'  => 0,
-    'returned' => 0
+$kpis = [
+    'users'   => 0,
+    'camps'   => 0,
+    'borrows' => 0,
+    'logs'    => 0
 ];
 
 try {
-    $stats['users']   = (int)$pdo->query("SELECT COUNT(*) FROM sys_users")->fetchColumn();
-    $stats['admins']  = (int)$pdo->query("SELECT COUNT(*) FROM sys_admins")->fetchColumn();
-    $stats['camps']   = (int)$pdo->query("SELECT COUNT(*) FROM camp_list WHERE status = 'active'")->fetchColumn();
+    $kpis['users'] = (int)$pdo->query("SELECT COUNT(*) FROM sys_users")->fetchColumn();
+    $kpis['camps'] = (int)$pdo->query("SELECT COUNT(*) FROM camp_list WHERE status = 'active'")->fetchColumn();
     
-    // ตรวจสอบการยืม (เช็คก่อนว่าตารางมีอยู่จริงไหม)
-    $stmt_borrow = $pdo->query("SHOW TABLES LIKE 'borrow_records'");
-    if ($stmt_borrow->rowCount() > 0) {
-        $stats['borrows']  = (int)$pdo->query("SELECT COUNT(*) FROM borrow_records WHERE approval_status = 'pending'")->fetchColumn();
-        $stats['returned'] = (int)$pdo->query("SELECT COUNT(*) FROM borrow_records WHERE status = 'returned'")->fetchColumn();
+    // เช็คตารางยืมอุปกรณ์ (โมดูลเสริม)
+    if ($pdo->query("SHOW TABLES LIKE 'borrow_records'")->rowCount() > 0) {
+        $kpis['borrows'] = (int)$pdo->query("SELECT COUNT(*) FROM borrow_records WHERE approval_status = 'pending'")->fetchColumn();
+    }
+    
+    // เช็คตารางกิจกรรม (โมดูลสถิติ)
+    if ($pdo->query("SHOW TABLES LIKE 'activity_logs'")->rowCount() > 0) {
+        $kpis['logs'] = (int)$pdo->query("SELECT COUNT(*) FROM activity_logs")->fetchColumn();
     }
 } catch (PDOException $e) {
-    // หากเกิด Error เฉพาะจุด ให้ใช้ค่าเริ่มต้น (0) ต่อไป หน้าเว็บจะไม่พัง
-    error_log("Portal Stats Error: " . $e->getMessage());
+    error_log("Portal Stats Fetch Error: " . $e->getMessage());
 }
 
 /**
- * 🕒 (2) RECENT ACTIVITY LOGS
- * ดึงกิจกรรมล่าสุด 5 รายการจากระบบ (พร้อมระบบป้องกัน Error)
+ * 🧩 (2) PROJECT CATALOG (SCALABLE STRUCTURE)
+ * โครงสร้างอาเรย์สำหรับวนลูปโปรเจกต์ รองรับการเพิ่มโมดูลในอนาคตได้ทันที
  */
-$recentLogs = [];
+$projects = [
+    [
+        'id'            => 'user_directory',
+        'title'         => 'User Directory',
+        'description'   => 'ฐานข้อมูลศูนย์กลางผู้ใช้งานทั้งหมด (Master List) สำหรับวิเคราะห์รายชื่อและจัดการสิทธิ์',
+        'icon'          => 'fa-id-card-clip',
+        'bg_color'      => 'bg-amber-50',
+        'icon_color'    => 'text-amber-500',
+        'border_color'  => 'border-amber-100',
+        'allowed_roles' => ['admin', 'superadmin'], // กำหนดสิทธิ์ที่เข้าถึงได้
+        'badges'        => [ 'Central DB', 'System Core' ],
+        'actions'       => [
+            ['label' => 'Search Users', 'url' => '../sys_admin/users.php?layout=none', 'primary' => false],
+            ['label' => 'Manage Admins', 'url' => '../sys_admin/manage_admins.php?layout=none', 'primary' => true],
+        ]
+    ],
+    [
+        'id'            => 'e_campaign',
+        'title'         => 'e-Campaign V2',
+        'description'   => 'ระบบจัดการแคมเปญ งานอบรม งานสแกนและการลงทะเบียนเข้าร่วมกิจกรรมแบบ Real-time',
+        'icon'          => 'fa-bullhorn',
+        'bg_color'      => 'bg-blue-50',
+        'icon_color'    => 'text-blue-600',
+        'border_color'  => 'border-blue-100',
+        'allowed_roles' => ['admin', 'superadmin'],
+        'badges'        => [ 'Campaigns', 'Activity' ],
+        'actions'       => [
+            ['label' => 'Launch Campaign Manager', 'url' => '../admin/index.php', 'primary' => true],
+        ]
+    ],
+    [
+        'id'            => 'e_borrow',
+        'title'         => 'e-Borrow & Inventory',
+        'description'   => 'ระบบยืม-คืนอุปกรณ์ทางการแพทย์และเวชภัณฑ์ (Archive Support) จัดการสต็อกและพัสดุกลาง',
+        'icon'          => 'fa-toolbox',
+        'bg_color'      => 'bg-slate-100',
+        'icon_color'    => 'text-slate-700',
+        'border_color'  => 'border-slate-200',
+        'allowed_roles' => ['admin', 'superadmin'],
+        'badges'        => [ 'Inventory', 'Asset Tracking' ],
+        'actions'       => [
+            ['label' => 'Open System', 'url' => '../archive/e_Borrow/admin/index.php', 'primary' => true],
+        ]
+    ],
+    /**
+     * ตัวอย่างการเพิ่มโปรเจกต์ในอนาคต:
+     * เพียงแค่ก๊อปปี้บล็อกนี้แล้วเปลี่ยน URL/Icon ระบบจะวาดหน้า Layout ให้เองทันที
+     */
+    [
+        'id'            => 'future_app',
+        'title'         => 'Upcoming Project...',
+        'description'   => 'ระบบใหม่ที่กำลังอยู่ในระหว่างการพัฒนา เพื่อเสริมสร้างศักยภาพการจัดการข้อมูลในอนาคต',
+        'icon'          => 'fa-plus-circle',
+        'bg_color'      => 'bg-gray-50',
+        'icon_color'    => 'text-gray-300',
+        'border_color'  => 'border-gray-100',
+        'allowed_roles' => ['superadmin'],
+        'badges'        => [ 'Dev Stage' ],
+        'actions'       => [
+            ['label' => 'No actions yet', 'url' => '#', 'primary' => false],
+        ]
+    ]
+];
+
+/**
+ * 🕒 (3) RECENT ACTIVITY FETCH
+ */
+$recentActivity = [];
 try {
-    $stmt_logs = $pdo->query("SHOW TABLES LIKE 'activity_logs'");
-    if ($stmt_logs->rowCount() > 0) {
-        $recentLogs = $pdo->query("SELECT action_details, created_at, admin_username FROM activity_logs ORDER BY created_at DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
+    if ($pdo->query("SHOW TABLES LIKE 'activity_logs'")->rowCount() > 0) {
+        $recentActivity = $pdo->query("SELECT action_details, created_at FROM activity_logs ORDER BY created_at DESC LIMIT 6")->fetchAll(PDO::FETCH_ASSOC);
     }
-} catch (PDOException $e) {
-    error_log("Portal Logs Error: " . $e->getMessage());
-}
+} catch (PDOException $e) { /* silent */ }
 
-/**
- * 🛡️ (3) SSO LOGIC FOR E-BORROW
- * ส่งสิทธิ์จาก Portal ไปยังโมดูลการยืม (Archive)
- */
-if (!isset($_SESSION['user_id']) && isset($_SESSION['admin_username'])) {
-    $staff = $pdo->prepare("SELECT id, full_name, role FROM sys_staff WHERE username = :uname LIMIT 1");
-    $staff->execute([':uname' => $_SESSION['admin_username']]);
-    $staffData = $staff->fetch();
-    if ($staffData) {
-        $_SESSION['user_id'] = $staffData['id'];
-        $_SESSION['full_name'] = $staffData['full_name'];
-        $_SESSION['role'] = $staffData['role'];
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart HUB Portal - Administrative Dashboard</title>
+    <title>Management Smart Portal - Central Intelligence HUB</title>
     
-    <!-- Fonts & Essentials -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- UI Framework & Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Prompt:wght@100;300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -83,207 +134,210 @@ if (!isset($_SESSION['user_id']) && isset($_SESSION['admin_username'])) {
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Outfit', 'Prompt', 'sans-serif'] },
-                    colors: { primary: '#0052CC', accent: '#FFAB00', success: '#10B981', warning: '#F59E0B' }
+                    fontFamily: { sans: ['Outfit', 'Prompt', 'sans-serif'], prompt: ['Prompt', 'sans-serif'] },
+                    colors: { primary: '#0052CC', secondary: '#0747A6', accent: '#FFAB00', surface: '#F8FAFC' }
                 }
             }
         }
     </script>
     
     <style>
-        body { background: #fdfdfd; min-height: 100vh; font-family: 'Outfit', 'Prompt', sans-serif; overflow-x: hidden; }
+        body { background: #fdfdfd; min-height: 100vh; overflow-x: hidden; }
         .bg-mesh {
             background: 
-                radial-gradient(at 0% 0%, rgba(0, 82, 204, 0.08) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(255, 171, 0, 0.08) 0px, transparent 50%),
-                radial-gradient(at 50% 50%, rgba(255, 255, 255, 1) 0px, transparent 100%);
+                radial-gradient(at 0% 0%, rgba(0, 82, 204, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(255, 171, 0, 0.05) 0px, transparent 50%);
         }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
-        }
-        .card-hover:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px -15px rgba(0, 82, 204, 0.15);
-        }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
-        .animate-slide { animation: slideIn 0.5s ease-out forwards; }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.4); }
+        .card-shift:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -20px rgba(0, 82, 204, 0.15); border-color: rgba(0, 82, 204, 0.2); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-enter { animation: fadeIn 0.5s ease-out forwards; }
     </style>
 </head>
-<body class="bg-mesh p-4 md:p-8">
+<body class="bg-mesh font-sans text-gray-800 p-4 md:p-8">
 
-    <div class="max-w-[1400px] mx-auto space-y-8">
+    <div class="max-w-[1440px] mx-auto space-y-10">
         
-        <!-- HEADER COMMAND BAR -->
-        <header class="flex flex-col md:flex-row justify-between items-center gap-6 animate-slide">
-            <div class="flex items-center gap-5">
-                <div class="w-16 h-16 bg-gradient-to-br from-primary to-blue-700 rounded-[22px] flex items-center justify-center text-white text-3xl shadow-xl shadow-blue-200">
-                    <i class="fa-solid fa-layer-group"></i>
+        <!-- HEADER & COMMANDER INFO -->
+        <header class="flex flex-col md:flex-row justify-between items-center gap-6 animate-enter">
+            <div class="flex items-center gap-6">
+                <div class="w-16 h-16 bg-gradient-to-br from-primary to-blue-800 rounded-[24px] flex items-center justify-center text-white text-3xl shadow-xl shadow-blue-200">
+                    <i class="fa-solid fa-square-rss"></i>
                 </div>
                 <div>
-                    <h1 class="text-3xl font-[800] text-gray-900 tracking-tight leading-none uppercase">Hub Portal</h1>
-                    <p class="text-xs text-primary/60 font-black tracking-widest uppercase mt-1">Central Command Center</p>
+                    <h1 class="text-3xl font-[900] text-gray-900 tracking-tight leading-none uppercase">Central HUB</h1>
+                    <p class="text-xs text-primary font-black tracking-[0.2em] uppercase mt-2 opacity-60">RSU Healthcare Management Portal</p>
                 </div>
             </div>
 
-            <div class="flex items-center gap-3 glass-card px-5 py-2.5 rounded-full">
-                <div class="w-9 h-9 bg-blue-100 text-primary rounded-full flex items-center justify-center text-sm font-bold shadow-inner">
-                    <i class="fa-solid fa-shield-halved"></i>
+            <div class="flex items-center gap-4 glass px-6 py-3 rounded-full shadow-sm">
+                <div class="w-10 h-10 bg-blue-100 text-primary rounded-full flex items-center justify-center font-bold">
+                    <i class="fa-solid fa-user-shield text-sm"></i>
                 </div>
-                <div class="hidden sm:block">
-                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider leading-none">Administrator</p>
-                    <p class="text-xs font-bold text-gray-800 leading-tight"><?= htmlspecialchars($_SESSION['admin_username'] ?? 'User Name') ?></p>
+                <div class="text-right hidden sm:block">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Administrative Node</p>
+                    <p class="text-xs font-black text-gray-900 leading-none"><?= htmlspecialchars($_SESSION['admin_username'] ?? 'Administrator') ?></p>
                 </div>
-                <div class="w-[1px] h-6 bg-gray-200 mx-1"></div>
-                <a href="../admin/logout.php" class="text-gray-300 hover:text-red-500 transition-all ml-1"><i class="fa-solid fa-power-off"></i></a>
+                <div class="h-6 w-px bg-gray-200 mx-2"></div>
+                <a href="../admin/logout.php" class="text-gray-300 hover:text-red-500 transition-all"><i class="fa-solid fa-power-off"></i></a>
             </div>
         </header>
 
-        <!-- KPI SUMMARY SECTION (Real Actionable Data) -->
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-slide" style="animation-delay: 0.1s;">
-            <div class="glass-card p-6 rounded-[32px] border-l-4 border-primary">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Total Database</span>
-                    <i class="fa-solid fa-users text-primary/30"></i>
+        <!-- DASHBOARD OVERVIEW (Top Stats KPI) -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 animate-enter" style="animation-delay: 0.1s;">
+            <div class="glass p-7 rounded-[40px] flex flex-col justify-between h-36 relative overflow-hidden group">
+                <div class="z-10 bg-amber-500/10 text-amber-600 w-10 h-10 rounded-2xl flex items-center justify-center text-lg mb-2"><i class="fa-solid fa-users"></i></div>
+                <div class="z-10">
+                    <h5 class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Total Members</h5>
+                    <p class="text-3xl font-black"><?= number_format($kpis['users']) ?></p>
                 </div>
-                <h3 class="text-3xl font-black text-gray-900"><?= number_format($stats['users']) ?><span class="text-xs text-gray-300 ml-1">Lives</span></h3>
+                <div class="absolute -bottom-4 -right-4 text-7xl text-gray-50 opacity-20 group-hover:scale-110 transition-all"><i class="fa-solid fa-id-card"></i></div>
             </div>
-            <div class="glass-card p-6 rounded-[32px] border-l-4 border-success">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Active Campaigns</span>
-                    <i class="fa-solid fa-bullhorn text-success/30"></i>
+            <div class="glass p-7 rounded-[40px] flex flex-col justify-between h-36 relative overflow-hidden group">
+                <div class="z-10 bg-blue-500/10 text-blue-600 w-10 h-10 rounded-2xl flex items-center justify-center text-lg mb-2"><i class="fa-solid fa-bullhorn"></i></div>
+                <div class="z-10">
+                    <h5 class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Running Camps</h5>
+                    <p class="text-3xl font-black"><?= $kpis['camps'] ?></p>
                 </div>
-                <h3 class="text-3xl font-black text-gray-900"><?= $stats['camps'] ?><span class="text-xs text-gray-300 ml-1">Active</span></h3>
+                <div class="absolute -bottom-4 -right-4 text-7xl text-gray-50 opacity-20"><i class="fa-solid fa-calendar-check"></i></div>
             </div>
-            <div class="glass-card p-6 rounded-[32px] border-l-4 border-accent">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Pending Actions</span>
-                    <i class="fa-solid fa-clock-rotate-left text-accent/30 scale-110"></i>
-                </div>
-                <div class="flex items-center gap-2">
-                    <h3 class="text-3xl font-black text-gray-900"><?= $stats['borrows'] ?></h3>
-                    <?php if($stats['borrows'] > 0): ?>
-                        <span class="px-2 py-0.5 bg-red-100 text-red-600 text-[10px] font-black rounded-lg animate-pulse">Urgent</span>
-                    <?php endif; ?>
+            <div class="glass p-7 rounded-[40px] flex flex-col justify-between h-36 relative overflow-hidden group">
+                <div class="z-10 bg-red-500/10 text-red-600 w-10 h-10 rounded-2xl flex items-center justify-center text-lg mb-2"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                <div class="z-10">
+                    <h5 class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Pending Borrows</h5>
+                    <div class="flex items-center gap-3">
+                        <p class="text-3xl font-black"><?= $kpis['borrows'] ?></p>
+                        <?php if($kpis['borrows'] > 0): ?>
+                            <span class="px-2 py-1 bg-red-500 text-white text-[9px] font-black rounded-lg animate-pulse">URGENT</span>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
-            <div class="glass-card p-6 rounded-[32px] border-l-4 border-gray-900">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">System Logs</span>
-                    <i class="fa-solid fa-database text-gray-900/10"></i>
+            <div class="glass p-7 rounded-[40px] flex flex-col justify-between h-36 relative overflow-hidden group border-2 border-primary/5">
+                <div class="z-10 bg-primary/10 text-primary w-10 h-10 rounded-2xl flex items-center justify-center text-lg mb-2"><i class="fa-solid fa-bolt"></i></div>
+                <div class="z-10">
+                    <h5 class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">System Health</h5>
+                    <p class="text-3xl font-black text-primary">Healthy</p>
                 </div>
-                <h3 class="text-3xl font-black text-gray-900">Ok<span class="text-[10px] text-success ml-2 font-bold uppercase">Healthy</span></h3>
             </div>
         </section>
 
-        <!-- MAIN LAYOUT (App Launcher + Activity Log) -->
-        <main class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <!-- MAIN LAYOUT: GRID & SIDEBAR -->
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-10">
             
-            <!-- LEFT AREA: PROJECT TILES -->
-            <div class="lg:col-span-3 space-y-8 animate-slide" style="animation-delay: 0.2s;">
-                <h4 class="text-lg font-black text-gray-900 uppercase tracking-tighter flex items-center gap-2">
-                    <div class="w-1.5 h-6 bg-accent rounded-full"></div> Available Applications
-                </h4>
+            <!-- (App Launcher Structure - 8 of 12 columns) -->
+            <section class="lg:col-span-8 space-y-8 animate-enter" style="animation-delay: 0.2s;">
+                <h2 class="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-3">
+                    <span class="w-1.5 h-7 bg-primary rounded-full"></span> 
+                    Project Command Grid
+                </h2>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     
-                    <!-- App 1: User Directory -->
-                    <div class="glass-card p-8 rounded-[40px] flex flex-col justify-between card-hover transition-all duration-300">
+                    <?php 
+                    /** 
+                     * 🚀 DYNAMIC LOOP: เรนเดอร์การ์ดโปรเจกต์ตามสิทธิที่ระบุใน Array
+                     */
+                    foreach($projects as $proj): 
+                        // [ROLE-BASED CHECK PLACEHOLDER]
+                        // $hasAccess = in_array($adminRole, $proj['allowed_roles']);
+                        // if (!$hasAccess) continue; // ซ่อนโปรเจกต์ถ้าแอดมินคนนี้ไม่มีสิทธิ์เข้า
+                    ?>
+                    
+                    <div class="group relative bg-white border border-gray-100 p-8 rounded-[48px] flex flex-col justify-between card-shift transition-all duration-500 overflow-hidden">
                         <div>
-                            <div class="w-14 h-14 bg-accent/10 text-accent rounded-3xl flex items-center justify-center text-2xl mb-6">
-                                <i class="fa-solid fa-id-card-clip"></i>
-                            </div>
-                            <h3 class="text-2xl font-black text-gray-900 mb-3 tracking-tight">User Directory</h3>
-                            <p class="text-gray-500 text-xs leading-relaxed mb-6">Master database สำหรับจัดการนักศึกษาและสิทธิ์ผู้ดูแลระบบทั้งหมดในเครือ RSU Services</p>
-                        </div>
-                        <div class="flex gap-2">
-                            <a href="../sys_admin/users.php?layout=none" class="flex-1 text-center bg-gray-50 hover:bg-gray-100 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-700 transition-all active:scale-95">Search Users</a>
-                            <a href="../sys_admin/manage_admins.php?layout=none" class="flex-1 text-center bg-accent text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-accent/20 hover:brightness-105 transition-all active:scale-95">Manage Admins</a>
-                        </div>
-                    </div>
-
-                    <!-- App 2: E-Campaign -->
-                    <div class="bg-primary p-2 rounded-[40px] shadow-2xl shadow-primary/10 card-hover transition-all duration-300">
-                        <div class="bg-white/5 backdrop-blur-sm p-8 rounded-[38px] h-full flex flex-col justify-between text-white border border-white/10">
-                            <div>
-                                <div class="w-14 h-14 bg-white/20 text-white rounded-3xl flex items-center justify-center text-2xl mb-6">
-                                    <i class="fa-solid fa-bullhorn rotate-12"></i>
+                            <!-- Icon & Badges -->
+                            <div class="flex justify-between items-start mb-8">
+                                <div class="w-16 h-16 <?= $proj['bg_color'] ?> <?= $proj['icon_color'] ?> rounded-[24px] flex items-center justify-center text-3xl shadow-sm group-hover:scale-110 transition-all duration-500">
+                                    <i class="fa-solid <?= $proj['icon'] ?>"></i>
                                 </div>
-                                <h3 class="text-2xl font-black mb-3 tracking-tight">e-Campaign V2</h3>
-                                <p class="text-blue-100/70 text-xs leading-relaxed mb-6">ระบบจัดการแคมเปญ งานอบรม และการจองสิทธิ์ต่างๆ ครอบคลุมระบบ QR Check-in</p>
-                            </div>
-                            <a href="../admin/index.php" class="w-full bg-white text-primary py-4 rounded-2xl text-center font-black text-xs uppercase tracking-[0.2em] shadow-xl hover:bg-accent hover:text-white transition-all active:scale-95">
-                                Launch Project <i class="fa-solid fa-arrow-right-long ml-2"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- App 3: E-Borrow -->
-                    <div class="glass-card p-6 rounded-[32px] flex items-center justify-between group transition-all duration-300 hover:bg-gray-50 md:col-span-2">
-                        <div class="flex items-center gap-6">
-                            <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center text-xl group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
-                                <i class="fa-solid fa-toolbox"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-lg font-black text-gray-900 group-hover:text-blue-600 transition-colors">e-Borrow & Inventory Archive</h3>
-                                <p class="text-gray-400 text-[10px] font-medium uppercase tracking-wide">จัดการอุปกรณ์และเวชภัณฑ์ทางการแพทย์</p>
-                            </div>
-                        </div>
-                        <a href="../archive/e_Borrow/admin/index.php" class="px-6 py-3.5 bg-gray-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:shadow-lg transition-all active:scale-95">Open System</a>
-                    </div>
-
-                    <!-- Future App Placeholder -->
-                    <div class="border-2 border-dashed border-gray-200 p-8 rounded-[40px] flex flex-col items-center justify-center text-center opacity-40 hover:opacity-100 transition-all group">
-                        <div class="w-12 h-12 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center text-xl mb-4 group-hover:bg-blue-50 group-hover:text-blue-600 transition-all">
-                            <i class="fa-solid fa-plus-circle"></i>
-                        </div>
-                        <p class="text-xs font-black uppercase tracking-widest text-gray-400 mb-1">Coming Soon</p>
-                        <p class="text-[10px] text-gray-300">Ready for next module...</p>
-                    </div>
-
-                </div>
-            </div>
-
-            <!-- RIGHT AREA: ACTIVITY FEED -->
-            <aside class="lg:col-span-1 space-y-6 animate-slide" style="animation-delay: 0.3s;">
-                <h4 class="text-lg font-black text-gray-900 uppercase tracking-tighter flex items-center gap-2">
-                    <i class="fa-solid fa-bolt-lightning text-accent"></i> Recent Activity
-                </h4>
-                
-                <div class="glass-card rounded-[32px] overflow-hidden">
-                    <div class="p-6 space-y-6">
-                        <?php if($recentLogs): ?>
-                            <?php foreach($recentLogs as $log): ?>
-                                <div class="relative pl-6 border-l-2 border-primary/20 last:border-0 pb-2">
-                                    <div class="absolute -left-[5px] top-0 w-2 h-2 bg-primary rounded-full"></div>
-                                    <p class="text-[11px] text-gray-400 font-bold mb-1 uppercase tracking-tighter">
-                                        <?= date('H:i', strtotime($log['created_at'])) ?> - <?= htmlspecialchars($log['admin_username']) ?>
-                                    </p>
-                                    <p class="text-xs font-bold text-gray-700 leading-snug line-clamp-2">
-                                        <?= htmlspecialchars($log['action_details']) ?>
-                                    </p>
+                                <div class="flex flex-col gap-1 items-end">
+                                    <?php foreach($proj['badges'] as $badge): ?>
+                                        <span class="px-3 py-1 bg-gray-50 text-gray-400 rounded-full text-[9px] font-black uppercase tracking-widest border border-gray-100"><?= $badge ?></span>
+                                    <?php endforeach; ?>
                                 </div>
+                            </div>
+                            
+                            <!-- Title & Desc -->
+                            <h3 class="text-2xl font-black text-gray-900 mb-3 tracking-tight group-hover:text-primary transition-colors"><?= $proj['title'] ?></h3>
+                            <p class="text-gray-500 text-xs leading-relaxed mb-10 opacity-80"><?= $proj['description'] ?></p>
+                        </div>
+
+                        <!-- Actions Grid -->
+                        <div class="flex gap-3">
+                            <?php foreach($proj['actions'] as $act): ?>
+                                <a href="<?= $act['url'] ?>" class="flex-1 px-4 py-4 rounded-[20px] text-[10px] font-black uppercase tracking-widest text-center transition-all active:scale-95 
+                                    <?= $act['primary'] ? 'bg-primary text-white shadow-lg shadow-blue-200 hover:brightness-110' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' ?>">
+                                    <?= $act['label'] ?>
+                                </a>
                             <?php endforeach; ?>
-                        <?php else: ?>
-                            <div class="text-center py-10">
-                                <i class="fa-solid fa-ghost text-gray-200 text-4xl mb-4"></i>
-                                <p class="text-xs font-bold text-gray-300 uppercase tracking-widest">No activity found</p>
-                            </div>
-                        <?php endif; ?>
+                        </div>
+
+                        <!-- Decoration Element -->
+                        <div class="absolute -top-10 -right-10 w-24 h-24 bg-gray-50 rounded-full opacity-50 blur-3xl group-hover:bg-primary/10 transition-all"></div>
                     </div>
-                    <div class="bg-gray-50/80 p-4 text-center border-t border-gray-100">
-                        <a href="../admin/activity_logs.php" class="text-[10px] font-black uppercase tracking-widest text-primary hover:underline">View All Logs</a>
+
+                    <?php endforeach; ?>
+                </div>
+            </section>
+
+            <!-- (Quick Action & Activity Feed - 4 of 12 columns) -->
+            <aside class="lg:col-span-4 space-y-10 animate-enter" style="animation-delay: 0.3s;">
+                
+                <div>
+                    <h2 class="text-xl font-black text-gray-900 tracking-tight flex items-center gap-3 mb-6">
+                        <i class="fa-solid fa-bolt-lightning text-accent"></i> Activity Center
+                    </h2>
+
+                    <div class="bg-white border border-gray-100 rounded-[40px] shadow-sm overflow-hidden p-3 shadow-xl shadow-gray-200/50">
+                        <div class="p-5 space-y-8">
+                            <?php if($recentActivity): ?>
+                                <?php foreach($recentActivity as $log): ?>
+                                    <div class="relative pl-7 border-l-2 border-blue-50 last:border-0 pb-2 group">
+                                        <div class="absolute -left-[5px] top-0 w-2 h-2 bg-blue-200 rounded-full group-hover:bg-primary transition-colors"></div>
+                                        <div class="flex flex-col">
+                                            <span class="text-[10px] font-black text-gray-300 uppercase tracking-tighter sm:tracking-widest mb-1"><?= date('H:i | d M', strtotime($log['created_at'])) ?></span>
+                                            <p class="text-[13px] font-bold text-gray-700 leading-snug"><?= htmlspecialchars($log['action_details']) ?></p>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <div class="text-center py-10 opacity-30">
+                                    <i class="fa-solid fa-ghost text-4xl mb-3"></i>
+                                    <p class="text-xs font-bold uppercase tracking-widest">Quiet in the hub...</p>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="bg-gray-50/50 p-5 text-center border-t border-gray-50 rounded-b-[40px]">
+                            <a href="../admin/activity_logs.php" class="text-[10px] font-black uppercase tracking-widest text-primary hover:underline transition-all underline-offset-4">View Operational Logs <i class="fa-solid fa-chevron-right ml-1"></i></a>
+                        </div>
                     </div>
                 </div>
-            </aside>
 
+                <!-- QUICK SHORTCUTS -->
+                <div class="bg-primary bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] p-8 rounded-[40px] text-white shadow-2xl shadow-blue-200 relative overflow-hidden">
+                    <h4 class="text-lg font-black mb-4 relative z-10">System Shortcut</h4>
+                    <div class="space-y-3 relative z-10">
+                        <a href="../sys_admin/users.php?layout=none" class="flex items-center gap-3 p-3 bg-white/10 rounded-2xl hover:bg-white/20 transition-all text-sm font-bold">
+                            <i class="fa-solid fa-user-plus w-5"></i> Add New User
+                        </a>
+                        <a href="../admin/campaigns.php" class="flex items-center gap-3 p-3 bg-white/10 rounded-2xl hover:bg-white/20 transition-all text-sm font-bold">
+                            <i class="fa-solid fa-plus w-5"></i> New Campaign
+                        </a>
+                    </div>
+                    <i class="fa-solid fa-screwdriver-wrench absolute -bottom-10 -right-10 text-9xl text-white/5 rotate-12"></i>
+                </div>
+
+            </aside>
         </main>
 
-        <!-- FOOTER INFO -->
-        <footer class="text-center py-10 opacity-30">
-            <p class="text-[10px] font-bold uppercase tracking-[0.3em]">Management Portal &copy; 2026 RSU Healthcare Services</p>
+        <!-- FOOTER & BRANDING -->
+        <footer class="pt-20 pb-10 text-center animate-enter" style="animation-delay: 0.5s;">
+            <div class="flex flex-col items-center gap-4 opacity-30">
+                <i class="fa-solid fa-shield-halved text-primary text-2xl"></i>
+                <p class="text-[10px] font-black uppercase tracking-[0.5em]">Central Command v3.0 Powered by Antigravity</p>
+            </div>
         </footer>
 
     </div>
