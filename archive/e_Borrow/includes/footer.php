@@ -1,9 +1,9 @@
 <?php
 // includes/footer.php
+// ปรับปรุงใหม่: ลิงก์ต้องสัมพันธ์กับ Base URL ที่ระบุไว้ใน header.php
 
-// (��Ǩ�ͺ��� $current_page �������� ����� 'index')
 $current_page = $current_page ?? 'index'; 
-$user_role = $_SESSION['role'] ?? 'employee'; // (�֧ Role �Ѩ�غѹ)
+$user_role = $_SESSION['role'] ?? 'employee'; 
 ?>
 
 </main> 
@@ -11,119 +11,79 @@ $user_role = $_SESSION['role'] ?? 'employee'; // (�֧ Role �Ѩ�غѹ)
     
     <a href="admin/index.php" class="<?php echo ($current_page == 'index') ? 'active' : ''; ?>">
         <i class="fas fa-tachometer-alt"></i>
-        �Ҿ���
+        <span>ภาพรวม</span>
     </a>
     
     <a href="admin/return_dashboard.php" class="<?php echo ($current_page == 'return') ? 'active' : ''; ?>">
         <i class="fas fa-undo-alt"></i>
-        �׹�ػ�ó�
+        <span>คืนอุปกรณ์</span>
     </a>
     
-    <?php // (��������Ѻ Admin ��� Editor) ?>
     <?php if (in_array($user_role, ['admin', 'editor'])): ?>
     <a href="admin/manage_equipment.php" class="<?php echo ($current_page == 'manage_equip') ? 'active' : ''; ?>">
         <i class="fas fa-tools"></i>
-        �Ѵ����ػ�ó�
+        <span>จัดการอุปกรณ์</span>
     </a>
     
     <a href="admin/manage_fines.php" class="<?php echo ($current_page == 'manage_fines') ? 'active' : ''; ?>">
         <i class="fas fa-file-invoice-dollar"></i>
-        �Ѵ��ä�һ�Ѻ
+        <span>จัดการค่าปรับ</span>
     </a>
-    <?php endif; // (�� Admin/Editor) ?>
+    <?php endif; ?>
 
-
-    <?php 
-    // (���ٷ������� ���ʴ�੾�� Admin ��ҹ��)
-    if ($user_role == 'admin'): 
-    ?>
-    
+    <?php if ($user_role == 'admin'): ?>
     <a href="admin/manage_students.php" class="<?php echo ($current_page == 'manage_user') ? 'active' : ''; ?>">
         <i class="fas fa-users-cog"></i>
-        �Ѵ��ü����
+        <span>จัดการผู้ใช้งาน</span>
     </a>
     
     <a href="admin/report_borrowed.php" class="<?php echo ($current_page == 'report') ? 'active' : ''; ?>">
         <i class="fas fa-chart-line"></i>
-        ��§ҹ
+        <span>รายงาน</span>
     </a>
     
     <a href="admin/admin_log.php" class="<?php echo ($current_page == 'admin_log') ? 'active' : ''; ?>">
         <i class="fas fa-history"></i>
-        Log Admin
+        <span>Log Admin</span>
     </a>
-
-    <?php endif; // (������� Admin) ?>
+    <?php endif; ?>
 </nav>
-<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Scripts (สัมพันธ์กับ Base URL ดังนั้นไม่ต้องใช้ ../) -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script src="assets/js/theme.js?v=<?php echo time(); ?>"></script>
 <script src="assets/js/admin_app.js?v=<?php echo time(); ?>"></script>
 
 <script>
-    // --- ? ��駤�� Auto Logout (JavaScript) ---
-    // ����������ç���͹��¡��� PHP �Դ˹��� (˹����� Milliseconds)
-    // 30 �ҷ� = 30 * 60 * 1000 = 1,800,000 ms
-    const INACTIVITY_LIMIT = 1800000; 
+    // --- Auto Logout Logic ---
+    const INACTIVITY_LIMIT = 18000000; // 5 ชั่วโมง (เพื่อความสะดวกขณะทำงาน)
     let inactivityTimer;
 
     function resetInactivityTimer() {
         clearTimeout(inactivityTimer);
-        // ������Ѻ�����ѧ����
         inactivityTimer = setTimeout(doLogout, INACTIVITY_LIMIT);
     }
 
     function doLogout() {
-        // ����͹��͹�մ�͡ (Optional) ���ʹմ��¡���
         Swal.fire({
-            title: '������ҡ����ҹ',
-            text: '�س��������¡�������ҹҹ �к����͡�ҡ�к��ѵ��ѵ�',
+            title: 'เซสชันหมดอายุ',
+            text: 'คุณไม่ได้ใช้งานระบบนานเกินไป ระบบจะออกจากระบบเพื่อความปลอดภัย',
             icon: 'warning',
             timer: 3000,
-            timerProgressBar: true,
-            showConfirmButton: false,
-            allowOutsideClick: false
+            showConfirmButton: false
         }).then(() => {
-            // ��� Redirect ���� Logout
-            // (��Ǩ�ͺ Path ���١������ logout.php �����˹)
+            // ออกจากระบบผ่าน Path ที่สัมพันธ์กับ Base
             window.location.href = 'admin/logout.php?reason=timeout'; 
         });
     }
 
-    // �ѡ�Ѻ�˵ء�ó�������͹��Ǣͧ����� ���� Reset ����
     window.onload = resetInactivityTimer;
     document.onmousemove = resetInactivityTimer;
     document.onkeypress = resetInactivityTimer;
-    document.ontouchstart = resetInactivityTimer; // ����Ѻ��Ͷ��
-    document.onclick = resetInactivityTimer;
-    document.onscroll = resetInactivityTimer;
-
-    // --- ?? Smooth Page Transition (Fade Out ��͹����¹˹��) ---
-    document.addEventListener('click', function(e) {
-        const link = e.target.closest('a');
-        if (link && link.href) {
-            const url = new URL(link.href);
-            const isLocal = url.origin === window.location.origin;
-            const isAnchor = url.pathname === window.location.pathname && url.hash !== '';
-            
-            // ¡��� modal toggles ���� data-* attributes ��� Bootstrap ��
-            const isBootstrap = link.hasAttribute('data-bs-toggle') || link.hasAttribute('data-bs-target');
-            // ¡��鹻���ź/confirm ����Ҩ���ա�õ�� onclick ���
-            const hasOnclick = link.hasAttribute('onclick');
-
-            if (isLocal && !isAnchor && !isBootstrap && !hasOnclick && link.target !== '_blank' && link.getAttribute('href') !== '#') {
-                e.preventDefault(); 
-                document.body.classList.add('page-transitioning'); 
-                setTimeout(() => {
-                    window.location.href = link.href;
-                }, 200);
-            }
-        }
-    });
 </script>
 </body>
 </html>
