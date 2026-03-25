@@ -1,5 +1,5 @@
 <?php
-// admin/camp_list.php
+// admin/campaigns.php
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/includes/auth.php';
 

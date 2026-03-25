@@ -162,7 +162,7 @@ require_once __DIR__ . '/includes/header.php';
     <!-- QUICK ACTIONS -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6 flex-1">
         
-        <a href="camp_list.php" class="relative overflow-hidden bg-gradient-to-br from-[#0052CC] to-[#0043a8] text-white p-8 rounded-[24px] flex flex-col justify-between hover:shadow-xl hover:shadow-blue-900/20 hover:-translate-y-1 transition-all group">
+        <a href="campaigns.php" class="relative overflow-hidden bg-gradient-to-br from-[#0052CC] to-[#0043a8] text-white p-8 rounded-[24px] flex flex-col justify-between hover:shadow-xl hover:shadow-blue-900/20 hover:-translate-y-1 transition-all group">
             <div class="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-bl-full transition-transform duration-500 group-hover:scale-110"></div>
             <div class="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mb-6 shadow-inner">
                 <i class="fa-solid fa-bullhorn text-2xl"></i>

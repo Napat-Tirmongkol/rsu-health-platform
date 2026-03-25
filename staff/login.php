@@ -14,8 +14,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     validate_csrf_or_die();
     $pin = $_POST['pin'] ?? '';
     
-    // 🌟 กำหนดรหัสผ่าน (PIN) สำหรับเจ้าหน้าที่ตรงนี้
-    if ($pin === '123456') { 
+    // ดึงรหัส PIN จากศูนย์กลาง
+    $secrets = require __DIR__ . '/../config/secrets.php';
+    $validPin = $secrets['STAFF_SCAN_PIN'] ?? '123456';
+    
+    if ($pin === $validPin) { 
+        session_regenerate_id(true); // ป้องกัน Session Fixation
         $_SESSION['staff_logged_in'] = true;
         header('Location: index.php');
         exit;
