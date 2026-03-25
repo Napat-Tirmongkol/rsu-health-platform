@@ -184,6 +184,60 @@ foreach ($slots as $s) {
 }
 
 require_once __DIR__ . '/includes/header.php';
+
+$header_actions = '
+<button id="deleteMultiBtn" onclick="deleteSelectedSlots()" style="display: none;" class="bg-red-500 text-white px-4 py-2 rounded-xl font-prompt text-sm font-bold shadow-sm hover:bg-red-600 transition-colors items-center gap-2">
+    <i class="fa-solid fa-trash-can"></i> ลบที่เลือก (<span id="selectedSlotCount">0</span>)
+</button>
+<div class="relative" id="multiSelectContainer">
+    <button type="button" onclick="toggleMultiSelect()" class="px-4 py-2 border border-gray-200 rounded-xl bg-white font-prompt text-sm shadow-sm hover:bg-gray-50 text-gray-700 flex items-center justify-between w-56 transition-colors gap-2">
+        <span id="multiSelectLabel" class="truncate font-semibold text-[#0052CC]">แสดงทุกแคมเปญ</span>
+        <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
+    </button>
+    <div id="multiSelectDropdown" class="absolute z-50 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 hidden flex flex-col top-full overflow-hidden right-0 origin-top-right transform transition-all">
+        <div class="p-2 border-b border-gray-100 bg-gray-50">
+            <div class="relative">
+                <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                <input type="text" id="multiSelectSearch" onkeyup="searchCampaigns(this.value)" placeholder="ค้นหาแคมเปญ..." class="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-[#0052CC] font-prompt transition-shadow">
+            </div>
+        </div>
+        <div class="max-h-60 overflow-y-auto p-2 space-y-0.5" id="multiSelectList">
+            <label class="flex items-center gap-3 px-2 py-2 hover:bg-blue-50/50 rounded-lg cursor-pointer transition-colors group">
+                <input type="checkbox" id="selectAllCamps" checked onchange="toggleAllCampaigns(this)" class="w-4 h-4 text-[#0052CC] rounded border-gray-300 focus:ring-[#0052CC] transition-colors cursor-pointer">
+                <span class="text-sm font-bold text-gray-800 group-hover:text-[#0052CC] transition-colors">เลือกทั้งหมด</span>
+            </label>
+            <div class="h-px bg-gray-100 my-1"></div>';
+            foreach ($activeCampaigns as $ac) {
+                $header_actions .= '
+                <label class="camp-label-item flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors group" data-title="' . htmlspecialchars(strtolower($ac['title'])) . '">
+                    <input type="checkbox" value="' . $ac['id'] . '" checked onchange="updateMultiSelectFilter()" class="camp-checkbox w-4 h-4 text-[#0052CC] rounded border-gray-300 focus:ring-[#0052CC] transition-colors cursor-pointer">
+                    <span class="text-sm text-gray-600 line-clamp-1 break-all group-hover:text-gray-900 transition-colors">' . htmlspecialchars($ac['title']) . '</span>
+                </label>';
+            }
+            $header_actions .= '
+        </div>
+    </div>
+</div>
+<div class="flex items-center bg-gray-100 p-1 rounded-xl">
+    <button onclick="switchView(\'calendar\')" id="btnViewCalendar" class="px-3 py-1.5 text-sm font-bold rounded-lg bg-white shadow-sm text-[#0052CC] transition-all" title="มุมมองปฏิทิน">
+        <i class="fa-solid fa-calendar-alt"></i>
+    </button>
+    <button onclick="switchView(\'table\')" id="btnViewTable" class="px-3 py-1.5 text-sm font-bold rounded-lg text-gray-500 hover:text-gray-700 hover:bg-white transition-all" title="มุมมองตาราง">
+        <i class="fa-solid fa-list-ul"></i>
+    </button>
+</div>
+<button onclick="openAddSlotModal(\'' . date('Y-m-d') . '\')" class="bg-gradient-to-r from-blue-600 to-[#0052CC] text-white px-5 py-2.5 rounded-xl font-prompt text-sm font-bold shadow-md hover:shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex items-center gap-2">
+    <i class="fa-solid fa-plus-circle"></i> สร้างรอบเวลา
+</button>
+<select onchange="location.href=\'?month=\'+this.value.split(\'-\')[1]+\'&year=\'+this.value.split(\'-\')[0]" class="px-5 py-2.5 border border-gray-200 rounded-xl bg-white font-prompt text-sm font-bold text-gray-700 outline-none shadow-sm cursor-pointer hover:bg-gray-50">';
+    for($i = -3; $i <= 6; $i++) {
+        $d = date('Y-m', strtotime("$i months"));
+        $selected = ($d == "$year-".str_pad($month, 2, '0', STR_PAD_LEFT)) ? 'selected' : '';
+        $header_actions .= "<option value='$d' $selected>".date('M Y', strtotime("$i months"))."</option>";
+    }
+$header_actions .= '</select>';
+
+renderPageHeader("Campaign Time Slots", "กำหนดช่วงเวลารับคิวต่อรอบ (เลือกสร้างพร้อมกันได้หลายวัน)", $header_actions);
 ?>
 
 <style>
@@ -207,73 +261,6 @@ require_once __DIR__ . '/includes/header.php';
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 </style>
-
-<div class="mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-5 animate-slide-up">
-    <div>
-        <h1 class="text-3xl font-extrabold text-[#0052CC] tracking-tight flex items-center gap-3">
-            <i class="fa-regular fa-clock"></i> จัดการรอบเวลาแคมเปญ
-        </h1>
-        <p class="text-gray-500 text-sm mt-1.5 font-medium">กำหนดช่วงเวลารับคิวต่อรอบ (เลือกสร้างพร้อมกันได้หลายวัน)</p>
-    </div>
-    <div class="flex flex-wrap gap-3 justify-end items-center">
-        <!-- ปุ่มลบหลายรายการ (จะซ่อน/แสดง อัตโนมัติด้วย JS) -->
-        <button id="deleteMultiBtn" onclick="deleteSelectedSlots()" style="display: none;" class="bg-red-500 text-white px-4 py-2 rounded-xl font-prompt text-sm font-bold shadow-sm hover:bg-red-600 transition-colors items-center gap-2">
-            <i class="fa-solid fa-trash-can"></i> ลบที่เลือก (<span id="selectedSlotCount">0</span>)
-        </button>
-
-        <!-- Multi-Select Dropdown แบบมีค้นหา (Filterable & Checkable) -->
-        <div class="relative" id="multiSelectContainer">
-            <button type="button" onclick="toggleMultiSelect()" class="px-4 py-2 border border-gray-200 rounded-xl bg-white font-prompt text-sm shadow-sm hover:bg-gray-50 text-gray-700 flex items-center justify-between w-56 transition-colors gap-2">
-                <span id="multiSelectLabel" class="truncate font-semibold text-[#0052CC]">แสดงทุกแคมเปญ</span>
-                <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
-            </button>
-            <div id="multiSelectDropdown" class="absolute z-50 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 hidden flex flex-col top-full overflow-hidden right-0 origin-top-right transform transition-all">
-                <div class="p-2 border-b border-gray-100 bg-gray-50">
-                    <div class="relative">
-                        <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                        <input type="text" id="multiSelectSearch" onkeyup="searchCampaigns(this.value)" placeholder="ค้นหาแคมเปญ..." class="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-[#0052CC] font-prompt transition-shadow">
-                    </div>
-                </div>
-                <div class="max-h-60 overflow-y-auto p-2 space-y-0.5" id="multiSelectList">
-                    <label class="flex items-center gap-3 px-2 py-2 hover:bg-blue-50/50 rounded-lg cursor-pointer transition-colors group">
-                        <input type="checkbox" id="selectAllCamps" checked onchange="toggleAllCampaigns(this)" class="w-4 h-4 text-[#0052CC] rounded border-gray-300 focus:ring-[#0052CC] transition-colors cursor-pointer">
-                        <span class="text-sm font-bold text-gray-800 group-hover:text-[#0052CC] transition-colors">เลือกทั้งหมด</span>
-                    </label>
-                    <div class="h-px bg-gray-100 my-1"></div>
-                    <?php foreach ($activeCampaigns as $ac): ?>
-                    <label class="camp-label-item flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors group" data-title="<?= htmlspecialchars(strtolower($ac['title'])) ?>">
-                        <input type="checkbox" value="<?= $ac['id'] ?>" checked onchange="updateMultiSelectFilter()" class="camp-checkbox w-4 h-4 text-[#0052CC] rounded border-gray-300 focus:ring-[#0052CC] transition-colors cursor-pointer">
-                        <span class="text-sm text-gray-600 line-clamp-1 break-all group-hover:text-gray-900 transition-colors"><?= htmlspecialchars($ac['title']) ?></span>
-                    </label>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Toggle View Mode -->
-        <div class="flex items-center bg-gray-100 p-1 rounded-xl">
-            <button onclick="switchView('calendar')" id="btnViewCalendar" class="px-3 py-1.5 text-sm font-bold rounded-lg bg-white shadow-sm text-[#0052CC] transition-all" title="มุมมองปฏิทิน">
-                <i class="fa-solid fa-calendar-alt"></i>
-            </button>
-            <button onclick="switchView('table')" id="btnViewTable" class="px-3 py-1.5 text-sm font-bold rounded-lg text-gray-500 hover:text-gray-700 hover:bg-white transition-all" title="มุมมองตาราง">
-                <i class="fa-solid fa-list-ul"></i>
-            </button>
-        </div>
-
-        <button onclick="openAddSlotModal('<?= date('Y-m-d') ?>')" class="bg-gradient-to-r from-blue-600 to-[#0052CC] text-white px-5 py-2.5 rounded-xl font-prompt text-sm font-bold shadow-md hover:shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex items-center gap-2">
-            <i class="fa-solid fa-plus-circle"></i> สร้างรอบเวลา
-        </button>
-        <select onchange="location.href='?month='+this.value.split('-')[1]+'&year='+this.value.split('-')[0]" class="px-5 py-2.5 border border-gray-200 rounded-xl bg-white font-prompt text-sm font-bold text-gray-700 outline-none shadow-sm cursor-pointer hover:bg-gray-50">
-            <?php 
-            for($i = -3; $i <= 6; $i++) {
-                $d = date('Y-m', strtotime("$i months"));
-                $selected = ($d == "$year-".str_pad($month, 2, '0', STR_PAD_LEFT)) ? 'selected' : '';
-                echo "<option value='$d' $selected>".date('M Y', strtotime("$i months"))."</option>";
-            }
-            ?>
-        </select>
-    </div>
-</div>
 
 <div id="calendarViewContainer" class="animate-slide-up delay-100 mb-10">
     <div class="bg-white rounded-t-3xl shadow-sm border border-gray-100 p-6">

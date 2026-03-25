@@ -171,17 +171,12 @@ require_once __DIR__ . '/includes/header.php';
 </style>
 
 <!-- HEADER SECTION -->
-<div class="mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4 animate-slide-up">
-    <div>
-        <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-3">
-            จัดการแคมเปญ (camp_list)
-        </h1>
-        <p class="text-gray-500 text-sm mt-1 font-medium">สร้างแคมเปญใหม่, กำหนดโควต้า, และตั้งเวลารับลงทะเบียน</p>
-    </div>
-    <button onclick="openAddModal()" class="bg-gradient-to-r from-[#0052CC] to-[#0043a8] hover:from-[#0043a8] hover:to-[#003688] text-white px-6 py-3 rounded-2xl font-bold transition-all shadow-lg hover:shadow-blue-900/20 hover:-translate-y-1 flex items-center gap-2">
-        <i class="fa-solid fa-plus-circle text-lg"></i> สร้างแคมเปญใหม่
-    </button>
-</div>
+<?php 
+$header_actions = '<button onclick="openAddModal()" class="bg-gradient-to-r from-[#0052CC] to-[#0043a8] hover:from-[#0043a8] hover:to-[#003688] text-white px-6 py-3 rounded-2xl font-bold transition-all shadow-lg hover:shadow-blue-900/20 hover:-translate-y-1 flex items-center gap-2">
+    <i class="fa-solid fa-plus-circle text-lg"></i> สร้างแคมเปญใหม่
+</button>';
+renderPageHeader("จัดการแคมเปญ", "สร้างแคมเปญใหม่, กำหนดโควต้า, และตั้งเวลารับลงทะเบียน", $header_actions); 
+?>
 
 <!-- ALERT MESSAGES -->
 <?php if ($message): ?>

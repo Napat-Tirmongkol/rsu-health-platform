@@ -76,15 +76,12 @@ require_once __DIR__ . '/../admin/includes/header.php';
 ?>
 
 <div class="max-w-6xl mx-auto">
-    <div class="flex justify-between items-center mb-8">
-        <div>
-            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">จัดการผู้ดูแลระบบ (Admins)</h1>
-            <p class="text-gray-500 mt-1">เพิ่ม แก้ไข หรือระงับสิทธิ์การเข้าถึงระบบจัดการ</p>
-        </div>
-        <button onclick="openAddModal()" class="bg-[#0052CC] hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-blue-200 active:scale-95">
-            <i class="fa-solid fa-user-plus"></i> เพิ่มแอดมินใหม่
-        </button>
-    </div>
+<?php 
+$header_actions = '<button onclick="openAddModal()" class="bg-[#0052CC] hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-blue-200 active:scale-95">
+    <i class="fa-solid fa-user-plus"></i> เพิ่มแอดมินใหม่
+</button>';
+renderPageHeader("จัดการผู้ดูแลระบบ (Admins)", "เพิ่ม แก้ไข หรือระงับสิทธิ์การเข้าถึงระบบจัดการ", $header_actions); 
+?>
 
     <?php if ($error): ?>
         <div class="bg-red-50 border border-red-100 text-red-600 p-4 rounded-xl mb-6 flex items-center gap-3 animate-in fade-in slide-in-from-top-2">

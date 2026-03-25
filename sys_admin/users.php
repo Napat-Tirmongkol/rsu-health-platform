@@ -102,14 +102,7 @@ require_once __DIR__ . '/../admin/includes/header.php';
 }
 </style>
 
-<div class="mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-5 animate-slide-up">
-    <div>
-        <h1 class="text-3xl font-extrabold text-[#0052CC] tracking-tight flex items-center gap-3">
-            <i class="fa-solid fa-users-gear"></i> จัดการรายชื่อผู้ใช้งาน
-        </h1>
-        <p class="text-gray-500 text-sm mt-1.5 font-medium">จัดการข้อมูลส่วนตัวนักศึกษา/บุคลากรที่สมัครผ่าน LINE</p>
-    </div>
-</div>
+<?php renderPageHeader("จัดการรายชื่อผู้ใช้งาน", "จัดการข้อมูลส่วนตัวนักศึกษา/บุคลากรที่สมัครผ่าน LINE"); ?>
 
 <?php if ($message): ?>
     <div class="mb-6 p-4 rounded-xl text-sm font-semibold border <?= $messageType === 'success' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200' ?>">

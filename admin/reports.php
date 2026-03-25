@@ -114,14 +114,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel' && $campaignId > 0) {
 require_once __DIR__ . '/includes/header.php';
 ?>
 
-<div class="mb-6 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
-    <div>
-        <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <i class="fa-solid fa-chart-pie text-[#0052CC]"></i> รายงานและสถิติ
-        </h1>
-        <p class="text-sm text-gray-500 mt-1">ดูยอดผู้เข้าร่วมและผู้ที่ขาดกิจกรรมของแต่ละแคมเปญ</p>
-    </div>
-</div>
+<?php renderPageHeader("รายงานและสถิติ", "ดูยอดผู้เข้าร่วมและผู้ที่ขาดกิจกรรมของแต่ละแคมเปญ"); ?>
 
 <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-6">
     <form method="GET" class="flex flex-col md:flex-row gap-3 items-end">

@@ -1,6 +1,25 @@
 <?php
 // admin/includes/header.php
-$no_layout = isset($_GET['layout']) && $_GET['layout'] === 'none';
+$layout_none = isset($_GET['layout']) && $_GET['layout'] === 'none';
+
+    // Helper Function for Unified Page Headers
+    if (!function_exists('renderPageHeader')) {
+        function renderPageHeader($title, $subtitle, $actions_html = '') {
+            echo '
+            <div class="mb-10 flex flex-col md:flex-row md:justify-between md:items-end gap-6 animate-slide-up">
+                <div class="relative">
+                    <h1 class="text-3xl md:text-4xl font-[950] text-gray-900 tracking-tight flex items-center gap-4">
+                        <div class="w-2 h-10 bg-gradient-to-b from-blue-600 to-blue-400 rounded-full shadow-lg shadow-blue-200"></div>
+                        ' . $title . '
+                    </h1>
+                    <p class="text-[11px] text-gray-400 font-black uppercase tracking-[0.25em] mt-3 ml-6 opacity-70">' . $subtitle . '</p>
+                </div>
+                <div class="flex flex-wrap gap-3 items-center ml-6 md:ml-0">
+                    ' . $actions_html . '
+                </div>
+            </div>';
+        }
+    }
 ?>
 <!DOCTYPE html>
 <html lang="th">

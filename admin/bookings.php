@@ -66,32 +66,25 @@ require_once __DIR__ . '/includes/header.php';
 <div class="max-w-[1600px] mx-auto space-y-8 pb-32">
     
     <!-- HEADER & KPI CARDS -->
-    <header class="flex flex-col md:flex-row justify-between items-end gap-6">
-        <div>
-            <h1 class="text-3xl font-[900] text-gray-900 tracking-tighter flex items-center gap-4">
-                <div class="w-1.5 h-8 bg-blue-600 rounded-full"></div> 
-                Booking Management Center
-            </h1>
-            <p class="text-xs text-gray-400 font-bold uppercase tracking-[0.2em] mt-2">ศูนย์บริหารจัดการคิวการจองแบบองค์รวม</p>
-        </div>
-
-        <div class="flex gap-4">
-            <div class="bg-white border border-gray-100 p-4 px-6 rounded-[24px] shadow-sm flex items-center gap-4">
-                <div class="w-12 h-12 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center text-xl shadow-inner animate-pulse"><i class="fa-solid fa-clock-rotate-left"></i></div>
-                <div>
-                    <h5 class="text-[10px] text-amber-600 font-black uppercase tracking-widest">Pending Approval</h5>
-                    <p class="text-2xl font-black text-gray-900"><?= number_format($total_pending) ?></p>
-                </div>
-            </div>
-            <div class="bg-white border border-gray-100 p-4 px-6 rounded-[24px] shadow-sm flex items-center gap-4">
-                <div class="w-12 h-12 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-circle-check"></i></div>
-                <div>
-                    <h5 class="text-[10px] text-emerald-600 font-black uppercase tracking-widest">Active Bookings</h5>
-                    <p class="text-2xl font-black text-gray-900"><?= number_format($total_confirmed) ?></p>
-                </div>
+    <?php 
+    $header_actions = '
+        <div class="bg-white border border-gray-100 p-4 px-6 rounded-[24px] shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center text-xl shadow-inner animate-pulse"><i class="fa-solid fa-clock-rotate-left"></i></div>
+            <div>
+                <h5 class="text-[10px] text-amber-600 font-black uppercase tracking-widest">Pending Approval</h5>
+                <p class="text-2xl font-black text-gray-900">' . number_format((float)$total_pending) . '</p>
             </div>
         </div>
-    </header>
+        <div class="bg-white border border-gray-100 p-4 px-6 rounded-[24px] shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-circle-check"></i></div>
+            <div>
+                <h5 class="text-[10px] text-emerald-600 font-black uppercase tracking-widest">Active Bookings</h5>
+                <p class="text-2xl font-black text-gray-900">' . number_format((float)$total_confirmed) . '</p>
+            </div>
+        </div>';
+    
+    renderPageHeader("Booking Management Center", "ศูนย์บริหารจัดการคิวการจองแบบองค์รวม", $header_actions); 
+    ?>
 
     <!-- TAB & SEARCH FILTER BAR -->
     <section class="bg-white border border-gray-100 p-5 rounded-[32px] shadow-sm flex flex-col lg:flex-row justify-between items-center gap-6">
@@ -384,7 +377,7 @@ require_once __DIR__ . '/includes/header.php';
     function rescheduleOne(id) {
         Swal.fire({
             title: 'ยืนยันการเลื่อนคิว?',
-            html: "ระบบจะแจ้งให้ผู้ใช้ทราบว่าคิวที่ยืนยันแล้วถูกยกเลิกเพื่อให้ <b>เลื่อนวันจองใหม่</b> พร้อมส่ง LINE อาหารเตือนทันที",
+            html: "ระบบจะแจ้งให้ผู้ใช้ทราบว่าคิวที่ยืนยันแล้วถูกยกเลิกเพื่อให้ <b>เลื่อนวันจองใหม่</b> พร้อมส่ง LINE แจ้งเตือนทันที",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#f97316',

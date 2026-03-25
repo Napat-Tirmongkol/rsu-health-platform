@@ -46,18 +46,14 @@ require_once __DIR__ . '/includes/header.php';
 </style>
 
 <!-- HEADER SECTION -->
-<div class="mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4 animate-slide-up">
-    <div>
-        <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-3">
-            ภาพรวมระบบ (Dashboard)
-            <div class="relative flex h-4 w-4" title="ระบบกำลังอัปเดตแบบ Real-time">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500 top-0.5 left-0.5"></span>
-            </div>
-        </h1>
-        <p class="text-gray-500 text-sm mt-1 font-medium">สถิติการลงทะเบียน อัปเดตข้อมูลแบบ Real-time รอบทุกซอกทุกมุม</p>
-    </div>
-</div>
+<?php 
+$header_title = 'ภาพรวมระบบ (Dashboard)
+    <div class="relative flex h-4 w-4" title="ระบบกำลังอัปเดตแบบ Real-time">
+      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+      <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500 top-0.5 left-0.5"></span>
+    </div>';
+renderPageHeader($header_title, "สถิติการลงทะเบียน อัปเดตข้อมูลแบบ Real-time รอบทุกซอกทุกมุม"); 
+?>
 
 <!-- STATS GRID -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
