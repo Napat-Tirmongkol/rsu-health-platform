@@ -188,8 +188,18 @@ require_once __DIR__ . '/includes/header.php';
                     <input type="email" name="email" id="modalEmail" required class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none font-medium text-sm">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Password (เว้นว่างไว้หากไม่ต้องการเปลี่ยน)</label>
-                    <input type="password" name="password" id="modalPassword" class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none font-medium text-sm" placeholder="********">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest">Password (เว้นว่างไว้หากไม่ต้องการเปลี่ยน)</label>
+                        <button type="button" onclick="generatePassword()" class="text-[#0052CC] text-[10px] font-bold uppercase tracking-wider hover:underline flex items-center gap-1">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> เจนรหัสอัตโนมัติ
+                        </button>
+                    </div>
+                    <div class="relative">
+                        <input type="password" name="password" id="modalPassword" class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none font-medium text-sm pr-12" placeholder="********">
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                            <i id="passwordToggleIcon" class="fa-solid fa-eye-slash text-sm"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -235,7 +245,36 @@ require_once __DIR__ . '/includes/header.php';
 
     function closeModal() {
         modalContent.classList.add('scale-95', 'opacity-0');
-        setTimeout(() => modal.classList.add('hidden'), 300);
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            // รีเซ็ตสถานะรหัสผ่าน
+            document.getElementById('modalPassword').type = 'password';
+            document.getElementById('passwordToggleIcon').classList.replace('fa-eye', 'fa-eye-slash');
+        }, 300);
+    }
+
+    function generatePassword() {
+        const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
+        let retVal = "";
+        for (let i = 0; i < 12; ++i) {
+            retVal += charset.charAt(Math.floor(Math.random() * charset.length));
+        }
+        const pwdInput = document.getElementById('modalPassword');
+        pwdInput.value = retVal;
+        pwdInput.type = 'text'; // แสดงรหัสที่เจนให้เห็น
+        document.getElementById('passwordToggleIcon').classList.replace('fa-eye-slash', 'fa-eye');
+    }
+
+    function togglePasswordVisibility() {
+        const pwdInput = document.getElementById('modalPassword');
+        const icon = document.getElementById('passwordToggleIcon');
+        if (pwdInput.type === 'password') {
+            pwdInput.type = 'text';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        } else {
+            pwdInput.type = 'password';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        }
     }
 </script>
 
