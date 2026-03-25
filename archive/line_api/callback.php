@@ -3,9 +3,9 @@
 declare(strict_types=1);
 session_start();
 
-// ดึงการตั้งค่า LINE และเชื่อมต่อ Database ของระบบหลัก
+// ดึงการตั้งค่า LINE และเชื่อมต่อ Database ของระบบหลัก (Correct path to Root)
 require_once __DIR__ . '/line_config.php';
-require_once __DIR__ . '/../config/db_connect.php';
+require_once __DIR__ . '/../../config/db_connect.php';
 
 // ตรวจสอบว่า User จะไปหน้าไหนหลัง Login (e-campaign หรือ e_Borrow)
 $redirectTarget = $_SESSION['redirect_to'] ?? 'ecampaign';
@@ -104,7 +104,7 @@ try {
         if ($redirectTarget === 'eborrow') {
             header("Location: ../e_Borrow/index.php");
         } else {
-            header("Location: ../index.php");
+            header("Location: ../../index.php");
         }
         exit;
 
