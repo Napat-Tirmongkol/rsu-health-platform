@@ -4,7 +4,7 @@
 // 1. "เธเนเธฒเธเธขเธฒเธก" เนเธฅเธฐ "เน€เธเธทเนเธญเธกเธ•เนเธญ DB"
 // โ—€๏ธ (เนเธเนเนเธ) เน€เธเธดเนเธก ../ โ—€๏ธ
 include('../includes/check_session.php'); 
-require_once('../includes/db_connect.php');
+require_once(__DIR__ . '/../../../config/db_connect.php');
 
 // 2. เธ•เธฃเธงเธเธชเธญเธเธชเธดเธ—เธเธดเน Admin
 $allowed_roles = ['admin', 'editor'];

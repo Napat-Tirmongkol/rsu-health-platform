@@ -4,7 +4,7 @@
 @session_start();
 // (1. เธ•เธฃเธงเธเธชเธญเธ Session Admin เนเธฅเธฐเน€เธเธทเนเธญเธกเธ•เนเธญ DB)
 include('../includes/check_session_ajax.php');
-require_once('../includes/db_connect.php');
+require_once(__DIR__ . '/../../../config/db_connect.php');
 
 header('Content-Type: application/json');
 

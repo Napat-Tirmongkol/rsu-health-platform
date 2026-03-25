@@ -5,7 +5,7 @@
 
 // 1. "เธเนเธฒเธเธขเธฒเธก" เนเธฅเธฐ "เน€เธเธทเนเธญเธกเธ•เนเธญ DB"
 include('../includes/check_session_ajax.php');
-require_once('../includes/db_connect.php');
+require_once(__DIR__ . '/../../../config/db_connect.php');
 
 $allowed_roles = ['admin', 'employee', 'editor'];
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], $allowed_roles)) {

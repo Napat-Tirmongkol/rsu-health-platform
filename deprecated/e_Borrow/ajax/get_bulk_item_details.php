@@ -1,7 +1,7 @@
 ﻿<?php
 // ajax/get_bulk_item_details.php
 include('../includes/check_session_ajax.php');
-require_once('../includes/db_connect.php');
+require_once(__DIR__ . '/../../../config/db_connect.php');
 
 // เธฃเธฑเธเธเนเธญเธกเธนเธฅเน€เธเนเธ Array เธเธญเธ ID [1, 2, 3, ...]
 $data_json = $_POST['ids'] ?? '[]';

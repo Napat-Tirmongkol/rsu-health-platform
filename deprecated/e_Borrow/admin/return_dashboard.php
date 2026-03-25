@@ -3,7 +3,7 @@
 
 // 1. "เธเนเธฒเธเธขเธฒเธก" เนเธฅเธฐ "เน€เธเธทเนเธญเธกเธ•เนเธญ DB"
 include('../includes/check_session.php'); 
-require_once('../includes/db_connect.php'); 
+require_once(__DIR__ . '/../../../config/db_connect.php'); 
 
 // 2. เธ•เธฃเธงเธเธชเธญเธเธชเธดเธ—เธเธดเน (เธญเธเธธเธเธฒเธ• Admin, Employee เนเธฅเธฐ Editor)
 $allowed_roles = ['admin', 'employee', 'editor'];

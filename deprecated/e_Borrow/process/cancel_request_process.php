@@ -4,7 +4,7 @@
 // 1. (เธชเธณเธเธฑเธ) เนเธเน "เธขเธฒเธก" เธเธญเธเธเธฑเธเธจเธถเธเธฉเธฒ
 @session_start();
 require_once('../includes/check_student_session_ajax.php');
-require_once('../includes/db_connect.php');
+require_once(__DIR__ . '/../../../config/db_connect.php');
 
 header('Content-Type: application/json');
 $response = ['status' => 'error', 'message' => 'Invalid request'];

@@ -3,7 +3,7 @@
 // (เนเธเธฅเนเนเธซเธกเนเธชเธณเธซเธฃเธฑเธเธเธฑเธเธ—เธถเธเธเธฒเธฃเนเธเนเนเธ Item)
 
 include('../includes/check_session_ajax.php');
-require_once('../includes/db_connect.php');
+require_once(__DIR__ . '/../../../config/db_connect.php');
 require_once('../includes/log_function.php');
 
 $allowed_roles = ['admin', 'editor'];

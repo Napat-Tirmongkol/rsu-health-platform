@@ -4,7 +4,7 @@
 
 // 1. "เธเนเธฒเธเธขเธฒเธก" เนเธฅเธฐ "เน€เธเธทเนเธญเธกเธ•เนเธญ DB"
 include('includes/check_session_ajax.php');
-require_once('db_connect.php');
+require_once(__DIR__ . '/../../../config/db_connect.php');
 require_once('includes/log_function.php'); // โ—€๏ธ (เน€เธเธดเนเธก) เน€เธฃเธตเธขเธเนเธเน Log
 
 // 2. เธ•เธฑเนเธเธเนเธฒ Header

@@ -1,7 +1,7 @@
 ﻿<?php
 // process/approve_request_process.php (เธเธเธฑเธเนเธเนเนเธ: เธฃเธญเธเธฃเธฑเธ AJAX/JSON เนเธฅเธฐ approver_id)
 include('../includes/check_session.php');
-require_once('../includes/db_connect.php');
+require_once(__DIR__ . '/../../../config/db_connect.php');
 require_once('../includes/log_function.php');
 
 // เธ•เธฑเนเธเธเนเธฒเนเธซเนเธ•เธญเธเธเธฅเธฑเธเน€เธเนเธ JSON

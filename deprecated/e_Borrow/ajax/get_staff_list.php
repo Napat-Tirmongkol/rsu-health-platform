@@ -1,15 +1,15 @@
-<?php
+﻿<?php
 // get_staff_list.php
-// ดึงรายชื่อเจ้าหน้าที่ (Admin/Employee) ทั้งหมดเพื่อใช้ใน Dropdown
+// เธ”เธถเธเธฃเธฒเธขเธเธทเนเธญเน€เธเนเธฒเธซเธเนเธฒเธ—เธตเน (Admin/Employee) เธ—เธฑเนเธเธซเธกเธ”เน€เธเธทเนเธญเนเธเนเนเธ Dropdown
 
 include('../includes/check_student_session_ajax.php'); 
-require_once('../includes/db_connect.php');
+require_once(__DIR__ . '/../../../config/db_connect.php');
 
 header('Content-Type: application/json');
 $response = ['status' => 'error', 'staff' => []];
 
 try {
-    // ดึงเฉพาะ Admin และ Employee (เจ้าหน้าที่)
+    // เธ”เธถเธเน€เธเธเธฒเธฐ Admin เนเธฅเธฐ Employee (เน€เธเนเธฒเธซเธเนเธฒเธ—เธตเน)
     $stmt = $pdo->prepare("SELECT id, full_name FROM sys_staff WHERE role IN ('admin', 'employee') ORDER BY full_name ASC");
     $stmt->execute();
     $staff_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -18,7 +18,7 @@ try {
     $response['staff'] = $staff_list;
 
 } catch (PDOException $e) {
-    $response['message'] = $e->getMessage(); // ◀️ (แก้ไข)
+    $response['message'] = $e->getMessage(); // โ—€๏ธ (เนเธเนเนเธ)
 }
 
 echo json_encode($response);

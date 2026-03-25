@@ -14,7 +14,7 @@ if (!isset($_GET['secret']) || $_GET['secret'] !== $MY_SECRET_KEY) {
 }
 
 // 3. เธ–เนเธฒ Key เธ–เธนเธเธ•เนเธญเธ เธชเธเธฃเธดเธเธ•เนเธเธฐเธ—เธณเธเธฒเธเธ•เนเธญ...
-require_once(__DIR__ . '/../includes/db_connect.php');
+require_once(__DIR__ . '/../../../config/db_connect.php');
 require_once(__DIR__ . '/../includes/line_config.php');
 
 $push_api_url = 'https://api.line.me/v2/bot/message/push';

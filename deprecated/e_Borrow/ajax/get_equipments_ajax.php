@@ -3,7 +3,7 @@
 // (เนเธเธฅเนเนเธซเธกเน) Endpoint เธชเธณเธซเธฃเธฑเธเธ”เธถเธเธเนเธญเธกเธนเธฅเธญเธธเธเธเธฃเธ“เนเธ”เนเธงเธข AJAX
 
 include('../includes/check_session_ajax.php');
-require_once('../includes/db_connect.php');
+require_once(__DIR__ . '/../../../config/db_connect.php');
 
 $response = ['status' => 'error', 'message' => 'เน€เธเธดเธ”เธเนเธญเธเธดเธ”เธเธฅเธฒเธ”', 'data' => []];
 

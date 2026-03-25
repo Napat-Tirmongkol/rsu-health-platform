@@ -1,7 +1,7 @@
 ﻿<?php
 // process/approve_request_process.php
 include('../includes/check_session.php');
-require_once('../includes/db_connect.php');
+require_once(__DIR__ . '/../../../config/db_connect.php');
 require_once('../includes/log_function.php');
 
 // เธ•เธฃเธงเธเธชเธญเธเธงเนเธฒเน€เธเนเธ POST เนเธฅเธฐเธกเธตเธเนเธฒ transaction_id เธชเนเธเธกเธฒ

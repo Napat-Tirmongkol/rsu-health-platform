@@ -3,7 +3,7 @@
 // โ—€๏ธ (เนเธเนเนเธ) API เธเธตเนเธเธฐเธเนเธเธซเธฒเธเธฒเธ "Types" เธ—เธตเนเธงเนเธฒเธ
 
 include('../includes/check_session_ajax.php');
-require_once('../includes/db_connect.php');
+require_once(__DIR__ . '/../../../config/db_connect.php');
 
 header('Content-Type: application/json');
 

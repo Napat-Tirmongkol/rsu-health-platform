@@ -3,7 +3,7 @@
 
 // 1. "เธเนเธฒเธเธขเธฒเธก" เนเธฅเธฐ "เน€เธเธทเนเธญเธกเธ•เนเธญ DB"
 require_once('../includes/check_student_session_ajax.php'); 
-require_once('../includes/db_connect.php');
+require_once(__DIR__ . '/../../../config/db_connect.php');
 require_once('../includes/log_function.php');
 
 header('Content-Type: application/json');

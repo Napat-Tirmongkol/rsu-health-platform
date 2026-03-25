@@ -6,7 +6,7 @@
 // 1. "เธเนเธฒเธเธขเธฒเธก" เนเธฅเธฐ "เน€เธเธทเนเธญเธกเธ•เนเธญ DB"
 // (เน€เธฃเธฒเนเธเน 'check_session.php' เน€เธเธฃเธฒเธฐเธเธตเนเธเธทเธญเธเธฑเธเธเนเธเธฑเธเธเธญเธ Admin/Staff)
 include('../includes/check_session_ajax.php');
-require_once('../includes/db_connect.php');
+require_once(__DIR__ . '/../../../config/db_connect.php');
 
 // 2. เธ•เธฑเนเธเธเนเธฒ Header เนเธซเนเธ•เธญเธเธเธฅเธฑเธเน€เธเนเธ JSON
 header('Content-Type: application/json');

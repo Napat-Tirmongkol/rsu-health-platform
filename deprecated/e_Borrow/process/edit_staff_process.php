@@ -1,27 +1,27 @@
-<?php
+﻿<?php
 // edit_staff_process.php
-// (ไฟล์ใหม่)
+// (เนเธเธฅเนเนเธซเธกเน)
 
-// 1. "จ้างยาม" และ "เชื่อมต่อ DB"
+// 1. "เธเนเธฒเธเธขเธฒเธก" เนเธฅเธฐ "เน€เธเธทเนเธญเธกเธ•เนเธญ DB"
 include('../includes/check_session_ajax.php');
-require_once('../includes/db_connect.php');
-require_once('../includes/log_function.php'); // ◀️ (เพิ่ม) เรียกใช้ Log
+require_once(__DIR__ . '/../../../config/db_connect.php');
+require_once('../includes/log_function.php'); // โ—€๏ธ (เน€เธเธดเนเธก) เน€เธฃเธตเธขเธเนเธเน Log
 
-// 2. ตรวจสอบสิทธิ์ Admin และตั้งค่า Header
+// 2. เธ•เธฃเธงเธเธชเธญเธเธชเธดเธ—เธเธดเน Admin เนเธฅเธฐเธ•เธฑเนเธเธเนเธฒ Header
 if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
     header('Content-Type: application/json');
-    echo json_encode(['status' => 'error', 'message' => 'คุณไม่มีสิทธิ์ดำเนินการ']);
+    echo json_encode(['status' => 'error', 'message' => 'เธเธธเธ“เนเธกเนเธกเธตเธชเธดเธ—เธเธดเนเธ”เธณเน€เธเธดเธเธเธฒเธฃ']);
     exit;
 }
 header('Content-Type: application/json');
 
-// 3. สร้างตัวแปรสำหรับเก็บคำตอบ
-$response = ['status' => 'error', 'message' => 'เกิดข้อผิดพลาดไม่ทราบสาเหตุ'];
+// 3. เธชเธฃเนเธฒเธเธ•เธฑเธงเนเธเธฃเธชเธณเธซเธฃเธฑเธเน€เธเนเธเธเธณเธ•เธญเธ
+$response = ['status' => 'error', 'message' => 'เน€เธเธดเธ”เธเนเธญเธเธดเธ”เธเธฅเธฒเธ”เนเธกเนเธ—เธฃเธฒเธเธชเธฒเน€เธซเธ•เธธ'];
 
-// 4. ตรวจสอบว่าเป็นการส่งข้อมูลแบบ POST หรือไม่
+// 4. เธ•เธฃเธงเธเธชเธญเธเธงเนเธฒเน€เธเนเธเธเธฒเธฃเธชเนเธเธเนเธญเธกเธนเธฅเนเธเธ POST เธซเธฃเธทเธญเนเธกเน
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    // 5. รับข้อมูลจากฟอร์ม AJAX
+    // 5. เธฃเธฑเธเธเนเธญเธกเธนเธฅเธเธฒเธเธเธญเธฃเนเธก AJAX
     $user_id      = isset($_POST['user_id']) ? (int)$_POST['user_id'] : 0;
     $username     = isset($_POST['username']) ? trim($_POST['username']) : '';
     $new_password = isset($_POST['new_password']) ? trim($_POST['new_password']) : '';
@@ -29,84 +29,84 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $role         = isset($_POST['role']) ? trim($_POST['role']) : null;
 
     if ($user_id == 0 || empty($username)) {
-        $response['message'] = 'ข้อมูลที่ส่งมาไม่ครบถ้วน (ID หรือ Username)';
+        $response['message'] = 'เธเนเธญเธกเธนเธฅเธ—เธตเนเธชเนเธเธกเธฒเนเธกเนเธเธฃเธเธ–เนเธงเธ (ID เธซเธฃเธทเธญ Username)';
         echo json_encode($response);
         exit;
     }
 
-    // 6. ดำเนินการ UPDATE
+    // 6. เธ”เธณเน€เธเธดเธเธเธฒเธฃ UPDATE
     try {
-        // 6.1 ดึงข้อมูลเดิม
+        // 6.1 เธ”เธถเธเธเนเธญเธกเธนเธฅเน€เธ”เธดเธก
         $stmt_get = $pdo->prepare("SELECT username, full_name, role, linked_line_user_id FROM sys_staff WHERE id = ?");
         $stmt_get->execute([$user_id]);
         $current_data = $stmt_get->fetch(PDO::FETCH_ASSOC);
 
         if (!$current_data) {
-            throw new Exception("ไม่พบบัญชีพนักงาน ID: $user_id");
+            throw new Exception("เนเธกเนเธเธเธเธฑเธเธเธตเธเธเธฑเธเธเธฒเธ ID: $user_id");
         }
 
-        // 6.2 ตรวจสอบ Username ซ้ำ
+        // 6.2 เธ•เธฃเธงเธเธชเธญเธ Username เธเนเธณ
         if ($current_data['username'] != $username) {
             $stmt_check = $pdo->prepare("SELECT id FROM sys_staff WHERE username = ?");
             $stmt_check->execute([$username]);
             if ($stmt_check->fetch()) {
-                throw new Exception("Username '$username' นี้ถูกใช้งานแล้ว");
+                throw new Exception("Username '$username' เธเธตเนเธ–เธนเธเนเธเนเธเธฒเธเนเธฅเนเธง");
             }
         }
 
-        // 6.3 (ตรรกะ) ถ้าเป็นบัญชีที่ผูกกับ LINE
+        // 6.3 (เธ•เธฃเธฃเธเธฐ) เธ–เนเธฒเน€เธเนเธเธเธฑเธเธเธตเธ—เธตเนเธเธนเธเธเธฑเธ LINE
         if ($current_data['linked_line_user_id']) {
             $sql = "UPDATE sys_staff SET username = ?";
             $params = [$username];
         } 
-        // (ถ้าเป็นบัญชีปกติ)
+        // (เธ–เนเธฒเน€เธเนเธเธเธฑเธเธเธตเธเธเธ•เธด)
         else {
            	if (!in_array($role, ['admin', 'employee', 'editor'])) {
-                throw new Exception("สิทธิ์ (Role) ที่ส่งมาไม่ถูกต้อง");
+                throw new Exception("เธชเธดเธ—เธเธดเน (Role) เธ—เธตเนเธชเนเธเธกเธฒเนเธกเนเธ–เธนเธเธ•เนเธญเธ");
             }
             $sql = "UPDATE sys_staff SET username = ?, full_name = ?, role = ?";
             $params = [$username, $full_name, $role];
         }
         
-        // 6.4 (ตรรกะ) ถ้ามีการกรอก "รหัสผ่านใหม่"
+        // 6.4 (เธ•เธฃเธฃเธเธฐ) เธ–เนเธฒเธกเธตเธเธฒเธฃเธเธฃเธญเธ "เธฃเธซเธฑเธชเธเนเธฒเธเนเธซเธกเน"
         if (!empty($new_password)) {
             $password_hash = password_hash($new_password, PASSWORD_DEFAULT);
             $sql .= ", password_hash = ?";
             $params[] = $password_hash;
         }
 
-        // 6.5 (รวมร่าง)
+        // 6.5 (เธฃเธงเธกเธฃเนเธฒเธ)
         $sql .= " WHERE id = ?";
         $params[] = $user_id;
         
         $stmt_update = $pdo->prepare($sql);
         $stmt_update->execute($params);
 
-        // ◀️ --- (เพิ่มส่วน Log) --- ◀️
+        // โ—€๏ธ --- (เน€เธเธดเนเธกเธชเนเธงเธ Log) --- โ—€๏ธ
         if ($stmt_update->rowCount() > 0) {
             $admin_user_id = $_SESSION['user_id'] ?? null;
             $admin_user_name = $_SESSION['full_name'] ?? 'System';
-            $log_desc = "Admin '{$admin_user_name}' (ID: {$admin_user_id}) ได้แก้ไขข้อมูลบัญชีพนักงาน (UID: {$user_id}, Username: {$username})";
+            $log_desc = "Admin '{$admin_user_name}' (ID: {$admin_user_id}) เนเธ”เนเนเธเนเนเธเธเนเธญเธกเธนเธฅเธเธฑเธเธเธตเธเธเธฑเธเธเธฒเธ (UID: {$user_id}, Username: {$username})";
             if (!empty($new_password)) {
-                $log_desc .= " (มีการ Reset รหัสผ่าน)";
+                $log_desc .= " (เธกเธตเธเธฒเธฃ Reset เธฃเธซเธฑเธชเธเนเธฒเธ)";
             }
             log_action($pdo, $admin_user_id, 'edit_staff', $log_desc);
         }
-        // ◀️ --- (จบส่วน Log) --- ◀️
+        // โ—€๏ธ --- (เธเธเธชเนเธงเธ Log) --- โ—€๏ธ
 
-        // 7. ถ้าสำเร็จ
+        // 7. เธ–เนเธฒเธชเธณเน€เธฃเนเธ
         $response['status'] = 'success';
-        $response['message'] = 'บันทึกการเปลี่ยนแปลงสำเร็จ';
+        $response['message'] = 'เธเธฑเธเธ—เธถเธเธเธฒเธฃเน€เธเธฅเธตเนเธขเธเนเธเธฅเธเธชเธณเน€เธฃเนเธ';
 
     } catch (Exception $e) {
-        $response['message'] = $e->getMessage(); // ◀️ (แก้ไข)
+        $response['message'] = $e->getMessage(); // โ—€๏ธ (เนเธเนเนเธ)
     }
 
 } else {
-    $response['message'] = 'ต้องใช้วิธี POST เท่านั้น';
+    $response['message'] = 'เธ•เนเธญเธเนเธเนเธงเธดเธเธต POST เน€เธ—เนเธฒเธเธฑเนเธ';
 }
 
-// 8. ส่งคำตอบ (JSON) กลับไปให้ JavaScript
+// 8. เธชเนเธเธเธณเธ•เธญเธ (JSON) เธเธฅเธฑเธเนเธเนเธซเน JavaScript
 echo json_encode($response);
 exit;
 ?>

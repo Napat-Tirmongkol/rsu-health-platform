@@ -1,39 +1,39 @@
-<?php
+﻿<?php
 // add_student_process.php
-// รับข้อมูลจาก Popup 'เพิ่มผู้ใช้งาน (โดย Admin)'
+// เธฃเธฑเธเธเนเธญเธกเธนเธฅเธเธฒเธ Popup 'เน€เธเธดเนเธกเธเธนเนเนเธเนเธเธฒเธ (เนเธ”เธข Admin)'
 
-// 1. "จ้างยาม" และ "เชื่อมต่อ DB"
+// 1. "เธเนเธฒเธเธขเธฒเธก" เนเธฅเธฐ "เน€เธเธทเนเธญเธกเธ•เนเธญ DB"
 include('../includes/check_session_ajax.php');
-require_once('../includes/db_connect.php');
-require_once('../includes/log_function.php'); // ◀️ (เพิ่ม) เรียกใช้ Log
+require_once(__DIR__ . '/../../../config/db_connect.php');
+require_once('../includes/log_function.php'); // โ—€๏ธ (เน€เธเธดเนเธก) เน€เธฃเธตเธขเธเนเธเน Log
 
-// 2. ตรวจสอบสิทธิ์ Admin และตั้งค่า Header
+// 2. เธ•เธฃเธงเธเธชเธญเธเธชเธดเธ—เธเธดเน Admin เนเธฅเธฐเธ•เธฑเนเธเธเนเธฒ Header
 if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
     header('Content-Type: application/json');
-    echo json_encode(['status' => 'error', 'message' => 'คุณไม่มีสิทธิ์ดำเนินการ']);
+    echo json_encode(['status' => 'error', 'message' => 'เธเธธเธ“เนเธกเนเธกเธตเธชเธดเธ—เธเธดเนเธ”เธณเน€เธเธดเธเธเธฒเธฃ']);
     exit;
 }
 header('Content-Type: application/json');
 
-// 3. สร้างตัวแปรสำหรับเก็บคำตอบ
-$response = ['status' => 'error', 'message' => 'เกิดข้อผิดพลาดไม่ทราบสาเหตุ'];
+// 3. เธชเธฃเนเธฒเธเธ•เธฑเธงเนเธเธฃเธชเธณเธซเธฃเธฑเธเน€เธเนเธเธเธณเธ•เธญเธ
+$response = ['status' => 'error', 'message' => 'เน€เธเธดเธ”เธเนเธญเธเธดเธ”เธเธฅเธฒเธ”เนเธกเนเธ—เธฃเธฒเธเธชเธฒเน€เธซเธ•เธธ'];
 
-// 4. ตรวจสอบว่าเป็นการส่งข้อมูลแบบ POST หรือไม่
+// 4. เธ•เธฃเธงเธเธชเธญเธเธงเนเธฒเน€เธเนเธเธเธฒเธฃเธชเนเธเธเนเธญเธกเธนเธฅเนเธเธ POST เธซเธฃเธทเธญเนเธกเน
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    // 5. รับข้อมูลจากฟอร์ม AJAX
+    // 5. เธฃเธฑเธเธเนเธญเธกเธนเธฅเธเธฒเธเธเธญเธฃเนเธก AJAX
     $full_name    = isset($_POST['full_name']) ? trim($_POST['full_name']) : '';
     $phone_number = isset($_POST['phone_number']) ? trim($_POST['phone_number']) : null;
 
     if (empty($full_name)) {
-        $response['message'] = 'กรุณากรอก ชื่อ-สกุล';
+        $response['message'] = 'เธเธฃเธธเธ“เธฒเธเธฃเธญเธ เธเธทเนเธญ-เธชเธเธธเธฅ';
         echo json_encode($response);
         exit;
     }
     
     if (empty($phone_number)) $phone_number = null;
 
-    // 6. (SQL ใหม่) ดำเนินการ INSERT ลง sys_users
+    // 6. (SQL เนเธซเธกเน) เธ”เธณเน€เธเธดเธเธเธฒเธฃ INSERT เธฅเธ sys_users
     try {
         $sql = "INSERT INTO sys_users (full_name, phone_number, status, line_user_id, student_personnel_id) 
                 VALUES (?, ?, 'other', NULL, '(Staff-Added)')";
@@ -43,28 +43,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $new_student_id = $pdo->lastInsertId();
 
-        // ◀️ --- (เพิ่มส่วน Log) --- ◀️
+        // โ—€๏ธ --- (เน€เธเธดเนเธกเธชเนเธงเธ Log) --- โ—€๏ธ
         if ($stmt->rowCount() > 0) {
             $admin_user_id = $_SESSION['user_id'] ?? null;
             $admin_user_name = $_SESSION['full_name'] ?? 'System';
-            $log_desc = "Admin '{$admin_user_name}' (ID: {$admin_user_id}) ได้เพิ่มผู้ใช้งาน (โดย Admin) ชื่อ: '{$full_name}' (ID ใหม่: {$new_student_id})";
+            $log_desc = "Admin '{$admin_user_name}' (ID: {$admin_user_id}) เนเธ”เนเน€เธเธดเนเธกเธเธนเนเนเธเนเธเธฒเธ (เนเธ”เธข Admin) เธเธทเนเธญ: '{$full_name}' (ID เนเธซเธกเน: {$new_student_id})";
             log_action($pdo, $admin_user_id, 'create_user_staff', $log_desc);
         }
-        // ◀️ --- (จบส่วน Log) --- ◀️
+        // โ—€๏ธ --- (เธเธเธชเนเธงเธ Log) --- โ—€๏ธ
 
-        // 7. ถ้าสำเร็จ ให้เปลี่ยนคำตอบ
+        // 7. เธ–เนเธฒเธชเธณเน€เธฃเนเธ เนเธซเนเน€เธเธฅเธตเนเธขเธเธเธณเธ•เธญเธ
         $response['status'] = 'success';
-        $response['message'] = 'เพิ่มผู้ใช้งานใหม่สำเร็จ';
+        $response['message'] = 'เน€เธเธดเนเธกเธเธนเนเนเธเนเธเธฒเธเนเธซเธกเนเธชเธณเน€เธฃเนเธ';
 
     } catch (PDOException $e) {
-        $response['message'] = 'เกิดข้อผิดพลาด DB: ' . $e->getMessage(); // ◀️ (แก้ไข)
+        $response['message'] = 'เน€เธเธดเธ”เธเนเธญเธเธดเธ”เธเธฅเธฒเธ” DB: ' . $e->getMessage(); // โ—€๏ธ (เนเธเนเนเธ)
     }
 
 } else {
-    $response['message'] = 'ต้องใช้วิธี POST เท่านั้น';
+    $response['message'] = 'เธ•เนเธญเธเนเธเนเธงเธดเธเธต POST เน€เธ—เนเธฒเธเธฑเนเธ';
 }
 
-// 8. ส่งคำตอบ (JSON) กลับไปให้ JavaScript
+// 8. เธชเนเธเธเธณเธ•เธญเธ (JSON) เธเธฅเธฑเธเนเธเนเธซเน JavaScript
 echo json_encode($response);
 exit;
 ?>

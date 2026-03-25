@@ -6,7 +6,7 @@
 // 1. "เธเนเธฒเธเธขเธฒเธก" เนเธฅเธฐ "เน€เธเธทเนเธญเธกเธ•เนเธญ DB"
 // โ… (เนเธเนเนเธ Path) เน€เธเธดเนเธก ../ เนเธฅเธฐเน€เธเธฅเธตเนเธขเธเน€เธเนเธเธขเธฒเธกเธเธญเธ AJAX
 include('../includes/check_session_ajax.php'); 
-require_once('../includes/db_connect.php');
+require_once(__DIR__ . '/../../../config/db_connect.php');
 require_once('../includes/log_function.php'); 
 
 // Set header to return JSON

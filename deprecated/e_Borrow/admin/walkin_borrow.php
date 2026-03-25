@@ -3,7 +3,7 @@
 // (Version: เธชเธกเธเธนเธฃเธ“เนเธ—เธตเนเธชเธธเธ” - เธเธฃเธญเธเธฃเธซเธฑเธชเน€เธญเธเนเธ”เน + เธชเนเธเธ QR เนเธ”เน + เธเธฑเธเธ—เธถเธเนเธกเน Error)
 
 include('../includes/check_session.php');
-require_once('../includes/db_connect.php');
+require_once(__DIR__ . '/../../../config/db_connect.php');
 
 if (!in_array($_SESSION['role'], ['admin', 'employee', 'editor'])) {
     header("Location: index.php");

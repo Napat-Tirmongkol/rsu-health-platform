@@ -1,7 +1,7 @@
 ﻿<?php
 // ajax/get_items_for_approve.php
 require_once('../includes/check_session_ajax.php'); // เธ•เธฃเธงเธเธชเธญเธ Session
-require_once('../includes/db_connect.php');
+require_once(__DIR__ . '/../../../config/db_connect.php');
 
 header('Content-Type: application/json');
 
