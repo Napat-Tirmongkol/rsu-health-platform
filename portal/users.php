@@ -118,7 +118,7 @@ require_once __DIR__ . '/../admin/includes/header.php';
                    onkeyup="filterUsers(this.value)">
         </div>
     </div>';
-    renderPageHeader("User Directory", "ศูนย์กลางข้อมูลและประวัติผู้ใช้งานทั้งระบบ", $header_actions);
+    renderPageHeader("User Directory", "ศูนย์กลางจัดการรายชื่อ: ค้นหา ตรวจสอบความถูกต้อง และจัดการประวัติผู้ใช้งานทั้งแคมเปญ", $header_actions); 
 ?>
 
     <!-- 📊 User Stats Summary -->

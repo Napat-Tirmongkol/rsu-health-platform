@@ -96,7 +96,7 @@ $header_actions = '
         <i class="fa-solid fa-user-plus group-hover:rotate-12 transition-transform"></i> เพิ่มเจ้าหน้าที่ใหม่
     </button>
 </div>';
-renderPageHeader("System Governance", "จัดการสิทธิ์และบัญชีผู้ดูแลระบบส่วนกลาง", $header_actions); 
+renderPageHeader("System Governance", "Hub บริหารจัดการ: เพิ่ม แก้ไข และควบคุมสิทธิ์การเข้าถึงระบบกลางของเจ้าหน้าที่", $header_actions); 
 ?>
 
     <!-- 📊 สรุปภาพรวม (Admin KPIs) -->
