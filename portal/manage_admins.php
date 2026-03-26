@@ -75,13 +75,53 @@ $admins = $pdo->query("SELECT * FROM sys_admins ORDER BY id DESC")->fetchAll();
 require_once __DIR__ . '/../admin/includes/header.php';
 ?>
 
-<div class="max-w-6xl mx-auto">
+<div class="max-w-6xl mx-auto px-4 py-8">
 <?php 
-$header_actions = '<button onclick="openAddModal()" class="bg-[#0052CC] hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-blue-200 active:scale-95">
-    <i class="fa-solid fa-user-plus"></i> เพิ่มแอดมินใหม่
+$header_actions = '<button onclick="openAddModal()" class="bg-[#0052CC] hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-blue-200 active:scale-95 group">
+    <i class="fa-solid fa-user-plus group-hover:rotate-12 transition-transform"></i> เพิ่มเจ้าหน้าที่ใหม่
 </button>';
-renderPageHeader("จัดการผู้ดูแลระบบ (Admins)", "เพิ่ม แก้ไข หรือระงับสิทธิ์การเข้าถึงระบบจัดการ", $header_actions); 
+renderPageHeader("System Governance", "จัดการสิทธิ์และบัญชีผู้ดูแลระบบส่วนกลาง", $header_actions); 
 ?>
+
+    <!-- 📊 สรุปภาพรวม (Admin KPIs) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 animate-slide-up">
+        <div class="bg-gradient-to-br from-white to-gray-50/50 p-6 rounded-[28px] border border-gray-100 shadow-sm">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-[#0052CC]">
+                    <i class="fa-solid fa-users-gear text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Admins</p>
+                    <p class="text-2xl font-black text-gray-900"><?= count($admins) ?></p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-gradient-to-br from-white to-gray-50/50 p-6 rounded-[28px] border border-gray-100 shadow-sm">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-rose-100 rounded-2xl flex items-center justify-center text-rose-600">
+                    <i class="fa-solid fa-shield-halved text-xl"></i>
+                </div>
+                <?php 
+                    $super_count = count(array_filter($admins, fn($a) => ($a['role'] ?? '') === 'superadmin' || ($a['role'] ?? '') === 'editor')); 
+                ?>
+                <div>
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">System Privileged</p>
+                    <p class="text-2xl font-black text-gray-900"><?= $super_count ?></p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-gradient-to-br from-white to-gray-50/50 p-6 rounded-[28px] border border-gray-100 shadow-sm border-dashed">
+            <div class="flex items-center gap-4 opacity-50">
+                <div class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-400">
+                    <i class="fa-solid fa-clock-rotate-left text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Last Activity</p>
+                    <p class="text-sm font-bold text-gray-900">Today, 07:44</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <?php if ($error): ?>
         <div class="bg-red-50 border border-red-100 text-red-600 p-4 rounded-xl mb-6 flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
@@ -95,48 +135,72 @@ renderPageHeader("จัดการผู้ดูแลระบบ (Admins)",
         </div>
     <?php endif; ?>
 
-    <div class="bg-white rounded-[24px] shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
-        <table class="w-full text-left border-collapse">
+    <div class="bg-white rounded-[32px] shadow-2xl shadow-gray-200/40 border border-gray-100/50 overflow-hidden animate-slide-up" style="animation-delay: 100ms;">
+        <div class="px-8 py-6 border-b border-gray-50 bg-gray-50/30 flex justify-between items-center">
+            <h3 class="font-black text-gray-900 text-sm uppercase tracking-widest">Administrative Roster</h3>
+            <div class="relative group">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-500 transition-colors"></i>
+                <input type="text" placeholder="ค้นหาแอดมิน..." class="pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all w-64 shadow-sm" onkeyup="filterAdmins(this.value)">
+            </div>
+        </div>
+        <table class="w-full text-left border-collapse" id="adminTable">
             <thead>
-                <tr class="bg-gray-50/50 border-b border-gray-100 text-[11px] uppercase tracking-[0.1em] font-bold text-gray-400">
-                    <th class="px-8 py-5">ชื่อ-นามสกุล</th>
-                    <th class="px-8 py-5">Username / Email</th>
-                    <th class="px-8 py-5">สถานะ</th>
-                    <th class="px-8 py-5 text-right">จัดการ</th>
+                <tr class="bg-white/50 border-b border-gray-50 text-[10px] uppercase tracking-[0.2em] font-black text-gray-400">
+                    <th class="px-8 py-5">Officer Details</th>
+                    <th class="px-8 py-5">Account Credentials</th>
+                    <th class="px-8 py-5">Privilege Level</th>
+                    <th class="px-8 py-5 text-right">Operations</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-50">
                 <?php foreach ($admins as $adm): ?>
-                <tr class="hover:bg-gray-50/50 transition-colors group">
+                <tr class="hover:bg-blue-50/30 transition-all group/row">
                     <td class="px-8 py-6">
                         <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold shadow-sm">
+                            <div class="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 text-gray-400 rounded-2xl flex items-center justify-center font-black shadow-sm group-hover/row:from-blue-500 group-hover/row:to-indigo-600 group-hover/row:text-white transition-all duration-500">
                                 <?= mb_substr($adm['full_name'], 0, 1) ?>
                             </div>
-                            <div class="font-bold text-gray-800"><?= htmlspecialchars($adm['full_name']) ?></div>
+                            <div>
+                                <div class="font-black text-gray-900 group-hover/row:text-blue-700 transition-colors uppercase tracking-tight"><?= htmlspecialchars($adm['full_name']) ?></div>
+                                <div class="text-[10px] text-gray-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Online
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-8 py-6 text-sm">
+                        <div class="flex flex-col gap-1">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-user-circle text-gray-300 text-xs"></i>
+                                <span class="font-black text-gray-800 tracking-tight"><?= htmlspecialchars($adm['username']) ?></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-envelope text-gray-300 text-[10px]"></i>
+                                <span class="text-xs text-gray-400 font-bold tracking-tight"><?= htmlspecialchars($adm['email']) ?></span>
+                            </div>
                         </div>
                     </td>
                     <td class="px-8 py-6">
-                        <div class="text-sm font-bold text-gray-900"><?= htmlspecialchars($adm['username']) ?></div>
-                        <div class="text-xs text-gray-400 font-medium"><?= htmlspecialchars($adm['email']) ?></div>
-                    </td>
-                    <td class="px-8 py-6">
-                        <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider <?= $adm['role'] === 'admin' ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-amber-50 text-amber-600 border border-amber-100' ?>">
-                            <?= $adm['role'] ?>
-                        </span>
+                        <?php 
+                            $is_super = ($adm['role'] ?? '') === 'superadmin' || ($adm['role'] ?? '') === 'editor';
+                        ?>
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border <?= $is_super ? 'bg-rose-50 border-rose-100 text-rose-600' : 'bg-blue-50 border-blue-100 text-[#0052CC]' ?> shadow-sm shadow-<?= $is_super ? 'rose-50' : 'blue-50' ?>">
+                            <i class="fa-solid <?= $is_super ? 'fa-crown' : 'fa-user-shield' ?> text-[10px]"></i>
+                            <span class="text-[10px] font-black uppercase tracking-widest"><?= htmlspecialchars($adm['role']) ?></span>
+                        </div>
                     </td>
                     <td class="px-8 py-6 text-right">
-                        <div class="flex justify-end gap-2">
-                            <button onclick='openEditModal(<?= json_encode($adm) ?>)' class="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-100 text-gray-500 hover:bg-blue-50 hover:text-blue-600 transition-all">
-                                <i class="fa-solid fa-pen-to-square"></i>
+                        <div class="flex justify-end gap-2 translate-x-4 opacity-0 group-hover/row:translate-x-0 group-hover/row:opacity-100 transition-all duration-300">
+                            <button onclick='openEditModal(<?= json_encode($adm) ?>)' class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-100 text-gray-400 hover:text-blue-600 hover:border-blue-100 hover:shadow-lg hover:shadow-blue-50 transition-all active:scale-90 shadow-sm" title="Edit Master">
+                                <i class="fa-solid fa-pen-nib text-sm"></i>
                             </button>
                             <?php if ($adm['id'] != $_SESSION['admin_id']): ?>
-                            <form method="POST" onsubmit="return confirm('ยืนยันระบบความปลอดภัย: คุณต้องการลบผู้ดูแลระบบคนนี้ใช่หรือไม่?')" style="display:inline;">
+                            <form method="POST" onsubmit="return confirm('CRITICAL ACTION: ยืนยันการลบทรัพยากรแอดมินคนนี้?')" style="display:inline;">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="admin_id" value="<?= $adm['id'] ?>">
                                 <?php csrf_field(); ?>
-                                <button type="submit" class="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-100 text-gray-500 hover:bg-red-50 hover:text-red-600 transition-all">
-                                    <i class="fa-solid fa-trash-can"></i>
+                                <button type="submit" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-100 text-gray-400 hover:text-rose-600 hover:border-rose-100 hover:shadow-lg hover:shadow-rose-50 transition-all active:scale-90 shadow-sm" title="Revoke Access">
+                                    <i class="fa-solid fa-trash-can text-sm"></i>
                                 </button>
                             </form>
                             <?php endif; ?>
@@ -272,6 +336,15 @@ renderPageHeader("จัดการผู้ดูแลระบบ (Admins)",
             pwdInput.type = 'password';
             icon.classList.replace('fa-eye', 'fa-eye-slash');
         }
+    }
+
+    function filterAdmins(val) {
+        const rows = document.querySelectorAll('#adminTable tbody tr');
+        val = val.toLowerCase();
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(val) ? '' : 'none';
+        });
     }
 </script>
 

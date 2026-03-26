@@ -95,17 +95,13 @@ $layout_none = isset($_GET['layout']) && $_GET['layout'] === 'none';
             <div class="mt-6 mb-2 px-6">
                 <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">User Management</p>
                 <div class="space-y-1">
-                    <a href="../sys_admin/users.php" class="flex-1 text-center bg-gray-50 hover:bg-gray-100 py-4 rounded-2xl text-sm font-black text-gray-700 transition-all active:scale-95">Users</a>
+                    <a href="../portal/users.php" class="flex-1 text-center bg-gray-50 hover:bg-gray-100 py-4 rounded-2xl text-sm font-black text-gray-700 transition-all active:scale-95 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-users"></i> Users Center
+                    </a>
                 </div>
             </div>
             <div class="mt-6 mb-2 px-6 text-xs uppercase tracking-[0.15em] font-extrabold text-gray-400 opacity-60">System Settings</div>
             <div class="px-6 space-y-1">
-                <a href="../sys_admin/manage_admins.php" class="flex items-center gap-3 p-3 rounded-xl <?= basename($_SERVER['PHP_SELF']) == 'manage_admins.php' ? 'bg-blue-50 text-[#0052CC] font-bold shadow-sm' : 'text-gray-500 hover:bg-gray-50' ?> transition-all group">
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 <?= basename($_SERVER['PHP_SELF']) == 'manage_admins.php' ? 'bg-blue-100' : 'bg-gray-50 group-hover:bg-blue-50' ?> transition-colors">
-                        <i class="fa-solid fa-user-shield text-[13px]"></i>
-                    </div>
-                    <span class="text-sm">จัดการผู้ดูแลระบบ</span>
-                </a>
                 <a href="../admin/activity_logs.php" class="flex items-center gap-3 p-3 rounded-xl <?= basename($_SERVER['PHP_SELF']) == 'activity_logs.php' ? 'bg-blue-50 text-[#0052CC] font-bold shadow-sm' : 'text-gray-500 hover:bg-gray-50' ?> transition-all group">
                     <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 <?= basename($_SERVER['PHP_SELF']) == 'activity_logs.php' ? 'bg-blue-100' : 'bg-gray-50 group-hover:bg-blue-50' ?> transition-colors">
                         <i class="fa-solid fa-file-lines text-[13px]"></i>

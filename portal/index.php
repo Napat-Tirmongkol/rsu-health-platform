@@ -47,16 +47,29 @@ $projects = [
     [
         'id'            => 'user_directory',
         'title'         => 'User Directory',
-        'description'   => 'ฐานข้อมูลศูนย์กลางผู้ใช้งานทั้งหมด (Master List) สำหรับวิเคราะห์รายชื่อและจัดการสิทธิ์',
+        'description'   => 'ฐานข้อมูลศูนย์กลางผู้ใช้งานทั้งหมด (Master List) สำหรับวิเคราะห์รายชื่อและตรวจสอบความถูกต้อง',
         'icon'          => 'fa-id-card-clip',
         'bg_color'      => 'bg-amber-50',
         'icon_color'    => 'text-amber-500',
         'border_color'  => 'border-amber-100',
-        'allowed_roles' => ['admin', 'superadmin'], // กำหนดสิทธิ์ที่เข้าถึงได้
-        'badges'        => [ 'Central DB', 'System Core' ],
+        'allowed_roles' => ['admin', 'superadmin'],
+        'badges'        => [ 'Central DB', 'Search' ],
         'actions'       => [
-            ['label' => 'Search Users', 'url' => '../sys_admin/users.php?layout=none', 'primary' => false],
-            ['label' => 'Manage Admins', 'url' => '../sys_admin/manage_admins.php?layout=none', 'primary' => true],
+            ['label' => 'Search Users', 'url' => 'users.php?layout=none', 'primary' => true],
+        ]
+    ],
+    [
+        'id'            => 'system_governance',
+        'title'         => 'System Governance',
+        'description'   => 'ศูนย์บริหารจัดการสิทธิ์และผู้ดูแลระบบ (Admin Control Tower) สำหรับเจ้าหน้าที่ระดับสูง',
+        'icon'          => 'fa-user-shield',
+        'bg_color'      => 'bg-rose-50',
+        'icon_color'    => 'text-rose-600',
+        'border_color'  => 'border-rose-100',
+        'allowed_roles' => ['superadmin', 'admin'],
+        'badges'        => [ 'Privileged', 'Security' ],
+        'actions'       => [
+            ['label' => 'Manage Admins', 'url' => 'manage_admins.php?layout=none', 'primary' => true],
         ]
     ],
     [
@@ -319,8 +332,8 @@ try {
                 <div class="bg-primary bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] p-8 rounded-[40px] text-white shadow-2xl shadow-blue-200 relative overflow-hidden">
                     <h4 class="text-lg font-black mb-4 relative z-10">System Shortcut</h4>
                     <div class="space-y-3 relative z-10">
-                        <a href="../sys_admin/users.php?layout=none" class="flex items-center gap-3 p-3 bg-white/10 rounded-2xl hover:bg-white/20 transition-all text-sm font-bold">
-                            <i class="fa-solid fa-user-plus w-5"></i> Add New User
+                        <a href="users.php" class="flex items-center gap-3 p-3 bg-white/10 rounded-2xl hover:bg-white/20 transition-all text-sm font-bold border border-white/5">
+                            <i class="fa-solid fa-users w-5"></i> Users Center
                         </a>
                         <a href="../admin/campaigns.php" class="flex items-center gap-3 p-3 bg-white/10 rounded-2xl hover:bg-white/20 transition-all text-sm font-bold">
                             <i class="fa-solid fa-plus w-5"></i> New Campaign
