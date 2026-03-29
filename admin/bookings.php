@@ -436,16 +436,79 @@ require_once __DIR__ . '/includes/header.php';
     /** 🛠️ API ACTIONS (Approve/Reject) */
     function approveOne(id) {
         Swal.fire({
-            title: 'Confirm Approval?',
-            text: "This will confirm the booking and send LINE notification.",
+            title: 'ยืนยันการอนุมัติ?',
+            text: "ระบบจะเปลี่ยนสถานะเป็น Confirmed และส่งอีเมล/LINE แจ้งเตือนผู้ใช้",
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#0052CC',
-            confirmButtonText: 'Yes, Approve'
+            confirmButtonText: 'ใช่, อนุมัติเลย',
+            cancelButtonText: 'ยกเลิก'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Perform Ajax... (Placeholder for actual call)
-                Swal.fire('Success!', 'The booking has been approved.', 'success').then(() => location.reload());
+                performApiCall('ajax_approve_booking.php', id, 'อนุมัติเรียบร้อย!', 'success');
+            }
+        });
+    }
+
+    function bulkApprove() {
+        const checked = document.querySelectorAll('.row-checkbox:checked');
+        const ids = Array.from(checked).map(cb => cb.closest('tr').dataset.id);
+        
+        Swal.fire({
+            title: `อนุมัติทั้งหมด ${ids.length} รายการ?`,
+            text: "สถานะจะเปลี่ยนเป็น Confirmed ทั้งหมด",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#0052CC',
+            confirmButtonText: 'ยืนยันอนุมัติทั้งหมด'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({ title: 'กำลังดำเนินการ...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                
+                // วนลูปส่งทีละตัว (เพื่อความง่ายและใช้ API เดิม) 
+                // หรือจะปรับ API ให้รับ Array ก็ได้ แต่ในขั้นนี้เพื่อความรวดเร็วจะใช้วิธี Promise.all
+                const requests = ids.map(id => {
+                    return fetch('ajax_approve_booking.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'appointment_id=' + id + '&csrf_token=<?= get_csrf_token() ?>'
+                    }).then(res => res.json());
+                });
+
+                Promise.all(requests).then(results => {
+                    Swal.fire('สำเร็จ!', `อนุมัติข้อมูลทั้งหมด ${ids.length} รายการแล้ว`, 'success').then(() => location.reload());
+                }).catch(err => {
+                    Swal.fire('Error', 'เกิดข้อผิดพลาดบางรายการ', 'error');
+                });
+            }
+        });
+    }
+
+    function bulkCancel() {
+        const checked = document.querySelectorAll('.row-checkbox:checked');
+        const ids = Array.from(checked).map(cb => cb.closest('tr').dataset.id);
+        
+        Swal.fire({
+            title: `ยกเลิกทั้งหมด ${ids.length} รายการ?`,
+            text: "ระบบจะแจ้งเตือนการยกเลิกไปยังผู้ใช้งานทุกคน",
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#EF4444',
+            confirmButtonText: 'ยืนยันยกเลิกทั้งหมด'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({ title: 'กำลังดำเนินการ...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                const requests = ids.map(id => {
+                    return fetch('ajax_force_cancel.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'appointment_id=' + id + '&csrf_token=<?= get_csrf_token() ?>'
+                    }).then(res => res.json());
+                });
+
+                Promise.all(requests).then(results => {
+                    Swal.fire('สำเร็จ!', 'ยกเลิกข้อมูลที่เลือกเรียบร้อยแล้ว', 'success').then(() => location.reload());
+                });
             }
         });
     }
