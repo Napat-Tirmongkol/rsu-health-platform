@@ -105,7 +105,7 @@ try {
         throw new Exception($error_msg);
     }
 
-} catch (Exception $e) {
+} catch (Throwable $e) {
     if ($pdo->inTransaction()) $pdo->rollBack();
     $response['message'] = $e->getMessage();
 }

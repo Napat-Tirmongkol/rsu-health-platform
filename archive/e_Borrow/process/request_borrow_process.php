@@ -132,7 +132,7 @@ try {
         'success' => false,
         'message' => 'Database Error: ' . $e->getMessage()
     ]);
-} catch (Exception $e) {
+} catch (Throwable $e) {
     if (isset($pdo) && $pdo->inTransaction()) {
         $pdo->rollBack();
     }

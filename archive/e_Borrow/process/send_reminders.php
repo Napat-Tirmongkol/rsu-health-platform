@@ -155,7 +155,7 @@ try {
 
 } catch (PDOException $e) {
     echo "Database Error: " . $e->getMessage() . "<br>";
-} catch (Exception $e) {
+} catch (Throwable $e) {
     echo "General Error: " . $e->getMessage() . "<br>";
 }
 

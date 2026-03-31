@@ -82,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $response['status'] = 'success';
         $response['message'] = 'บันทึกการเปลี่ยนแปลงสำเร็จ';
 
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         $pdo->rollBack();
         $response['message'] = $e->getMessage();
     }

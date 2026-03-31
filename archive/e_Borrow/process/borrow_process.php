@@ -77,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $response['status'] = 'success';
         $response['message'] = 'บันทึกการยืมสำเร็จ';
 
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         $pdo->rollBack(); 
         $response['message'] = 'เกิดข้อผิดพลาด: ' . $e->getMessage(); // ◀️ (แก้ไข)
     }

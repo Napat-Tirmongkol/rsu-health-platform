@@ -82,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['transaction_id'])) {
         $response['status'] = 'success';
         $response['message'] = "อนุมัติเรียบร้อยแล้ว (มอบอุปกรณ์ ID: $selected_item_id)";
 
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         $pdo->rollBack();
         $response['message'] = "เกิดข้อผิดพลาด: " . $e->getMessage();
     }

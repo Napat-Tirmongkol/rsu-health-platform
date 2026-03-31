@@ -89,7 +89,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $response['status'] = 'success';
         $response['message'] = 'เลื่อนขั้นผู้ใช้งานสำเร็จ';
 
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         $response['message'] = $e->getMessage();
     }
 

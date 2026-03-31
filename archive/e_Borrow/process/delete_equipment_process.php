@@ -69,7 +69,7 @@ try {
         throw new Exception("ไม่พบประเภทอุปกรณ์ที่ต้องการลบ (ID: $equipment_id)");
     }
 
-} catch (Exception $e) {
+} catch (Throwable $e) {
     $response['message'] = $e->getMessage();
 }
 

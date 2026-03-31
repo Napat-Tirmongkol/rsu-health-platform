@@ -84,7 +84,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $response['status'] = 'success';
         $response['message'] = 'บันทึกการคืนอุปกรณ์สำเร็จ';
 
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         $pdo->rollBack();
         $response['message'] = $e->getMessage();
     }

@@ -106,7 +106,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $response['message'] = 'บันทึกการชำระเงินเรียบร้อย';
         $response['new_payment_id'] = $new_payment_id;
 
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         $pdo->rollBack();
         $response['message'] = $e->getMessage();
     }

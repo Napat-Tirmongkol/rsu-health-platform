@@ -102,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
              $response['message'] = 'เกิดข้อผิดพลาด DB: ' . $e->getMessage();
         }
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
          $response['message'] = $e->getMessage();
     }
 

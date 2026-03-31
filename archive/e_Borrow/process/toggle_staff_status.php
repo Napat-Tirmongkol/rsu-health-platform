@@ -61,7 +61,7 @@ try {
         throw new Exception('�Դ��ͼԴ��Ҵ㹡���ѻവ�ҹ������');
     }
 
-} catch (Exception $e) {
+} catch (Throwable $e) {
     $response['message'] = $e->getMessage();
 }
 

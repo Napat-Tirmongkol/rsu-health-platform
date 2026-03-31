@@ -71,7 +71,7 @@ try {
         throw new Exception("LINE API Error: $http_code");
     }
 
-} catch (Exception $e) {
+} catch (Throwable $e) {
     echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
 }
 ?>

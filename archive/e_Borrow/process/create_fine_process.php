@@ -60,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             throw new Exception("ไม่สามารถอัปเดตข้อมูล Transaction หรือสร้าง Fine ได้");
         }
 
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         $pdo->rollBack();
         $response['message'] = $e->getMessage();
     }

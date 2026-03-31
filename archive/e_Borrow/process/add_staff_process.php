@@ -73,7 +73,7 @@ try {
 } catch (PDOException $e) {
     // �ó� Database Error
     $response['message'] = 'Database Error: ' . $e->getMessage();
-} catch (Exception $e) {
+} catch (Throwable $e) {
     // �ó� Error �����
     $response['message'] = $e->getMessage();
 }

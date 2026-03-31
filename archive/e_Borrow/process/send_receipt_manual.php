@@ -139,7 +139,7 @@ try {
         throw new Exception("LINE API Error: $httpCode");
     }
 
-} catch (Exception $e) {
+} catch (Throwable $e) {
     echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
 }
 ?>

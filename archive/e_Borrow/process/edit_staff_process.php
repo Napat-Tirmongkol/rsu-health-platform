@@ -98,7 +98,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $response['status'] = 'success';
         $response['message'] = 'บันทึกการเปลี่ยนแปลงสำเร็จ';
 
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         $response['message'] = $e->getMessage(); // ◀️ (แก้ไข)
     }
 

@@ -64,7 +64,7 @@ try {
         }
     }
 
-} catch (Exception $e) {
+} catch (Throwable $e) {
     $response['message'] = $e->getMessage();
 }
 

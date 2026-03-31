@@ -77,7 +77,7 @@ try {
         throw new Exception("ไม่สามารถคืนอุปกรณ์เข้าสต็อกได้ (อาจมีบางอย่างผิดพลาด)");
     }
 
-} catch (Exception $e) {
+} catch (Throwable $e) {
     // 11. (ใหม่) ย้อนกลับ Transaction หากล้มเหลว
     $pdo->rollBack();
     $response['message'] = $e->getMessage();

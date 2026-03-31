@@ -75,7 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             throw new Exception("ไม่พบพนักงานคนนี้ในระบบ (อาจถูกลบไปแล้ว)");
         }
 
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         $response['message'] = $e->getMessage(); // ◀️ (แก้ไข)
     }
 

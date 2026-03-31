@@ -75,7 +75,7 @@ try {
     $response['status'] = 'success';
     $response['message'] = 'ยกเลิกคำขอเรียบร้อย อุปกรณ์ถูกคืนเข้าสต็อกแล้ว';
 
-} catch (Exception $e) {
+} catch (Throwable $e) {
     $pdo->rollBack();
     $response['message'] = $e->getMessage();
 }
