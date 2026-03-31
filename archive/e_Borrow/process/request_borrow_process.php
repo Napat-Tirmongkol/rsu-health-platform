@@ -15,12 +15,11 @@ require_once __DIR__ . '/../../../config/db_connect.php';
 // ตั้งค่า Header เป็น JSON และ UTF-8
 header('Content-Type: application/json; charset=utf-8');
 
-// เตรียมคำตอบพื้นฐาน
-$response = ['success' => false, 'message' => 'เกิดข้อผิดพลาดในการประมวลผล'];
+$response = ['status' => 'error', 'message' => 'เกิดข้อผิดพลาดในการประมวลผล'];
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     http_response_code(405); // Method Not Allowed
-    echo json_encode(['success' => false, 'message' => 'อนุญาตเฉพาะการส่งข้อมูลแบบ POST เท่านั้น']);
+    echo json_encode(['status' => 'error', 'message' => 'อนุญาตเฉพาะการส่งข้อมูลแบบ POST เท่านั้น']);
     exit;
 }
 
@@ -119,7 +118,7 @@ try {
 
     // ส่งผลลัพธ์กลับแบบ Success
     echo json_encode([
-        'success' => true,
+        'status' => 'success',
         'message' => 'ส่งคำขอยืมสำเร็จ! กรุณารอเจ้าหน้าที่ตรวจสอบและอนุมัติ'
     ]);
 
@@ -129,7 +128,7 @@ try {
     }
     http_response_code(500);
     echo json_encode([
-        'success' => false,
+        'status' => 'error',
         'message' => 'Database Error: ' . $e->getMessage()
     ]);
 } catch (Throwable $e) {
@@ -138,7 +137,7 @@ try {
     }
     http_response_code(500);
     echo json_encode([
-        'success' => false,
+        'status' => 'error',
         'message' => 'Error: ' . $e->getMessage()
     ]);
 }
