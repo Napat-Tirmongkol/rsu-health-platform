@@ -33,8 +33,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $pdo->beginTransaction();
 
         // 1. ตรวจสอบว่า item_id เป็นของ transaction_id นี้จริง และสถานะถูกต้อง
-        $stmt_verify = $pdo->prepare("SELECT equipment_type_id FROM borrow_records
-                                     WHERE id = ? AND equipment_id = ?
+        $stmt_verify = $pdo->prepare("SELECT type_id FROM borrow_records
+                                     WHERE id = ? AND item_id = ?
                                      AND status = 'borrowed'
                                      AND approval_status IN ('approved', 'staff_added')");
         $stmt_verify->execute([$transaction_id, $item_id]);
