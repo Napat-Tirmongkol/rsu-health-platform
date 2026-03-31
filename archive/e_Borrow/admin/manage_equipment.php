@@ -1,6 +1,6 @@
 <?php
 // manage_equipment.php (กู้ชีพ: แก้ไข SQL ให้คำนวณจำนวนอุปกรณ์อัตโนมัติ)
-include('../includes/check_session.php'); 
+include('../includes/check_session.php');
 require_once(__DIR__ . '/../../../config/db_connect.php');
 
 $pdo = db();
@@ -17,7 +17,7 @@ $message = $_GET['message'] ?? '';
 $message_type = $_GET['type'] ?? 'success';
 
 // 3. ตั้งค่าหน้าเพจ
-$page_title = "จัดการประเภทอุปกรณ์"; 
+$page_title = "จัดการประเภทอุปกรณ์";
 $current_page = "manage_equip";
 
 include('../includes/header.php');
@@ -25,7 +25,7 @@ include('../includes/header.php');
 // 4. ดึงข้อมูลประเภทอุปกรณ์ พร้อมนับจำนวน (Sub-queries)
 try {
     $search_query = $_GET['search'] ?? '';
-    
+
     // SQL อัจฉริยะ: นับจำนวนอุปกรณ์ทั้งหมด และอุปกรณ์ที่ว่าง (Status = 'available')
     $sql = "SELECT 
                 bc.*,
@@ -51,6 +51,8 @@ try {
     $equipment_types = [];
     $error_msg = "ไม่สามารถเชื่อมต่อฐานข้อมูลได้ในขณะนี้";
 }
+
+
 ?>
 
 <div class="admin-wrap" style="padding: 20px;">
@@ -58,7 +60,8 @@ try {
         <div class="alert alert-danger"><?php echo $error_msg; ?></div>
     <?php endif; ?>
 
-    <div class="header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <div class="header-row"
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
         <h2><i class="fas fa-tools"></i> จัดการประเภทอุปกรณ์</h2>
         <div style="display: flex; gap: 10px;">
             <button class="btn btn-primary" onclick="openAddTypePopup()">
@@ -87,7 +90,8 @@ try {
                     <?php foreach ($equipment_types as $type): ?>
                         <tr>
                             <td><strong><?php echo htmlspecialchars($type['name']); ?></strong></td>
-                            <td><span class="text-muted"><?php echo htmlspecialchars($type['description'] ?? '-'); ?></span></td>
+                            <td><span class="text-muted"><?php echo htmlspecialchars($type['description'] ?? '-'); ?></span>
+                            </td>
                             <td style="text-align: center;">
                                 <span class="badge status-badge borrowed-ok">
                                     <?php echo $type['available_quantity']; ?> / <?php echo $type['total_quantity']; ?>
@@ -136,6 +140,17 @@ try {
             }
         });
     }
+    document.addEventListener('click', function (e) {
+        // ดักจับการคลิกปุ่มที่มีคำว่า "เพิ่มประเภท"
+        if (e.target && e.target.innerText.includes('เพิ่มประเภท')) {
+            e.preventDefault();
+            console.log('✅ ระบบจับการคลิกปุ่ม "+ เพิ่มประเภท" ได้แล้ว!');
+            console.log('ข้อมูลปุ่มที่กด:', e.target);
+
+            // แจ้งเตือนเพื่อให้เห็นชัดเจนว่าปุ่มกดติด
+            alert('ปุ่มกดติดแล้ว! แต่ยังไม่มีคำสั่งเปิด Modal หรือเพิ่มข้อมูลครับ');
+        }
+    });
 </script>
 
 <?php include('../includes/footer.php'); ?>
