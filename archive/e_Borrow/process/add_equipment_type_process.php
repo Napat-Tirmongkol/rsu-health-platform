@@ -98,12 +98,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $response['message'] = 'เพิ่มประเภทอุปกรณ์ใหม่สำเร็จ';
 
     } catch (PDOException $e) {
-        if ($e->getCode() == '23000') { 
+        if ($e->getCode() == '23000') {
              $response['message'] = 'ชื่อประเภทอุปกรณ์นี้มีในระบบแล้ว';
         } else {
              $response['message'] = 'เกิดข้อผิดพลาด DB: ' . $e->getMessage();
         }
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
          $response['message'] = $e->getMessage();
     }
 
