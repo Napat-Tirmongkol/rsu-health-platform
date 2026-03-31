@@ -116,41 +116,71 @@ try {
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     // Popup สำหรับเพิ่มประเภทอุปกรณ์
     function openAddTypePopup() {
         Swal.fire({
             title: 'เพิ่มประเภทอุปกรณ์ใหม่',
             html: `
-                <input id="swal-name" class="swal2-input" placeholder="ชื่อประเภท">
-                <textarea id="swal-desc" class="swal2-textarea" placeholder="รายละเอียด"></textarea>
+                <input id="swal-name" class="swal2-input" placeholder="ชื่อประเภท (เช่น โปรเจคเตอร์)">
+                <textarea id="swal-desc" class="swal2-textarea" placeholder="รายละเอียดเพิ่มเติม"></textarea>
             `,
             showCancelButton: true,
-            confirmButtonText: 'บันทึก',
+            confirmButtonText: 'บันทึกข้อมูล',
+            cancelButtonText: 'ยกเลิก',
             preConfirm: () => {
                 const name = document.getElementById('swal-name').value;
-                if (!name) return Swal.showValidationMessage('โปรดระบุชื่อประเภท');
-                return { name: name, desc: document.getElementById('swal-desc').value };
+                const desc = document.getElementById('swal-desc').value;
+
+                // ดักจับกรณีผู้ใช้ไม่กรอกชื่อ
+                if (!name.trim()) {
+                    Swal.showValidationMessage('โปรดระบุชื่อประเภทอุปกรณ์');
+                    return false;
+                }
+                return { name: name.trim(), desc: desc.trim() };
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                // ส่ง AJAX ไปบันทึก (ตัวอย่าง)
-                Swal.fire('กำลังสร้าง...', '', 'info');
-                // ... logic การส่งบันทึก ...
+
+                // แสดง Popup โหลดดิ้งระหว่างรอ
+                Swal.fire({
+                    title: 'กำลังบันทึกข้อมูล...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // เตรียมข้อมูลเพื่อส่งไป Backend
+                const formData = new FormData();
+                formData.append('type_name', result.value.name); // กำหนด Key ให้ตรงกับที่ไฟล์ process คาดหวัง
+                formData.append('type_desc', result.value.desc);
+
+                // ส่ง AJAX ไปที่ไฟล์จัดการ Database
+                fetch('../process/add_equipment_type_process.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.text()) // รับค่าการตอบกลับจาก PHP
+                    .then(data => {
+                        // สมมติว่าไฟล์ process บันทึกสำเร็จ
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'บันทึกประเภทอุปกรณ์สำเร็จ!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            window.location.reload(); // รีเฟรชหน้าเว็บ 1 รอบเพื่อแสดงข้อมูลใหม่
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire('เกิดข้อผิดพลาด!', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
+                    });
             }
         });
     }
-    document.addEventListener('click', function (e) {
-        // ดักจับการคลิกปุ่มที่มีคำว่า "เพิ่มประเภท"
-        if (e.target && e.target.innerText.includes('เพิ่มประเภท')) {
-            e.preventDefault();
-            console.log('✅ ระบบจับการคลิกปุ่ม "+ เพิ่มประเภท" ได้แล้ว!');
-            console.log('ข้อมูลปุ่มที่กด:', e.target);
-
-            // แจ้งเตือนเพื่อให้เห็นชัดเจนว่าปุ่มกดติด
-            alert('ปุ่มกดติดแล้ว! แต่ยังไม่มีคำสั่งเปิด Modal หรือเพิ่มข้อมูลครับ');
-        }
-    });
 </script>
 
 <?php include('../includes/footer.php'); ?>
