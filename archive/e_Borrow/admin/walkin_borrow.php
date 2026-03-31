@@ -4,6 +4,7 @@
 
 include('../includes/check_session.php');
 require_once(__DIR__ . '/../../../config/db_connect.php');
+$pdo = db();
 
 if (!in_array($_SESSION['role'], ['admin', 'employee', 'editor'])) {
     header("Location: index.php");

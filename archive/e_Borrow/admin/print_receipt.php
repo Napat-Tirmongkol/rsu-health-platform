@@ -1,6 +1,7 @@
 <?php
 include('../includes/check_session.php'); 
 require_once(__DIR__ . '/../../../config/db_connect.php');
+$pdo = db();
 
 $allowed_roles = ['admin', 'editor'];
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], $allowed_roles)) {

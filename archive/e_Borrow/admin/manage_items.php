@@ -5,6 +5,7 @@
 // ◀️ (แก้ไข) เพิ่ม ../ ◀️
 include('../includes/check_session.php'); 
 require_once(__DIR__ . '/../../../config/db_connect.php');
+$pdo = db();
 
 // 2. ตรวจสอบสิทธิ์ Admin
 $allowed_roles = ['admin', 'editor'];
