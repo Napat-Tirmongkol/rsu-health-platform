@@ -11,7 +11,7 @@
 declare(strict_types=1);
 
 // ── Secret Token (ต้องตรงกันกับที่ใส่ใน URL ของ cron-job.org) ──────────────
-define('PURGE_SECRET_TOKEN', 'CHANGE_THIS_TO_RANDOM_STRING');
+define('PURGE_SECRET_TOKEN', 'rsu_purge_a8f3k2m9x');
 
 // ── ตรวจสอบ token (รองรับทั้ง HTTP และ CLI) ──────────────────────────────────
 $isCli = php_sapi_name() === 'cli';
