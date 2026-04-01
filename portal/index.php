@@ -242,10 +242,9 @@ try {
                     /** 
                      * 🚀 DYNAMIC LOOP: เรนเดอร์การ์ดโปรเจกต์ตามสิทธิที่ระบุใน Array
                      */
-                    foreach($projects as $proj): 
-                        // [ROLE-BASED CHECK PLACEHOLDER]
-                        // $hasAccess = in_array($adminRole, $proj['allowed_roles']);
-                        // if (!$hasAccess) continue; // ซ่อนโปรเจกต์ถ้าแอดมินคนนี้ไม่มีสิทธิ์เข้า
+                    foreach($projects as $proj):
+                        $hasAccess = in_array($adminRole, $proj['allowed_roles']);
+                        if (!$hasAccess) continue; // ซ่อนโปรเจกต์ถ้าแอดมินคนนี้ไม่มีสิทธิ์เข้า
                     ?>
                     
                     <div class="group relative bg-white border border-gray-100 p-8 rounded-[48px] flex flex-col justify-between card-shift transition-all duration-500 overflow-hidden">
