@@ -13,7 +13,7 @@
 declare(strict_types=1);
 
 // ── Secret Token (เปลี่ยนเป็นรหัสของคุณ) ─────────────────────────────────────
-define('BACKUP_SECRET_TOKEN', 'CHANGE_THIS_TO_RANDOM_STRING');
+define('BACKUP_SECRET_TOKEN', 'rsu_purge_a8f3k2m9x');
 
 // ── ตรวจสอบ token ─────────────────────────────────────────────────────────────
 $token = $_GET['token'] ?? $_SERVER['HTTP_X_CRON_TOKEN'] ?? '';
