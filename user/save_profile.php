@@ -26,12 +26,17 @@ $phoneNumber = trim((string) ($_POST['phone_number'] ?? ''));
 $status = trim((string) ($_POST['status'] ?? ''));
 $email = trim((string) ($_POST['email'] ?? ''));
 
-if ($fullName === '' || $citizenId === '' || $phoneNumber === '' || $status === '' || $email === '') {
+if ($status === '') {
+    header('Location: profile.php?error=no_status', true, 303);
+    exit;
+}
+
+if ($fullName === '' || $citizenId === '' || $phoneNumber === '' || $email === '') {
     header('Location: profile.php?error=empty', true, 303);
     exit;
 }
 
-// ถ้าไม่ใช่ external ต้องมีรหัส 7 หลัก
+// ถ้าไม่ใช่ external ต้องมีรหัส
 if ($status !== 'external' && $idNumber === '') {
     header('Location: profile.php?error=empty_student', true, 303);
     exit;

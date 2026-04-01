@@ -42,10 +42,27 @@ try {
   // กรณี Error ให้ปล่อยผ่านไปกรอกใหม่
 }
 
+$error_param = $_GET['error'] ?? '';
 render_header('ข้อมูลส่วนตัว');
 ?>
 
 <div class="p-5 pb-28 flex flex-col min-h-screen animate-in fade-in slide-in-from-right-4 duration-500">
+
+  <?php if ($error_param !== ''): ?>
+  <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 font-prompt flex items-start gap-3">
+    <i class="fa-solid fa-circle-exclamation mt-0.5 shrink-0"></i>
+    <span>
+      <?php if ($error_param === 'no_status'): ?>
+        กรุณาเลือกประเภทผู้ใช้งาน (นักศึกษา / บุคลากร / บุคคลทั่วไป)
+      <?php elseif ($error_param === 'empty_student'): ?>
+        กรุณากรอกรหัสนักศึกษา / บุคลากร
+      <?php else: ?>
+        กรุณากรอกข้อมูลให้ครบถ้วนทุกช่อง
+      <?php endif; ?>
+    </span>
+  </div>
+  <?php endif; ?>
+
   <form id="profileForm" class="flex-1 flex flex-col" method="post" action="save_profile.php">
     <?php csrf_field(); ?>
     <div class="flex-1 space-y-6">
@@ -167,6 +184,7 @@ render_header('ข้อมูลส่วนตัว');
     const statusInputs = document.querySelectorAll('input[name="status"]');
     const studentIdBtn = document.getElementById('student_id_container');
     const studentIdInput = document.getElementById('id_number');
+    const statusSection = document.querySelector('.grid.grid-cols-3');
 
     function toggleFields() {
       const rad = document.querySelector('input[name="status"]:checked');
@@ -178,6 +196,8 @@ render_header('ข้อมูลส่วนตัว');
         if (studentIdBtn) studentIdBtn.classList.remove('hidden');
         if (studentIdInput) studentIdInput.setAttribute('required', 'required');
       }
+      // ลบ error highlight เมื่อเลือกแล้ว
+      if (statusSection) statusSection.classList.remove('ring-2', 'ring-red-400', 'rounded-xl');
     }
 
     statusInputs.forEach(input => {
@@ -185,6 +205,27 @@ render_header('ข้อมูลส่วนตัว');
     });
 
     toggleFields();
+
+    // JS validation ก่อน submit (สำหรับ hidden radio ที่ browser อาจไม่ validate)
+    document.getElementById('profileForm').addEventListener('submit', function (e) {
+      const selected = document.querySelector('input[name="status"]:checked');
+      if (!selected) {
+        e.preventDefault();
+        if (statusSection) {
+          statusSection.classList.add('ring-2', 'ring-red-400', 'rounded-xl');
+          statusSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        // แสดง inline error
+        let errEl = document.getElementById('status-error');
+        if (!errEl) {
+          errEl = document.createElement('p');
+          errEl.id = 'status-error';
+          errEl.className = 'text-xs text-red-500 mt-1 font-prompt';
+          errEl.textContent = 'กรุณาเลือกประเภทผู้ใช้งาน';
+          if (statusSection) statusSection.insertAdjacentElement('afterend', errEl);
+        }
+      }
+    });
   });
 </script>
 
