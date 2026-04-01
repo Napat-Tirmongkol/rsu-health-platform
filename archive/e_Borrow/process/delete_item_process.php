@@ -78,6 +78,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             throw new Exception("ลบข้อมูลไม่สำเร็จ (rowCount = 0)");
         }
 
+    } catch (PDOException $e) {
+        $pdo->rollBack();
+        // FK constraint violation (1451) — มีประวัติการยืมเชื่อมอยู่
+        if ($e->getCode() === '23000' || (isset($e->errorInfo[1]) && $e->errorInfo[1] === 1451)) {
+            $response['message'] = 'ไม่สามารถลบอุปกรณ์ได้ เนื่องจากมีประวัติการยืมที่เชื่อมโยงอยู่';
+        } else {
+            $response['message'] = $e->getMessage();
+        }
     } catch (Throwable $e) {
         $pdo->rollBack();
         $response['message'] = $e->getMessage();
