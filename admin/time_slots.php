@@ -195,7 +195,7 @@ $header_actions = '
         <span id="multiSelectLabel" class="truncate font-semibold text-[#0052CC]">แสดงทุกแคมเปญ</span>
         <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
     </button>
-    <div id="multiSelectDropdown" class="absolute z-50 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 hidden flex flex-col top-full overflow-hidden right-0 origin-top-right transform transition-all">
+    <div id="multiSelectDropdown" class="absolute z-50 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 flex-col top-full overflow-hidden right-0 origin-top-right transform transition-all" style="display:none">
         <div class="p-2 border-b border-gray-100 bg-gray-50">
             <div class="relative">
                 <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
@@ -660,18 +660,14 @@ function switchView(view) {
 // ฟังก์ชันปิด/เปิด Dropdown และ Multi-Select Logic
 function toggleMultiSelect() {
     const dropdown = document.getElementById('multiSelectDropdown');
-    if (dropdown.classList.contains('hidden')) {
-        dropdown.classList.remove('hidden');
-    } else {
-        dropdown.classList.add('hidden');
-    }
+    dropdown.style.display = (dropdown.style.display === 'none' || dropdown.style.display === '') ? 'flex' : 'none';
 }
 
 // ปิด dropdown เมื่อกดคลิกที่อื่น
 document.addEventListener('click', function(event) {
     const container = document.getElementById('multiSelectContainer');
     if (container && !container.contains(event.target)) {
-        document.getElementById('multiSelectDropdown').classList.add('hidden');
+        document.getElementById('multiSelectDropdown').style.display = 'none';
     }
 });
 
