@@ -46,7 +46,7 @@ try {
         JOIN sys_users u ON b.student_id = u.id
         JOIN camp_slots s ON b.slot_id = s.id
         JOIN camp_list c ON b.campaign_id = c.id
-        WHERE ( (s.slot_date >= :start AND s.slot_date <= :end) OR b.status = 'booked' )
+        WHERE ( (s.slot_date >= :start AND s.slot_date <= :end) OR b.status IN ('booked', 'confirmed') )
           AND b.status IN ('booked', 'confirmed', 'cancelled', 'cancelled_by_admin') 
         ORDER BY 
             CASE WHEN b.status = 'booked' THEN 0 ELSE 1 END,
