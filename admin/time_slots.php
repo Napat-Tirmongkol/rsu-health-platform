@@ -195,7 +195,7 @@ $header_actions = '
         <span id="multiSelectLabel" class="truncate font-semibold text-[#0052CC]">แสดงทุกแคมเปญ</span>
         <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
     </button>
-    <div id="multiSelectDropdown" class="absolute mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 flex-col top-full overflow-hidden right-0" style="display:none;z-index:9999">
+    <div id="multiSelectDropdown" class="w-64 bg-white rounded-xl shadow-xl border border-gray-100 flex-col overflow-hidden" style="display:none;position:fixed;z-index:9999">
         <div class="p-2 border-b border-gray-100 bg-gray-50">
             <div class="relative">
                 <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
@@ -660,7 +660,15 @@ function switchView(view) {
 // ฟังก์ชันปิด/เปิด Dropdown และ Multi-Select Logic
 function toggleMultiSelect() {
     const dropdown = document.getElementById('multiSelectDropdown');
-    dropdown.style.display = (dropdown.style.display === 'none' || dropdown.style.display === '') ? 'flex' : 'none';
+    if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+        const btn = document.querySelector('#multiSelectContainer button');
+        const rect = btn.getBoundingClientRect();
+        dropdown.style.top  = (rect.bottom + 8) + 'px';
+        dropdown.style.right = (window.innerWidth - rect.right) + 'px';
+        dropdown.style.display = 'flex';
+    } else {
+        dropdown.style.display = 'none';
+    }
 }
 
 // ปิด dropdown เมื่อกดคลิกที่อื่น
