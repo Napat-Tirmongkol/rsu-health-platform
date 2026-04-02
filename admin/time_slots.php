@@ -192,11 +192,11 @@ $header_actions = '
     <i class="fa-solid fa-trash-can"></i> ลบที่เลือก (<span id="selectedSlotCount">0</span>)
 </button>
 <div class="relative" id="multiSelectContainer">
-    <button type="button" onclick="toggleMultiSelect()" class="px-4 py-2 border border-gray-200 rounded-xl bg-white font-prompt text-sm shadow-sm hover:bg-gray-50 text-gray-700 flex items-center justify-between w-56 transition-colors gap-2">
+    <button type="button" onclick="toggleMultiSelect(event)" class="px-4 py-2 border border-gray-200 rounded-xl bg-white font-prompt text-sm shadow-sm hover:bg-gray-50 text-gray-700 flex items-center justify-between w-56 transition-colors gap-2">
         <span id="multiSelectLabel" class="truncate font-semibold text-[#0052CC]">แสดงทุกแคมเปญ</span>
         <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
     </button>
-    <div id="multiSelectDropdown" class="w-64 bg-white rounded-xl shadow-xl border border-gray-100 flex-col overflow-hidden" style="display:none;position:fixed;z-index:9999">
+    <div id="multiSelectDropdown" class="w-64 bg-white rounded-xl shadow-xl border border-gray-100 flex-col overflow-hidden" style="display:none;position:fixed;z-index:9999" onclick="event.stopPropagation()">
         <div class="p-2 border-b border-gray-100 bg-gray-50">
             <div class="relative">
                 <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
@@ -787,7 +787,8 @@ function switchView(view) {
 }
 
 // ฟังก์ชันปิด/เปิด Dropdown และ Multi-Select Logic
-function toggleMultiSelect() {
+function toggleMultiSelect(e) {
+    if (e) e.stopPropagation();
     const dropdown = document.getElementById('multiSelectDropdown');
     if (dropdown.style.display === 'none' || dropdown.style.display === '') {
         const btn = document.querySelector('#multiSelectContainer button');
