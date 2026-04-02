@@ -17,7 +17,7 @@ $layout_none = isset($_GET['layout']) && $_GET['layout'] === 'none';
                     </h1>
                     <p class="text-[11px] text-gray-400 font-black uppercase tracking-[0.25em] mt-3 ml-6 opacity-70">' . $subtitle . '</p>
                 </div>
-                <div class="flex flex-wrap gap-3 items-center ml-6 md:ml-0">
+                <div class="flex flex-wrap gap-3 items-center ml-6 md:ml-0" style="position:relative;z-index:100">
                     ' . $actions_html . '
                 </div>
             </div>';
