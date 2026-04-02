@@ -254,9 +254,9 @@ require_once __DIR__ . '/includes/header.php';
 </div>
 
 <!-- 📦 SIDE DRAWER COMPONENT (Slide-over Details) -->
-<div id="drawerOverlay" class="fixed inset-0 z-[60] drawer-overlay hidden opacity-0" onclick="closeDrawer()"></div>
+<div id="drawerOverlay" class="fixed inset-0 z-[150] drawer-overlay hidden opacity-0" onclick="closeDrawer()"></div>
 <aside id="sideDrawer"
-    class="fixed top-0 right-0 h-screen w-full md:w-[480px] bg-white z-[70] shadow-2xl translate-x-full hidden flex flex-col transition-all duration-300">
+    class="fixed top-0 right-0 h-screen w-full md:w-[480px] bg-white z-[200] shadow-2xl translate-x-full hidden flex flex-col transition-all duration-300">
     <div class="p-8 border-b border-gray-100 flex justify-between items-center">
         <h3 class="text-2xl font-black text-gray-900 tracking-tight">Booking Info</h3>
         <button onclick="closeDrawer()"
