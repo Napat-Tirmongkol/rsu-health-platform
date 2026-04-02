@@ -27,7 +27,7 @@ if ($isUserFolder && !in_array($currentPage, $excludedPages)) {
             $stmtCheck->execute([':lid' => $lineUserId]);
             $uProf = $stmtCheck->fetch();
 
-            if (!$uProf || empty($uProf['full_name']) || empty($uProf['citizen_id']) || empty($uProf['phone_number']) || empty($uProf['status']) || ($uProf['status'] !== 'external' && empty($uProf['student_personnel_id']))) {
+            if (!$uProf || empty($uProf['full_name']) || empty($uProf['citizen_id']) || empty($uProf['phone_number']) || empty($uProf['status']) || ($uProf['status'] !== 'other' && empty($uProf['student_personnel_id']))) {
                 header('Location: profile.php');
                 exit;
             }

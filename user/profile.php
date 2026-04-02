@@ -98,8 +98,8 @@ render_header('ข้อมูลส่วนตัว');
                 บุคลากร/อาจารย์</div>
             </label>
             <label class="cursor-pointer">
-              <input type="radio" name="status" value="external" required class="peer hidden"
-                <?= $userData['status'] === 'external' ? 'checked' : '' ?>>
+              <input type="radio" name="status" value="other" required class="peer hidden"
+                <?= $userData['status'] === 'other' ? 'checked' : '' ?>>
               <div
                 class="py-3 px-1 text-center border border-gray-200 rounded-xl peer-checked:bg-[#E6F0FF] peer-checked:border-[#0052CC] peer-checked:text-[#0052CC] font-prompt text-[11px] font-bold transition-all h-full flex items-center justify-center">
                 บุคคลทั่วไป</div>
@@ -189,7 +189,7 @@ render_header('ข้อมูลส่วนตัว');
     function toggleFields() {
       const rad = document.querySelector('input[name="status"]:checked');
       const selectedStatus = rad ? rad.value : '';
-      if (selectedStatus === 'external') {
+      if (selectedStatus === 'other') {
         if (studentIdBtn) studentIdBtn.classList.add('hidden');
         if (studentIdInput) studentIdInput.removeAttribute('required');
       } else {

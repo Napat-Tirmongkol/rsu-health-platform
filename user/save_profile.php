@@ -36,8 +36,8 @@ if ($fullName === '' || $citizenId === '' || $phoneNumber === '' || $email === '
     exit;
 }
 
-// ถ้าไม่ใช่ external ต้องมีรหัส
-if ($status !== 'external' && $idNumber === '') {
+// ถ้าไม่ใช่ other ต้องมีรหัส
+if ($status !== 'other' && $idNumber === '') {
     header('Location: profile.php?error=empty_student', true, 303);
     exit;
 }
@@ -45,7 +45,7 @@ if ($status !== 'external' && $idNumber === '') {
 try {
     $pdo = db();
 
-    $sidValue = ($status === 'external') ? null : $idNumber;
+    $sidValue = ($status === 'other') ? null : $idNumber;
 
     // 3. ตรวจสอบว่ามี Record อยู่แล้วหรือไม่
     $stmtCheck = $pdo->prepare("SELECT id FROM sys_users WHERE line_user_id = :line_id LIMIT 1");

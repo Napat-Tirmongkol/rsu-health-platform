@@ -312,7 +312,7 @@ require_once __DIR__ . '/../admin/includes/header.php';
                         <option value="">-- เลือกประเภท --</option>
                         <option value="student">นักศึกษา</option>
                         <option value="staff">บุคลากร/อาจารย์</option>
-                        <option value="external">บุคคลทั่วไป</option>
+                        <option value="other">บุคคลทั่วไป</option>
                     </select>
                 </div>
             </div>

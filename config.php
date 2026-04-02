@@ -52,7 +52,7 @@ if (!function_exists('check_user_profile')) {
             $stmt->execute([':id' => $studentId]);
             $u = $stmt->fetch();
 
-            if (!$u || empty($u['email']) || empty($u['full_name']) || empty($u['phone_number']) || empty($u['status']) || ($u['status'] !== 'external' && empty($u['student_personnel_id']))) {
+            if (!$u || empty($u['email']) || empty($u['full_name']) || empty($u['phone_number']) || empty($u['status']) || ($u['status'] !== 'other' && empty($u['student_personnel_id']))) {
                 header('Location: profile.php');
                 exit;
             }
