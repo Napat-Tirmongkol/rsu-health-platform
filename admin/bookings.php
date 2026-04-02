@@ -202,7 +202,7 @@ require_once __DIR__ . '/includes/header.php';
                                     class="font-black text-gray-900 group-hover:text-blue-600 tracking-tight transition-colors">
                                     <?= htmlspecialchars($b['full_name']) ?></div>
                                 <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                                    <?= htmlspecialchars($b['student_personnel_id']) ?></div>
+                                    <?= htmlspecialchars($b['student_personnel_id'] ?? '—') ?></div>
                             </td>
                             <td class="p-6">
                                 <div class="text-sm font-bold text-gray-700 max-w-[200px] truncate">

@@ -219,7 +219,7 @@ require_once __DIR__ . '/../admin/includes/header.php';
                                     <div class="font-black text-gray-900 group-hover/row:text-blue-700 transition-colors uppercase tracking-tight"><?= htmlspecialchars($user['full_name']) ?></div>
                                     <div class="flex items-center gap-2">
                                         <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 px-2 py-0.5 rounded-md border border-gray-100">
-                                            #<?= htmlspecialchars($user['student_personnel_id']) ?>
+                                            #<?= htmlspecialchars($user['student_personnel_id'] ?? '—') ?>
                                         </div>
                                         <span class="w-1 h-1 rounded-full bg-gray-300"></span>
                                         <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider"><?= htmlspecialchars($user['status'] ?? 'Registered') ?></span>
