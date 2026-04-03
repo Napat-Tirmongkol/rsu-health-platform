@@ -212,7 +212,7 @@ function renderBookingCard($b): void {
                 <i class="fa-solid fa-user-pen text-[11px]"></i>
                 แก้ไขโปรไฟล์
             </a>
-            <button onclick="document.getElementById('logoutConfirm').classList.remove('hidden')"
+            <button onclick="openLogout()"
                 class="shrink-0 w-9 h-9 flex items-center justify-center bg-white/15 hover:bg-red-500/80 border border-white/20 rounded-xl text-white transition-all"
                 title="ออกจากระบบ">
                 <i class="fa-solid fa-right-from-bracket text-sm"></i>
@@ -220,31 +220,6 @@ function renderBookingCard($b): void {
         </div>
     </div>
 
-    <!-- Logout confirmation dialog -->
-    <div id="logoutConfirm" class="hidden fixed inset-0 z-[200] bg-black/40 backdrop-blur-sm flex items-end justify-center p-4"
-        onclick="if(event.target===this) this.classList.add('hidden')">
-        <div class="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl animate-in slide-in-from-bottom-4 duration-300">
-            <div class="flex items-center gap-3 mb-1">
-                <div class="w-11 h-11 bg-red-100 rounded-2xl flex items-center justify-center shrink-0">
-                    <i class="fa-solid fa-right-from-bracket text-red-500 text-lg"></i>
-                </div>
-                <div>
-                    <p class="font-black text-gray-900 text-base">ออกจากระบบ?</p>
-                    <p class="text-xs text-gray-500 mt-0.5">คุณจะต้อง Login ผ่าน LINE ใหม่อีกครั้ง</p>
-                </div>
-            </div>
-            <div class="flex gap-3 mt-5">
-                <button onclick="document.getElementById('logoutConfirm').classList.add('hidden')"
-                    class="flex-1 py-3 border-2 border-gray-200 rounded-2xl font-bold text-gray-600 hover:bg-gray-50 transition-all text-sm">
-                    ยกเลิก
-                </button>
-                <a href="logout.php"
-                    class="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-2xl font-bold text-center transition-all text-sm shadow-md shadow-red-200 active:scale-[0.98]">
-                    ออกจากระบบ
-                </a>
-            </div>
-        </div>
-    </div>
     <!-- Floating stats -->
     <div class="relative z-10 mt-5 flex gap-3">
         <div class="flex-1 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-3 text-center">
@@ -548,6 +523,39 @@ function closeModal() {
     modalSheet.classList.add('translate-y-full');
     modal.classList.add('opacity-0', 'pointer-events-none');
     setTimeout(() => { document.getElementById('modal-qrcode').src = ''; }, 300);
+}
+</script>
+
+<!-- Logout confirmation dialog — วางนอก <main> เพื่อให้ fixed positioning ทำงานถูกต้อง -->
+<div id="logoutConfirm" class="hidden" style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center;padding:16px"
+    onclick="if(event.target===this){this.style.display='none'}">
+    <div class="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl">
+        <div class="flex items-center gap-3 mb-1">
+            <div class="w-11 h-11 bg-red-100 rounded-2xl flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-right-from-bracket text-red-500 text-lg"></i>
+            </div>
+            <div>
+                <p class="font-black text-gray-900 text-base">ออกจากระบบ?</p>
+                <p class="text-xs text-gray-500 mt-0.5">คุณจะต้อง Login ผ่าน LINE ใหม่อีกครั้ง</p>
+            </div>
+        </div>
+        <div class="flex gap-3 mt-5">
+            <button onclick="document.getElementById('logoutConfirm').style.display='none'"
+                class="flex-1 py-3 border-2 border-gray-200 rounded-2xl font-bold text-gray-600 text-sm">
+                ยกเลิก
+            </button>
+            <a href="logout.php"
+                class="flex-1 py-3 bg-red-500 text-white rounded-2xl font-bold text-center text-sm shadow-md shadow-red-200">
+                ออกจากระบบ
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function openLogout() {
+    var el = document.getElementById('logoutConfirm');
+    el.style.display = 'flex';
 }
 </script>
 
