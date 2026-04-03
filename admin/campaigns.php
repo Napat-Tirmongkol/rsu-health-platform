@@ -25,8 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // 1. สร้างแคมเปญใหม่
     if ($action === 'add' && $title && $capacity >= 0) {
         try {
-            $sql = "INSERT INTO camp_list (title, type, description, total_capacity, available_until, status, is_auto_approve) 
-                    VALUES (:title, :type, :description, :capacity, :until, :status, :auto_approve)";
+            $newToken = bin2hex(random_bytes(8)); // 16-char hex token
+            $sql = "INSERT INTO camp_list (title, type, description, total_capacity, available_until, status, is_auto_approve, share_token)
+                    VALUES (:title, :type, :description, :capacity, :until, :status, :auto_approve, :token)";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([
                 ':title' => $title,
@@ -35,7 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':capacity' => $capacity,
                 ':until' => $availableUntil,
                 ':status' => $status,
-                ':auto_approve' => $isAutoApprove
+                ':auto_approve' => $isAutoApprove,
+                ':token' => $newToken
             ]);
             $message = "สร้างแคมเปญเรียบร้อยแล้ว!";
             $messageType = "success";
@@ -75,6 +77,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $messageType = "success";
                 }
             } catch (PDOException $e) {
+                $message = "เกิดข้อผิดพลาด: " . $e->getMessage();
+                $messageType = "error";
+            }
+        }
+    }
+
+    // 3a. สร้าง/รีเซ็ต share token
+    if ($action === 'gen_token') {
+        $id = (int) ($_POST['campaign_id'] ?? 0);
+        if ($id > 0) {
+            try {
+                $newToken = bin2hex(random_bytes(8));
+                $pdo->prepare("UPDATE camp_list SET share_token = :token WHERE id = :id")
+                    ->execute([':token' => $newToken, ':id' => $id]);
+                $message = "สร้าง URL แชร์เรียบร้อยแล้ว!";
+                $messageType = "success";
+            } catch (Exception $e) {
                 $message = "เกิดข้อผิดพลาด: " . $e->getMessage();
                 $messageType = "error";
             }
@@ -135,6 +154,14 @@ function getCampaignTypeDetails($type)
         'health_check' => ['label' => 'ตรวจสุขภาพ', 'color' => 'text-emerald-600', 'bg' => 'bg-emerald-100', 'icon' => 'fa-stethoscope', 'border' => 'border-emerald-200'],
         default => ['label' => 'กิจกรรมอื่นๆ', 'color' => 'text-orange-600', 'bg' => 'bg-orange-100', 'icon' => 'fa-star', 'border' => 'border-orange-200'],
     };
+}
+
+function buildShareUrl(string $token): string {
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'];
+    $adminDir = dirname($_SERVER['SCRIPT_NAME']); // /e-campaignv2/admin
+    $baseDir  = dirname($adminDir);               // /e-campaignv2
+    return $scheme . '://' . $host . $baseDir . '/user/c.php?t=' . $token;
 }
 
 require_once __DIR__ . '/includes/header.php';
@@ -345,6 +372,26 @@ renderPageHeader("จัดการแคมเปญ", "สร้างแค�
                         <td
                             class="px-6 py-5 text-center sticky right-0 <?= ($c['status'] === 'inactive' || $isExpired) ? 'bg-gray-50' : 'bg-white' ?> group-hover:bg-[#f8fafc] z-10 transition-colors shadow-[-4px_0_10px_rgba(0,0,0,0.02)] border-l border-gray-50">
                             <div class="flex items-center justify-center gap-2">
+                                <!-- Share URL button -->
+                                <?php if (!empty($c['share_token'])): ?>
+                                <button type="button"
+                                    class="share-btn w-9 h-9 bg-teal-50 text-teal-600 rounded-xl flex items-center justify-center hover:bg-teal-500 hover:text-white transition-all shadow-sm border border-teal-100"
+                                    title="คัดลอกลิงก์แชร์"
+                                    data-shareurl="<?= htmlspecialchars(buildShareUrl($c['share_token'])) ?>">
+                                    <i class="fa-solid fa-link pointer-events-none"></i>
+                                </button>
+                                <?php else: ?>
+                                <form method="POST" class="m-0">
+                                    <?php csrf_field(); ?>
+                                    <input type="hidden" name="action" value="gen_token">
+                                    <input type="hidden" name="campaign_id" value="<?= $c['id'] ?>">
+                                    <button type="submit"
+                                        class="w-9 h-9 bg-gray-50 text-gray-400 rounded-xl flex items-center justify-center hover:bg-teal-500 hover:text-white transition-all shadow-sm border border-gray-200"
+                                        title="สร้างลิงก์แชร์">
+                                        <i class="fa-solid fa-link-slash"></i>
+                                    </button>
+                                </form>
+                                <?php endif; ?>
                                 <button
                                     class="edit-btn w-9 h-9 bg-yellow-50 text-yellow-600 rounded-xl flex items-center justify-center hover:bg-yellow-400 hover:text-white transition-all shadow-sm border border-yellow-100"
                                     title="แก้ไขแคมเปญ" data-id="<?= htmlspecialchars($c['id']) ?>"
@@ -550,6 +597,48 @@ renderPageHeader("จัดการแคมเปญ", "สร้างแค�
         btn.className = 'w-2/3 bg-gradient-to-r from-[#0052CC] to-[#0043a8] text-white font-bold py-3.5 rounded-2xl hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-0.5 transition-all text-lg tracking-wide shadow-sm flex items-center justify-center gap-2';
 
         document.getElementById('campaignModal').classList.remove('hidden');
+    }
+
+    // ── Share URL copy-to-clipboard ──────────────────────────────
+    document.addEventListener('DOMContentLoaded', function () {
+        const shareBtns = document.querySelectorAll('.share-btn');
+        shareBtns.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const url = this.getAttribute('data-shareurl');
+                if (!url) return;
+                navigator.clipboard.writeText(url).then(function() {
+                    showShareToast(url);
+                }).catch(function() {
+                    // fallback สำหรับ browser เก่า
+                    const ta = document.createElement('textarea');
+                    ta.value = url;
+                    ta.style.position = 'fixed';
+                    ta.style.opacity = '0';
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    showShareToast(url);
+                });
+            });
+        });
+    });
+
+    function showShareToast(url) {
+        let toast = document.getElementById('shareToast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'shareToast';
+            toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:12px 20px;border-radius:16px;font-size:13px;font-weight:700;z-index:9999;display:flex;flex-direction:column;align-items:center;gap:6px;max-width:360px;width:90%;box-shadow:0 8px 30px rgba(0,0,0,0.25);transition:opacity 0.3s';
+            document.body.appendChild(toast);
+        }
+        toast.innerHTML = '<div style="display:flex;align-items:center;gap:8px"><span style="color:#22c55e;font-size:16px">✓</span> คัดลอกลิงก์แล้ว!</div>'
+                        + '<div style="background:#1e293b;border-radius:8px;padding:6px 10px;font-size:11px;font-family:monospace;color:#94a3b8;word-break:break-all;max-width:100%">' + url + '</div>';
+        toast.style.opacity = '1';
+        clearTimeout(toast._timer);
+        toast._timer = setTimeout(function() {
+            toast.style.opacity = '0';
+        }, 3000);
     }
 
     // Event Listener ให้ปุ่มแก้ไขทั้งหมดแทนการใช้ onclick
