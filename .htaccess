@@ -10,3 +10,12 @@ RewriteRule ^favicon\.ico$ - [R=204,L]
 
 # DirectoryIndex
 DirectoryIndex index.php index.html
+
+# ─── Custom Error Pages ───────────────────────────────────────
+ErrorDocument 400 /e-campaignv2/errors/404.php
+ErrorDocument 403 /e-campaignv2/errors/403.php
+ErrorDocument 404 /e-campaignv2/errors/404.php
+ErrorDocument 500 /e-campaignv2/errors/500.php
+ErrorDocument 502 /e-campaignv2/errors/500.php
+ErrorDocument 503 /e-campaignv2/errors/503.php
+ErrorDocument 504 /e-campaignv2/errors/503.php
