@@ -201,9 +201,16 @@ function renderBookingCard($b): void {
 <div class="bg-gradient-to-br from-[#0052CC] to-[#0070f3] pt-10 pb-16 px-5 relative overflow-hidden">
     <div class="absolute -right-10 -top-10 w-48 h-48 bg-white opacity-[0.05] rounded-full blur-3xl"></div>
     <div class="absolute -left-8 bottom-0 w-40 h-40 bg-cyan-300 opacity-[0.08] rounded-full blur-2xl"></div>
-    <div class="relative z-10">
-        <h1 class="text-[22px] font-bold text-white">การจองของฉัน</h1>
-        <p class="text-blue-200 text-sm mt-1">คิวจองกิจกรรมและประวัติการเข้าร่วม</p>
+    <div class="relative z-10 flex items-start justify-between gap-3">
+        <div>
+            <h1 class="text-[22px] font-bold text-white">การจองของฉัน</h1>
+            <p class="text-blue-200 text-sm mt-1">คิวจองกิจกรรมและประวัติการเข้าร่วม</p>
+        </div>
+        <a href="profile.php?redirect_back=my_bookings.php"
+           class="shrink-0 flex items-center gap-1.5 bg-white/15 hover:bg-white/25 border border-white/20 rounded-xl px-3 py-2 text-white text-xs font-bold font-prompt transition-all mt-1">
+            <i class="fa-solid fa-user-pen text-[11px]"></i>
+            แก้ไขโปรไฟล์
+        </a>
     </div>
     <!-- Floating stats -->
     <div class="relative z-10 mt-5 flex gap-3">

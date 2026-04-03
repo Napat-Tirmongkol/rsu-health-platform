@@ -25,6 +25,7 @@ $citizenId = trim((string) ($_POST['citizen_id'] ?? ''));
 $phoneNumber = trim((string) ($_POST['phone_number'] ?? ''));
 $status = trim((string) ($_POST['status'] ?? ''));
 $email = trim((string) ($_POST['email'] ?? ''));
+$redirectBack = trim((string) ($_POST['redirect_back'] ?? ''));
 
 if ($status === '') {
     header('Location: profile.php?error=no_status', true, 303);
@@ -106,7 +107,18 @@ try {
     $stmtCheck->execute([':student_id' => $studentPkId]);
     $hasBooking = (int) $stmtCheck->fetchColumn() > 0;
 
-    if ($hasBooking) {
+    // ถ้ามี redirect_back ที่ปลอดภัยให้ใช้
+    $safeRedirectBack = '';
+    if ($redirectBack !== '') {
+        // อนุญาตเฉพาะ relative path ภายใน user/ เท่านั้น
+        if (preg_match('/^[a-zA-Z0-9_\-\.]+\.php(\?[^\s]*)?$/', $redirectBack)) {
+            $safeRedirectBack = $redirectBack;
+        }
+    }
+
+    if ($safeRedirectBack !== '') {
+        header('Location: ' . $safeRedirectBack, true, 303);
+    } elseif ($hasBooking) {
         header('Location: my_bookings.php', true, 303);
     } else {
         header('Location: booking_campaign.php', true, 303);
