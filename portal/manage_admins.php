@@ -348,11 +348,11 @@ renderPageHeader("System Governance", "Hub บริหารจัดการ:
                                 <i class="fa-solid fa-pen-nib text-sm"></i>
                             </button>
                             <?php if ($adm['id'] != $_SESSION['admin_id']): ?>
-                            <form method="POST" onsubmit="return confirm('CRITICAL ACTION: ยืนยันการลบทรัพยากรแอดมินคนนี้?')" style="display:inline;">
+                            <form method="POST" id="deleteAdminForm_<?= $adm['id'] ?>" style="display:inline;">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="admin_id" value="<?= $adm['id'] ?>">
                                 <?php csrf_field(); ?>
-                                <button type="submit" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-100 text-gray-400 hover:text-rose-600 hover:border-rose-100 hover:shadow-lg hover:shadow-rose-50 transition-all active:scale-90 shadow-sm" title="Revoke Access">
+                                <button type="button" onclick="confirmDeleteAdmin(<?= $adm['id'] ?>, '<?= htmlspecialchars(addslashes($adm['full_name']), ENT_QUOTES) ?>')" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-100 text-gray-400 hover:text-rose-600 hover:border-rose-100 hover:shadow-lg hover:shadow-rose-50 transition-all active:scale-90 shadow-sm" title="Revoke Access">
                                     <i class="fa-solid fa-trash-can text-sm"></i>
                                 </button>
                             </form>
@@ -474,11 +474,11 @@ renderPageHeader("System Governance", "Hub บริหารจัดการ:
                                 class="w-9 h-9 flex items-center justify-center rounded-xl bg-white border border-gray-100 text-gray-400 hover:text-blue-600 hover:border-blue-100 shadow-sm transition-all">
                                 <i class="fa-solid fa-pen-nib text-xs"></i>
                             </button>
-                            <form method="POST" onsubmit="return confirm('ยืนยันการลบเจ้าหน้าที่คนนี้?')" style="display:inline">
+                            <form method="POST" id="deleteStaffForm_<?= (int)$st['id'] ?>" style="display:inline">
                                 <?php csrf_field(); ?>
                                 <input type="hidden" name="action" value="delete_staff">
                                 <input type="hidden" name="sf_id" value="<?= (int)$st['id'] ?>">
-                                <button type="submit" class="w-9 h-9 flex items-center justify-center rounded-xl bg-white border border-gray-100 text-gray-400 hover:text-rose-600 hover:border-rose-100 shadow-sm transition-all">
+                                <button type="button" onclick="confirmDeleteStaff(<?= (int)$st['id'] ?>, '<?= htmlspecialchars(addslashes($st['full_name'] ?? ''), ENT_QUOTES) ?>')" class="w-9 h-9 flex items-center justify-center rounded-xl bg-white border border-gray-100 text-gray-400 hover:text-rose-600 hover:border-rose-100 shadow-sm transition-all">
                                     <i class="fa-solid fa-trash-can text-xs"></i>
                                 </button>
                             </form>
@@ -872,7 +872,47 @@ renderPageHeader("System Governance", "Hub บริหารจัดการ:
 
     // close modal on backdrop click
     staffModal.addEventListener('click', e => { if (e.target === staffModal) closeStaffModal(); });
+
+    /* ── SweetAlert2 Delete Confirmations ─────────────────── */
+    function confirmDeleteAdmin(id, name) {
+        Swal.fire({
+            title: 'ลบผู้ดูแลระบบ?',
+            html: `ต้องการลบ <b>${name}</b> ออกจากระบบ?<br><span style="font-size:.8rem;color:#9ca3af">การดำเนินการนี้ไม่สามารถยกเลิกได้</span>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '<i class="fa-solid fa-trash-can mr-1"></i> ลบออก',
+            cancelButtonText: 'ยกเลิก',
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            reverseButtons: true,
+            focusCancel: true,
+            customClass: { popup: 'swal-font' },
+        }).then(result => {
+            if (result.isConfirmed) document.getElementById('deleteAdminForm_' + id).submit();
+        });
+    }
+
+    function confirmDeleteStaff(id, name) {
+        Swal.fire({
+            title: 'ลบเจ้าหน้าที่?',
+            html: `ต้องการลบ <b>${name}</b> ออกจากระบบ?<br><span style="font-size:.8rem;color:#9ca3af">การดำเนินการนี้ไม่สามารถยกเลิกได้</span>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '<i class="fa-solid fa-trash-can mr-1"></i> ลบออก',
+            cancelButtonText: 'ยกเลิก',
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            reverseButtons: true,
+            focusCancel: true,
+            customClass: { popup: 'swal-font' },
+        }).then(result => {
+            if (result.isConfirmed) document.getElementById('deleteStaffForm_' + id).submit();
+        });
+    }
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+<style>.swal-font { font-family: 'Prompt', sans-serif !important; }</style>
 
 <?php require_once __DIR__ . '/../admin/includes/footer.php'; ?>
 
