@@ -1,10 +1,11 @@
 /* ── Base ─────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
 body {
-    background: #f4f6fb;
+    background: #e2f4ea;
     background-image:
-        radial-gradient(circle at 18% 12%, rgba(0,82,204,.06) 0, transparent 420px),
-        radial-gradient(circle at 85% 80%, rgba(255,171,0,.05) 0, transparent 380px);
+        radial-gradient(circle at 18% 12%, rgba(46,158,99,.09) 0, transparent 420px),
+        radial-gradient(circle at 85% 80%, rgba(77,201,138,.07) 0, transparent 380px),
+        radial-gradient(circle at 50% 50%, rgba(59,186,122,.04) 0, transparent 600px);
     min-height: 100vh;
 }
 
@@ -19,29 +20,29 @@ body {
 /* ── Header ───────────────────────────────────────────── */
 .portal-header {
     background: #fff;
-    border-bottom: 1.5px solid #e8eef7;
-    box-shadow: 0 2px 12px rgba(0,82,204,.05);
+    border-bottom: 1.5px solid #c7e8d5;
+    box-shadow: 0 2px 12px rgba(46,158,99,.08);
     position: sticky; top: 0; z-index: 40;
 }
 .brand-icon {
     width: 44px; height: 44px;
-    background: linear-gradient(135deg, #0052CC 0%, #1a6fe8 100%);
+    background: linear-gradient(135deg, #2e9e63 0%, #3bba7a 100%);
     border-radius: 14px;
     display: flex; align-items: center; justify-content: center;
     color: #fff; font-size: 1.15rem;
-    box-shadow: 0 4px 12px rgba(0,82,204,.3);
+    box-shadow: 0 4px 12px rgba(46,158,99,.35);
     flex-shrink: 0;
 }
 .user-pill {
     display: flex; align-items: center; gap: 10px;
-    background: #f8fafc;
-    border: 1.5px solid #e2e8f0;
+    background: #f0faf4;
+    border: 1.5px solid #c7e8d5;
     border-radius: 99px;
     padding: 6px 14px 6px 8px;
 }
 .user-avatar {
     width: 30px; height: 30px;
-    background: linear-gradient(135deg,#0052CC,#1a6fe8);
+    background: linear-gradient(135deg, #2e9e63, #3bba7a);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     color: #fff; font-size: .7rem;
@@ -52,12 +53,12 @@ body {
     background: #fff;
     border-radius: 18px;
     padding: 22px 24px;
-    border: 1.5px solid #e8eef7;
+    border: 1.5px solid #d0ead9;
     box-shadow: 0 2px 8px rgba(0,0,0,.04);
     position: relative; overflow: hidden;
     transition: box-shadow .2s, transform .2s;
 }
-.kpi-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,82,204,.1); }
+.kpi-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(46,158,99,.14); }
 .kpi-accent { position: absolute; top:0; left:0; right:0; height:3px; border-radius:18px 18px 0 0; }
 .kpi-icon {
     width: 40px; height: 40px;
@@ -79,14 +80,14 @@ body {
     content: '';
     display: block;
     width: 4px; height: 20px;
-    background: linear-gradient(180deg,#0052CC,#60a5fa);
+    background: linear-gradient(180deg, #2e9e63, #6ee7b7);
     border-radius: 99px;
 }
 
 /* ── Project cards ────────────────────────────────────── */
 .proj-card {
     background: #fff;
-    border: 1.5px solid #e8eef7;
+    border: 1.5px solid #d0ead9;
     border-radius: 22px;
     padding: 24px;
     display: flex; flex-direction: column;
@@ -95,8 +96,8 @@ body {
 }
 .proj-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 16px 40px rgba(0,82,204,.1);
-    border-color: rgba(0,82,204,.2);
+    box-shadow: 0 16px 40px rgba(46,158,99,.13);
+    border-color: rgba(46,158,99,.35);
 }
 .proj-card-icon {
     width: 52px; height: 52px;
@@ -112,9 +113,9 @@ body {
 .proj-badge {
     font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em;
     padding: 3px 8px;
-    background: #f1f5f9; color: #64748b;
+    background: #f0faf4; color: #2e7d52;
     border-radius: 99px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #c7e8d5;
 }
 .proj-action {
     display: flex; align-items: center; justify-content: center;
@@ -126,77 +127,81 @@ body {
     text-decoration: none;
 }
 .proj-action.primary {
-    background: linear-gradient(135deg,#0052CC,#1a6fe8);
+    background: linear-gradient(135deg, #2e9e63, #3bba7a);
     color: #fff;
-    box-shadow: 0 4px 12px rgba(0,82,204,.25);
+    box-shadow: 0 4px 12px rgba(46,158,99,.3);
 }
-.proj-action.primary:hover { box-shadow: 0 6px 18px rgba(0,82,204,.4); filter:brightness(1.07); }
+.proj-action.primary:hover { box-shadow: 0 6px 18px rgba(46,158,99,.45); filter:brightness(1.06); }
 .proj-action.secondary {
-    background: #f1f5f9; color: #475569;
-    border: 1.5px solid #e2e8f0;
+    background: #f0faf4; color: #2e7d52;
+    border: 1.5px solid #c7e8d5;
 }
-.proj-action.secondary:hover { background: #e2e8f0; }
+.proj-action.secondary:hover { background: #d6f0e2; }
 
 /* ── Activity feed ────────────────────────────────────── */
 .feed-card {
     background: #fff;
-    border: 1.5px solid #e8eef7;
+    border: 1.5px solid #d0ead9;
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 2px 12px rgba(0,0,0,.04);
 }
 .feed-item {
     padding: 14px 18px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f0faf4;
     display: flex; gap: 12px; align-items: flex-start;
 }
 .feed-item:last-child { border-bottom: none; }
 .feed-dot {
     width: 34px; height: 34px; border-radius: 10px;
-    background: #eff6ff; color: #0052CC;
+    background: #e8f8f0; color: #2e9e63;
     display: flex; align-items: center; justify-content: center;
     font-size: .7rem; flex-shrink: 0;
 }
 
 /* ── Shortcut card ────────────────────────────────────── */
 .shortcut-card {
-    background: linear-gradient(135deg, #0052CC 0%, #1a6fe8 100%);
+    background: linear-gradient(135deg, #2e9e63 0%, #3bba7a 100%);
     border-radius: 20px;
     padding: 22px;
     color: #fff;
     position: relative; overflow: hidden;
-    box-shadow: 0 8px 24px rgba(0,82,204,.3);
+    box-shadow: 0 8px 24px rgba(46,158,99,.35);
 }
 .shortcut-link {
     display: flex; align-items: center; gap: 10px;
     padding: 10px 14px;
-    background: rgba(255,255,255,.12);
+    background: rgba(255,255,255,.15);
     border-radius: 12px;
     color: #fff; text-decoration: none;
     font-size: .8rem; font-weight: 700;
-    border: 1px solid rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.15);
     transition: background .18s;
 }
-.shortcut-link:hover { background: rgba(255,255,255,.22); }
-.shortcut-link i { width: 16px; text-align: center; opacity: .8; }
+.shortcut-link:hover { background: rgba(255,255,255,.25); }
+.shortcut-link i { width: 16px; text-align: center; opacity: .85; }
+
+/* ── LIVE badge ───────────────────────────────────────── */
+.live-badge {
+    font-size: 10px; font-weight: 800;
+    color: #2e9e63; background: #e8f8f0;
+    padding: 2px 8px; border-radius: 6px;
+}
 
 /* ── Scrollbar ────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+::-webkit-scrollbar-thumb { background: #a7d9bb; border-radius: 99px; }
 
 /* ═══════════════════════════════════════════════════════
    ANIMATIONS
    ═══════════════════════════════════════════════════════ */
-
-/* ── KPI accent pulse ─────────────────────────────────── */
 @keyframes accentPulse {
     0%,100% { opacity: 1; }
     50%      { opacity: .4; }
 }
 .kpi-accent { animation: accentPulse 2.8s ease-in-out infinite; }
 
-/* ── Project card stagger entrance ───────────────────── */
 @keyframes cardIn {
     from { opacity: 0; transform: translateY(22px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -206,7 +211,6 @@ body {
     animation: cardIn .55s cubic-bezier(.16,1,.3,1) both;
 }
 
-/* ── Activity feed slide-in from right ───────────────── */
 @keyframes feedSlideIn {
     from { opacity: 0; transform: translateX(20px); }
     to   { opacity: 1; transform: translateX(0); }
@@ -221,7 +225,6 @@ body {
 .feed-item:nth-child(4) { animation-delay: .54s; }
 .feed-item:nth-child(5) { animation-delay: .67s; }
 
-/* ── Ripple on buttons ────────────────────────────────── */
 .proj-action { position: relative; overflow: hidden; }
 .ripple-wave {
     position: absolute;
@@ -251,7 +254,6 @@ body {
     66%     { transform: translate(calc(var(--dx,20px) * -.6),calc(var(--dy,-20px) * .7)) scale(.92); }
 }
 
-/* ── Background gradient shift ────────────────────────── */
 @keyframes bgShift {
     0%   { background-position: 0% 50%;   }
     50%  { background-position: 100% 50%; }
@@ -259,5 +261,5 @@ body {
 }
 body {
     background-size: 300% 300%;
-    animation: bgShift 18s ease infinite;
+    animation: bgShift 20s ease infinite;
 }

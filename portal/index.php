@@ -155,21 +155,21 @@ try {
 <body class="font-sans text-gray-800" style="min-height:100vh">
 
     <!-- Ambient background dots -->
-    <div class="amb-dot" style="width:320px;height:320px;background:rgba(0,82,204,.07);top:5%;left:10%;--dur:16s;--delay:0s;--dx:40px;--dy:-30px"></div>
-    <div class="amb-dot" style="width:240px;height:240px;background:rgba(255,171,0,.06);top:60%;right:8%;--dur:20s;--delay:-5s;--dx:-35px;--dy:25px"></div>
-    <div class="amb-dot" style="width:180px;height:180px;background:rgba(16,185,129,.05);bottom:15%;left:30%;--dur:13s;--delay:-8s;--dx:25px;--dy:30px"></div>
-    <div class="amb-dot" style="width:200px;height:200px;background:rgba(139,92,246,.05);top:35%;right:25%;--dur:17s;--delay:-3s;--dx:-20px;--dy:-25px"></div>
-    <div class="amb-dot" style="width:150px;height:150px;background:rgba(239,68,68,.04);top:80%;left:55%;--dur:22s;--delay:-11s;--dx:30px;--dy:-20px"></div>
+    <div class="amb-dot" style="width:320px;height:320px;background:rgba(46,158,99,.1);top:5%;left:10%;--dur:16s;--delay:0s;--dx:40px;--dy:-30px"></div>
+    <div class="amb-dot" style="width:240px;height:240px;background:rgba(77,201,138,.07);top:60%;right:8%;--dur:20s;--delay:-5s;--dx:-35px;--dy:25px"></div>
+    <div class="amb-dot" style="width:180px;height:180px;background:rgba(59,186,122,.07);bottom:15%;left:30%;--dur:13s;--delay:-8s;--dx:25px;--dy:30px"></div>
+    <div class="amb-dot" style="width:200px;height:200px;background:rgba(13,61,34,.05);top:35%;right:25%;--dur:17s;--delay:-3s;--dx:-20px;--dy:-25px"></div>
+    <div class="amb-dot" style="width:150px;height:150px;background:rgba(110,231,183,.06);top:80%;left:55%;--dur:22s;--delay:-11s;--dx:30px;--dy:-20px"></div>
 
     <!-- ══════════════════ HEADER ══════════════════ -->
     <header class="portal-header au">
         <div class="max-w-[1280px] mx-auto px-6 py-3 flex items-center justify-between gap-4">
             <!-- Brand -->
             <div class="flex items-center gap-3">
-                <div class="brand-icon"><i class="fa-solid fa-square-rss"></i></div>
+                <div class="brand-icon"><i class="fa-solid fa-heart"></i></div>
                 <div>
                     <div class="font-black text-gray-900 text-[17px] leading-none tracking-tight">Central HUB</div>
-                    <div class="text-[10px] font-bold text-[#0052CC] tracking-[.15em] uppercase opacity-60 mt-0.5">RSU Healthcare Portal</div>
+                    <div class="text-[10px] font-bold tracking-[.15em] uppercase opacity-70 mt-0.5" style="color:#2e9e63">RSU Healthcare Portal</div>
                 </div>
             </div>
 
@@ -208,8 +208,8 @@ try {
 
             <!-- Running Campaigns -->
             <div class="kpi-card">
-                <div class="kpi-accent" style="background:linear-gradient(90deg,#0052CC,#60a5fa)"></div>
-                <div class="kpi-icon" style="background:#eff6ff; color:#0052CC">
+                <div class="kpi-accent" style="background:linear-gradient(90deg,#2e9e63,#6ee7b7)"></div>
+                <div class="kpi-icon" style="background:#e8f8f0; color:#2e9e63">
                     <i class="fa-solid fa-bullhorn"></i>
                 </div>
                 <div class="kpi-num text-gray-900" data-counter="<?= $kpis['camps'] ?>">0</div>
@@ -292,7 +292,7 @@ try {
                 <div>
                     <div class="sec-title mb-4">
                         Recent Activity
-                        <span class="ml-auto text-[10px] font-bold text-[#0052CC] bg-blue-50 px-2 py-0.5 rounded-md">LIVE</span>
+                        <span class="ml-auto live-badge">LIVE</span>
                     </div>
                     <div class="feed-card">
                         <?php if($recentActivity): ?>
@@ -303,7 +303,7 @@ try {
                                     </div>
                                     <div class="min-w-0 flex-1">
                                         <div class="flex items-center justify-between gap-2 mb-0.5">
-                                            <span class="text-[10px] font-black text-[#0052CC] uppercase tracking-wider truncate"><?= htmlspecialchars($log['action']) ?></span>
+                                            <span class="text-[10px] font-black uppercase tracking-wider truncate" style="color:#2e9e63"><?= htmlspecialchars($log['action']) ?></span>
                                             <span class="text-[9px] text-gray-400 whitespace-nowrap"><?= date('d M H:i', strtotime($log['created_at'])) ?></span>
                                         </div>
                                         <p class="text-[12px] font-bold text-gray-800 leading-snug truncate"><?= htmlspecialchars($log['admin_name'] ?? 'System') ?></p>
@@ -318,7 +318,7 @@ try {
                             </div>
                         <?php endif; ?>
                         <a href="../admin/activity_logs.php"
-                           class="flex items-center justify-center gap-1.5 py-3 text-[10px] font-black text-[#0052CC] uppercase tracking-wider hover:bg-blue-50 transition-colors border-t border-gray-50">
+                           class="flex items-center justify-center gap-1.5 py-3 text-[10px] font-black uppercase tracking-wider transition-colors border-t border-gray-50 hover:bg-green-50" style="color:#2e9e63">
                             View all logs <i class="fa-solid fa-chevron-right text-[9px]"></i>
                         </a>
                     </div>
@@ -348,7 +348,7 @@ try {
         <!-- FOOTER -->
         <footer class="pt-6 pb-4 text-center">
             <div class="flex items-center justify-center gap-2 opacity-25">
-                <i class="fa-solid fa-shield-halved text-[#0052CC]"></i>
+                <i class="fa-solid fa-shield-halved" style="color:#2e9e63"></i>
                 <span class="text-[10px] font-black uppercase tracking-[.4em]">Central Command v3.0 · RSU Healthcare</span>
             </div>
         </footer>
