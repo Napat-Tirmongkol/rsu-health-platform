@@ -175,14 +175,14 @@ renderPageHeader("System Governance", "Hub บริหารจัดการ:
     <!-- Tabs -->
     <div class="flex gap-2 mb-4 animate-slide-up" style="animation-delay:80ms">
         <button id="tabAdmins" onclick="switchTab('admins')"
-            class="tab-btn px-5 py-2.5 rounded-xl text-sm font-black transition-all bg-green-600 text-white shadow-md">
-            <i class="fa-solid fa-users-gear mr-1.5"></i> System Admins
-            <span class="ml-1.5 bg-white/25 text-white text-[10px] px-1.5 py-0.5 rounded-md"><?= count($admins) ?></span>
+            style="padding:.6rem 1.25rem;border-radius:.75rem;font-size:.875rem;font-weight:900;transition:all .2s;background:#2e9e63;color:#fff;box-shadow:0 4px 12px rgba(46,158,99,.3);border:none;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem">
+            <i class="fa-solid fa-users-gear"></i> System Admins
+            <span style="background:rgba(255,255,255,.25);color:#fff;font-size:.65rem;padding:.15rem .5rem;border-radius:.4rem;font-weight:900"><?= count($admins) ?></span>
         </button>
         <button id="tabStaff" onclick="switchTab('staff')"
-            class="tab-btn px-5 py-2.5 rounded-xl text-sm font-black transition-all bg-white border border-gray-200 text-gray-500 hover:bg-gray-50">
-            <i class="fa-solid fa-id-badge mr-1.5"></i> e-Borrow Staff
-            <span class="ml-1.5 bg-gray-100 text-gray-500 text-[10px] px-1.5 py-0.5 rounded-md"><?= count($staffList) ?></span>
+            style="padding:.6rem 1.25rem;border-radius:.75rem;font-size:.875rem;font-weight:900;transition:all .2s;background:#fff;color:#6b7280;border:1.5px solid #e5e7eb;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem">
+            <i class="fa-solid fa-id-badge"></i> e-Borrow Staff
+            <span style="background:#f3f4f6;color:#6b7280;font-size:.65rem;padding:.15rem .5rem;border-radius:.4rem;font-weight:900"><?= count($staffList) ?></span>
         </button>
     </div>
 
@@ -512,20 +512,29 @@ renderPageHeader("System Governance", "Hub บริหารจัดการ:
         });
     }
 
+    const ACTIVE_S  = 'padding:.6rem 1.25rem;border-radius:.75rem;font-size:.875rem;font-weight:900;transition:all .2s;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;';
+    const INACTIVE_S = 'padding:.6rem 1.25rem;border-radius:.75rem;font-size:.875rem;font-weight:900;transition:all .2s;background:#fff;color:#6b7280;border:1.5px solid #e5e7eb;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;';
+
     function switchTab(tab) {
         const isAdmins = tab === 'admins';
         document.getElementById('panelAdmins').classList.toggle('hidden', !isAdmins);
         document.getElementById('panelStaff').classList.toggle('hidden', isAdmins);
 
-        const btnAdmins = document.getElementById('tabAdmins');
-        const btnStaff  = document.getElementById('tabStaff');
+        const btnAdmins   = document.getElementById('tabAdmins');
+        const btnStaff    = document.getElementById('tabStaff');
+        const badgeAdmins = btnAdmins.querySelector('span');
+        const badgeStaff  = btnStaff.querySelector('span');
 
         if (isAdmins) {
-            btnAdmins.className = 'tab-btn px-5 py-2.5 rounded-xl text-sm font-black transition-all bg-green-600 text-white shadow-md';
-            btnStaff.className  = 'tab-btn px-5 py-2.5 rounded-xl text-sm font-black transition-all bg-white border border-gray-200 text-gray-500 hover:bg-gray-50';
+            btnAdmins.style.cssText = ACTIVE_S + 'background:#2e9e63;color:#fff;box-shadow:0 4px 12px rgba(46,158,99,.3);';
+            btnStaff.style.cssText  = INACTIVE_S;
+            badgeAdmins.style.cssText = 'background:rgba(255,255,255,.25);color:#fff;font-size:.65rem;padding:.15rem .5rem;border-radius:.4rem;font-weight:900';
+            badgeStaff.style.cssText  = 'background:#f3f4f6;color:#6b7280;font-size:.65rem;padding:.15rem .5rem;border-radius:.4rem;font-weight:900';
         } else {
-            btnStaff.className  = 'tab-btn px-5 py-2.5 rounded-xl text-sm font-black transition-all bg-blue-600 text-white shadow-md';
-            btnAdmins.className = 'tab-btn px-5 py-2.5 rounded-xl text-sm font-black transition-all bg-white border border-gray-200 text-gray-500 hover:bg-gray-50';
+            btnStaff.style.cssText  = ACTIVE_S + 'background:#2563eb;color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.3);';
+            btnAdmins.style.cssText = INACTIVE_S;
+            badgeStaff.style.cssText  = 'background:rgba(255,255,255,.25);color:#fff;font-size:.65rem;padding:.15rem .5rem;border-radius:.4rem;font-weight:900';
+            badgeAdmins.style.cssText = 'background:#f3f4f6;color:#6b7280;font-size:.65rem;padding:.15rem .5rem;border-radius:.4rem;font-weight:900';
         }
     }
 </script>
