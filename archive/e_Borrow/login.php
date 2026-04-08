@@ -228,7 +228,7 @@ $authUrl = "https://access.line.me/oauth2/v2.1/authorize?" . http_build_query([
                 </div>
             </div>
 
-            <a href="admin/login.php" class="btn-staff">
+            <a href="admin/staff_login.php" class="btn-staff">
                 <i class="fa-solid fa-user-shield"></i>
                 สำหรับเจ้าหน้าที่ / ผู้ดูแลระบบ
             </a>
