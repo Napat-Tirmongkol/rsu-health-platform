@@ -70,6 +70,24 @@ try {
         echo json_encode(['status' => 'warning', 'message' => 'คิวนี้ยังไม่ได้รับการอนุมัติ กรุณาให้ Admin อนุมัติก่อน']);
         exit;
     }
+
+    // ── ยังไม่ถึงวันรับบริการ ────────────────────────────────────────────
+    if (!empty($booking['slot_date'])) {
+        $today    = new DateTimeImmutable('today', new DateTimeZone('Asia/Bangkok'));
+        $slotDay  = new DateTimeImmutable($booking['slot_date'], new DateTimeZone('Asia/Bangkok'));
+        if ($slotDay > $today) {
+            $dateStr = date('d/m/Y', strtotime($booking['slot_date']));
+            $timeStr = !empty($booking['start_time'])
+                ? ' เวลา ' . substr($booking['start_time'], 0, 5) . ' น.'
+                : '';
+            echo json_encode([
+                'status'  => 'error',
+                'message' => "ยังไม่ถึงวันรับบริการ — นัดหมาย {$dateStr}{$timeStr}",
+            ]);
+            exit;
+        }
+    }
+
     if (!empty($booking['attended_at'])) {
         $time = date('H:i', strtotime($booking['attended_at']));
         echo json_encode(['status' => 'warning', 'message' => "เช็คอินซ้ำ! ได้เช็คอินไปแล้วเวลา {$time} น."]);
