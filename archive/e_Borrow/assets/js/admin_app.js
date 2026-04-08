@@ -887,6 +887,11 @@ function openApproveSelectionModal(transId, currentItemId, equipName) {
         });
 }
 
+// Reload manage_items page for given typeId (called after add/edit/delete item)
+function openManageItemsPopup(typeId) {
+    window.location.href = 'manage_items.php?type_id=' + typeId;
+}
+
 function openAddItemPopup(typeId, typeName) {
     Swal.fire({
         title: `➕ เพิ่มชิ้นอุปกรณ์ใหม่`,
