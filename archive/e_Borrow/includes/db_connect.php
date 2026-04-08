@@ -1,0 +1,38 @@
+<?php
+/*
+ * db_connect.php
+ * �������Ѻ�������Ͱҹ������
+ */
+
+// 1. ��駤�ҵ������������ (�����������ͧ�س)
+$db_host = "171.102.216.219"; // <-- IP Address �������������
+$db_user = "healthy";         // <-- Username ����
+$db_pass = "61r_pl6NmNoviy3aB"; // <-- Password ����
+$db_name = "e_Borrow";    // <-- ���Ͱҹ���������� (�ҡ�ٻ image_4ccfb8.png)
+$db_port = 3306;              // <-- Port (���Ԥ�� 3306)
+
+// 2. ��������������
+try {
+    // ���ҧ�����������Ẻ PDO
+    // *** �ѻവ DSN ����� host, dbname, ��� port ***
+    $dsn = "mysql:host=$db_host;port=$db_port;dbname=$db_name;charset=utf8mb4";
+    $options = [
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES   => false,
+    ];
+
+    // ���ҧ����� $pdo �����纡����������
+    $pdo = new PDO($dsn, $db_user, $db_pass, $options);
+
+} catch (PDOException $e) {
+    // �ҡ��������������� �����ش�ӧҹ����ʴ���ͼԴ��Ҵ
+    die("�Դ��ͼԴ��Ҵ㹡���������Ͱҹ������: " . $e->getMessage());
+}
+
+// ��˹��ѵ�Ҥ�һ�Ѻ (�ҷ ��� �ѹ)
+define('FINE_RATE_PER_DAY', 10.00);
+
+// ─── Error Logger (main DB) ───────────────────────────────────────────────────
+require_once __DIR__ . '/../../../includes/error_logger.php';
+?>

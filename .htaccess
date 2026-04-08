@@ -1,4 +1,4 @@
-# health-hub/.htaccess
+# e-campaignv2/.htaccess
 
 Options -Indexes
 
@@ -39,10 +39,10 @@ RewriteRule ^favicon\.ico$ - [R=204,L]
 DirectoryIndex index.php index.html
 
 # ─── Custom Error Pages ───────────────────────────────────────
-ErrorDocument 400 /health-hub/errors/404.php
-ErrorDocument 403 /health-hub/errors/403.php
-ErrorDocument 404 /health-hub/errors/404.php
-ErrorDocument 500 /health-hub/errors/500.php
-ErrorDocument 502 /health-hub/errors/500.php
-ErrorDocument 503 /health-hub/errors/503.php
-ErrorDocument 504 /health-hub/errors/503.php
+ErrorDocument 400 /e-campaignv2/errors/404.php
+ErrorDocument 403 /e-campaignv2/errors/403.php
+ErrorDocument 404 /e-campaignv2/errors/404.php
+ErrorDocument 500 /e-campaignv2/errors/500.php
+ErrorDocument 502 /e-campaignv2/errors/500.php
+ErrorDocument 503 /e-campaignv2/errors/503.php
+ErrorDocument 504 /e-campaignv2/errors/503.php

@@ -164,8 +164,8 @@ function getCampaignTypeDetails($type)
 function buildShareUrl(string $token): string {
     $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'];
-    $adminDir = dirname($_SERVER['SCRIPT_NAME']); // /health-hub/admin
-    $baseDir  = dirname($adminDir);               // /health-hub
+    $adminDir = dirname($_SERVER['SCRIPT_NAME']); // /e-campaignv2/admin
+    $baseDir  = dirname($adminDir);               // /e-campaignv2
     return $scheme . '://' . $host . $baseDir . '/user/c.php?t=' . $token;
 }
 
