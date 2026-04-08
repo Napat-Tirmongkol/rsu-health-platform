@@ -1,7 +1,6 @@
 <?php
 // admin/ajax_git_pull.php
-// Proxy endpoint สำหรับ trigger Plesk Git webhook
-// เฉพาะ Superadmin เท่านั้น — URL webhook ไม่เปิดเผยใน frontend
+// รัน git pull โดยตรงบน server — เฉพาะ Superadmin เท่านั้น
 
 require_once __DIR__ . '/../portal/includes/auth.php';
 header('Content-Type: application/json; charset=utf-8');
@@ -20,33 +19,36 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// 3. Plesk Git Webhook URL (เก็บ server-side เท่านั้น)
-$webhookUrl = 'https://magical-wu.49-231-198-219.plesk.page:8443/modules/git/public/web-hook.php?uuid=dd095230-b1b5-111b-594e-1ce4dd1ec34f';
-
-// 4. Call webhook via cURL
-$ch = curl_init($webhookUrl);
-curl_setopt_array($ch, [
-    CURLOPT_POST           => true,
-    CURLOPT_POSTFIELDS     => '',
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_TIMEOUT        => 30,
-    CURLOPT_SSL_VERIFYPEER => false, // Plesk ใช้ self-signed cert
-    CURLOPT_SSL_VERIFYHOST => false,
-    CURLOPT_USERAGENT      => 'RSU-HealthHub/1.0',
-]);
-
-$result   = curl_exec($ch);
-$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-$curlErr  = curl_error($ch);
-curl_close($ch);
-
-if ($curlErr) {
-    echo json_encode(['status' => 'error', 'message' => 'ไม่สามารถเชื่อมต่อ Plesk ได้: ' . $curlErr]);
+// 3. ตรวจสอบว่า exec() ใช้งานได้
+if (!function_exists('exec')) {
+    echo json_encode(['status' => 'error', 'message' => 'exec() ถูกปิดใช้งานบน server นี้']);
     exit;
 }
 
-if ($httpCode >= 200 && $httpCode < 300) {
-    echo json_encode(['status' => 'success', 'message' => 'Git Pull สำเร็จ ✓ (HTTP ' . $httpCode . ')']);
+// 4. Path ของ git repo (= root ของโปรเจกต์)
+$repoPath = realpath(__DIR__ . '/..');
+
+// 5. รัน git pull
+$output = [];
+$code   = 0;
+exec(
+    'cd ' . escapeshellarg($repoPath) . ' && git pull origin main 2>&1',
+    $output,
+    $code
+);
+
+$outputText = implode("\n", $output);
+
+if ($code === 0) {
+    echo json_encode([
+        'status'  => 'success',
+        'message' => 'Git Pull สำเร็จ ✓',
+        'detail'  => $outputText,
+    ]);
 } else {
-    echo json_encode(['status' => 'error', 'message' => 'Webhook ตอบกลับ HTTP ' . $httpCode]);
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'git pull ล้มเหลว (exit code ' . $code . ')',
+        'detail'  => $outputText,
+    ]);
 }

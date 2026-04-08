@@ -428,12 +428,20 @@ function triggerGitPull() {
                 btn.style.background = '#dcfce7';
                 btn.style.color = '#15803d';
                 btn.innerHTML = '<i class="fa-solid fa-check"></i> <span>สำเร็จ!</span>';
+                if (data.detail && !data.detail.includes('Already up to date')) {
+                    // มีโค้ดใหม่ — แจ้งให้ refresh
+                    setTimeout(() => {
+                        if (confirm('Git Pull สำเร็จ!\n\n' + data.detail + '\n\nรีโหลดหน้าเพื่อใช้งานโค้ดใหม่?')) {
+                            location.reload();
+                        }
+                    }, 500);
+                }
             } else {
                 btn.style.background = '#fef2f2';
                 btn.style.color = '#dc2626';
                 btn.style.borderColor = '#fecaca';
                 btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span>ล้มเหลว</span>';
-                alert('Git Pull ล้มเหลว: ' + data.message);
+                alert('Git Pull ล้มเหลว:\n' + data.message + (data.detail ? '\n\n' + data.detail : ''));
             }
         })
         .catch(() => {
