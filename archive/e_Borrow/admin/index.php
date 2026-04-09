@@ -90,7 +90,7 @@ $current_page = "index";
 include('../includes/header.php');
 ?>
 
-<link rel="stylesheet" href="../../assets/css/tailwind.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <!-- SweetAlert2 สำหรับแจ้งเตือน (กรณีไม่ได้เรียกใน header) -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
