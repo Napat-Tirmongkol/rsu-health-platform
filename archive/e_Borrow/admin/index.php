@@ -463,7 +463,7 @@ include('../includes/header.php');
             <!-- Quick Actions คล้าย e-Campaign -->
             <div class="grid grid-cols-2 lg:grid-cols-2 xl:grid-cols-1 gap-4">
 
-                <a href="./manage_fines.php"
+                <a href="admin/manage_fines.php"
                     class="relative overflow-hidden bg-white border border-gray-200 p-6 rounded-[24px] flex flex-col justify-between hover:border-emerald-300 hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-1 transition-all group">
                     <div
                         class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-4 border border-emerald-100">
@@ -479,7 +479,7 @@ include('../includes/header.php');
                         class="fa-solid fa-arrow-right absolute bottom-6 right-6 text-xl text-emerald-500 opacity-0 -translate-x-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0"></i>
                 </a>
 
-                <a href="manage_equipment.php"
+                <a href="admin/manage_equipment.php"
                     class="relative overflow-hidden bg-white border border-gray-200 p-6 rounded-[24px] flex flex-col justify-between hover:border-blue-300 hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1 transition-all group">
                     <div
                         class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-4 border border-blue-100">
