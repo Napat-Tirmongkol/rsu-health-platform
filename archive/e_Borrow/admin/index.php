@@ -90,301 +90,349 @@ $current_page = "index";
 include('../includes/header.php'); 
 ?>
 
+<script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- SweetAlert2 สำหรับแจ้งเตือน (กรณีไม่ได้เรียกใน header) -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
-/* ===== PAGE WRAPPER ===== */
+/* CSS Animations เพิ่มความแพง (นำมาจากฝั่ง Campaign) */
+@keyframes slideUpFade {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up { animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+
+/* Custom Scrollbar for list */
+.custom-scrollbar::-webkit-scrollbar { width: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+
 .admin-wrap { padding: 20px 24px 80px; max-width: 1400px; margin: 0 auto; }
 
-/* ===== DASH HEADER ===== */
-.dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-.dash-title h2 { font-size: 1.5rem; font-weight: 700; color: var(--color-text-dark); margin: 0; display: flex; align-items: center; gap: 10px; }
-.dash-title i { color: var(--color-primary); }
-
-.btn-scan {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); color: #fff;
-    padding: 10px 20px; border-radius: 12px; text-decoration: none;
-    font-weight: 700; font-size: .95rem; display: inline-flex; align-items: center; gap: 8px;
-    box-shadow: 0 4px 12px rgba(11,102,35,.2); transition: all .2s;
-}
-.btn-scan:hover { opacity: .9; transform: translateY(-2px); color: #fff;}
-
-/* ===== KPI ROW ===== */
-.kpi-row {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;
-}
-.kpi-card {
-    background: var(--color-content-bg); border-radius: 16px; padding: 20px;
-    display: flex; align-items: center; justify-content: space-between;
-    box-shadow: var(--box-shadow-main); border: 1px solid var(--border-color);
-    position: relative; overflow: hidden;
-}
-.kpi-card::after {
-    content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--border-color);
-}
-.kpi-card.avail::after { background: #22c55e; }
-.kpi-card.borrow::after { background: #3b82f6; }
-.kpi-card.maint::after { background: #f59e0b; }
-.kpi-card.overdue::after { background: #ef4444; }
-
-.kpi-data h4 { font-size: .85rem; color: var(--color-text-muted); margin: 0 0 4px; font-weight: 600; }
-.kpi-data .val { font-size: 1.8rem; font-weight: 800; color: var(--color-text-dark); line-height: 1; }
-.kpi-icon {
-    width: 48px; height: 48px; border-radius: 12px;
-    display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
-}
-.kpi-card.avail .kpi-icon { background: rgba(22,163,74,.15); color: #22c55e; }
-.kpi-card.borrow .kpi-icon { background: rgba(59,130,246,.15); color: #3b82f6; }
-.kpi-card.maint .kpi-icon { background: rgba(245,158,11,.15); color: #f59e0b; }
-.kpi-card.overdue .kpi-icon { background: rgba(239,68,68,.15); color: #ef4444; }
-
-/* ===== MAIN GRID ===== */
-.dash-grid {
-    display: grid; grid-template-columns: 2fr 1fr; gap: 20px;
-}
-@media(max-width: 992px) { .dash-grid { grid-template-columns: 1fr; } }
-
-/* ===== PANELS ===== */
-.panel {
-    background: var(--color-content-bg); border-radius: 18px; padding: 20px;
-    box-shadow: var(--box-shadow-main); border: 1px solid var(--border-color);
-    margin-bottom: 20px;
-}
-.panel-head {
-    display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
-    padding-bottom: 12px; border-bottom: 1px solid var(--border-color);
-}
-.panel-head h3 { font-size: 1.1rem; font-weight: 700; color: var(--color-text-dark); margin: 0; }
-.panel-head .badge { background: var(--border-color); color: var(--color-text-muted); padding: 2px 8px; border-radius: 12px; font-size: .8rem; }
-
-/* ===== LIST CARDS (Pending, Overdue) ===== */
-.list-card {
-    border: 1px solid var(--border-color); border-radius: 12px; padding: 14px;
-    display: flex; align-items: flex-start; gap: 14px; margin-bottom: 10px;
-    transition: background .2s; background: var(--color-content-bg);
-}
-.list-card:hover { background: var(--color-page-bg); }
-.list-icon {
-    width: 42px; height: 42px; border-radius: 10px;
-    display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;
-}
-.list-icon.yellow { background: rgba(202,138,4,.15); color: #ca8a04; }
-.list-icon.red { background: rgba(220,38,38,.15); color: #dc2626; }
-
-.list-info { flex: 1; min-width: 0; }
-.list-info h4 { font-size: .95rem; font-weight: 700; color: var(--color-text-dark); margin: 0 0 4px; }
-.list-info p { font-size: .8rem; color: var(--color-text-muted); margin: 0 0 2px; }
-.list-info strong { color: var(--color-text-dark); }
-.list-actions {
-    display: flex; flex-direction: column; gap: 6px; flex-shrink: 0;
-}
-.btn-sm-action {
-    border: none; padding: 6px 12px; border-radius: 8px;
-    font-size: .75rem; font-weight: 700; cursor: pointer; transition: opacity .2s;
-    display: flex; align-items: center; gap: 6px; justify-content: center; width: 100px;
-}
-.btn-approve { background: var(--color-primary); color: #fff; }
-.btn-reject { background: transparent; color: #ef4444; border: 1px solid #ef4444; }
-.btn-fine { background: #ef4444; color: #fff; }
-
-.link-detail { font-size: .75rem; color: #3b82f6; text-decoration: none; font-weight: 600; margin-top: 6px; display: inline-block; }
-
-/* ===== ACTIVITY LOG ===== */
-.act-item {
-    display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px dashed var(--border-color);
-}
-.act-item:last-child { border: none; padding-bottom: 0; }
-.act-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
-.act-text { font-size: .8rem; color: var(--color-text-muted); line-height: 1.4; margin: 0; }
-.act-text strong { color: var(--color-text-dark); }
-
-.empty-msg { text-align: center; color: var(--color-text-muted); font-size: .85rem; padding: 20px 0; }
+/* เกลี่ยสีพื้นหลังถ้า body ปกติของ e_borrow ไม่ตรงกับ tailwind */
+body { background-color: #f8fafc; }
 </style>
 
-<div class="admin-wrap">
+<div class="admin-wrap font-sans text-gray-800">
 
-    <?php if (isset($kpi_error)) echo "<div class='alert alert-danger'>$kpi_error</div>"; ?>
-    <?php if (isset($pending_error)) echo "<div class='alert alert-danger'>$pending_error</div>"; ?>
-    <?php if (isset($overdue_error)) echo "<div class='alert alert-danger'>$overdue_error</div>"; ?>
+    <?php if (isset($kpi_error)) echo "<div class='bg-red-50 text-red-500 p-3 rounded-xl mb-4 text-sm font-bold border border-red-100'><i class='fas fa-exclamation-triangle'></i> $kpi_error</div>"; ?>
+    <?php if (isset($pending_error)) echo "<div class='bg-red-50 text-red-500 p-3 rounded-xl mb-4 text-sm font-bold border border-red-100'><i class='fas fa-exclamation-triangle'></i> $pending_error</div>"; ?>
+    <?php if (isset($overdue_error)) echo "<div class='bg-red-50 text-red-500 p-3 rounded-xl mb-4 text-sm font-bold border border-red-100'><i class='fas fa-exclamation-triangle'></i> $overdue_error</div>"; ?>
 
-    <div class="dash-header">
-        <div class="dash-title">
-            <h2><i class="fas fa-tachometer-alt"></i> Dashboard ภาพรวม</h2>
+    <!-- HEADER SECTION แบบใหม่ -->
+    <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+        <div>
+            <h2 class="text-3xl font-black text-gray-900 flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl shadow-sm">
+                    <i class="fas fa-boxes-packing"></i>
+                </div>
+                ภาพรวมคลังอุปกรณ์ (Dashboard)
+                <div class="relative flex h-3 w-3 -ml-1 -mt-4 shadow-sm" title="ระบบกำลังอัปเดตแบบ Real-time">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                </div>
+            </h2>
+            <p class="text-gray-500 mt-2 text-sm font-medium">สถิติการยืม-คืน อุปกรณ์ทางการแพทย์ และเวชภัณฑ์ (Real-time)</p>
         </div>
-        <a href="admin/walkin_borrow.php" class="btn-scan">
-            <i class="fas fa-qrcode"></i> สแกนยืม/คืน
+        <a href="walkin_borrow.php" class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex items-center gap-2">
+            <i class="fas fa-qrcode"></i> สแกนยืม/คืน (Walk-in)
         </a>
     </div>
 
-    <!-- KPI ROW -->
-    <div class="kpi-row">
-        <div class="kpi-card avail">
-            <div class="kpi-data">
-                <h4>พร้อมใช้งาน</h4>
-                <div class="val"><?php echo $count_available; ?></div>
+    <!-- STATS GRID แบบใหม่ -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
+        
+        <!-- STAT 1: พร้อมใช้งาน -->
+        <div class="group bg-gradient-to-br from-[#0B6623] to-[#1a8c35] p-6 rounded-[24px] shadow-lg shadow-green-900/20 text-white relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 animate-slide-up">
+            <div class="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-500"></div>
+            <div class="flex justify-between items-start relative z-10">
+                <div>
+                    <p class="text-green-100 text-sm font-semibold mb-1 uppercase tracking-wide">พร้อมใช้งาน</p>
+                    <h3 id="kp-available" class="text-4xl font-black transition-all duration-300"><?= number_format((float)$count_available) ?></h3>
+                </div>
+                <div class="w-14 h-14 bg-white/20 backdrop-blur-md rounded-[18px] flex items-center justify-center text-white shadow-inner">
+                    <i class="fa-solid fa-box-open text-2xl"></i>
+                </div>
             </div>
-            <div class="kpi-icon"><i class="fas fa-box-open"></i></div>
-        </div>
-        <div class="kpi-card borrow">
-            <div class="kpi-data">
-                <h4>กำลังถูกยืม</h4>
-                <div class="val"><?php echo $count_borrowed; ?></div>
+            <div class="mt-4 flex items-center gap-2 text-[11px] text-green-100/90 font-bold bg-green-900/30 px-3 py-1.5 rounded-full w-max border border-green-800/40 tracking-wider">
+                <i class="fa-solid fa-check-circle"></i> อุปกรณ์นอนรออยู่ในคลัง
             </div>
-            <div class="kpi-icon"><i class="fas fa-hand-holding-medical"></i></div>
         </div>
-        <div class="kpi-card maint">
-            <div class="kpi-data">
-                <h4>ส่งซ่อมบำรุง</h4>
-                <div class="val"><?php echo $count_maintenance; ?></div>
+
+        <!-- STAT 2: กำลังถูกยืม -->
+        <div class="group bg-white p-6 rounded-[24px] shadow-sm border border-gray-100 relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1 animate-slide-up delay-100">
+            <div class="absolute right-0 top-0 w-2 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-gray-500 text-sm font-semibold mb-1 uppercase tracking-wide">กำลังถูกยืม</p>
+                    <h3 id="kp-borrowed" class="text-4xl font-black text-gray-800 transition-all duration-300"><?= number_format((float)$count_borrowed) ?></h3>
+                </div>
+                <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-[18px] flex items-center justify-center shadow-inner">
+                    <i class="fa-solid fa-hand-holding-medical text-2xl group-hover:scale-110 transition-transform"></i>
+                </div>
             </div>
-            <div class="kpi-icon"><i class="fas fa-tools"></i></div>
-        </div>
-        <?php if ($count_overdue > 0): ?>
-        <div class="kpi-card overdue">
-            <div class="kpi-data">
-                <h4 style="color:#ef4444;">เกินกำหนดคืน (ยังไม่คืน)</h4>
-                <div class="val" style="color:#ef4444;"><?php echo $count_overdue; ?></div>
+            <div class="mt-4 flex items-center gap-2 text-[11px] text-blue-600 font-bold bg-blue-50 w-max px-3 py-1.5 rounded-full border border-blue-100 tracking-wider">
+                <i class="fa-solid fa-people-carry"></i> อยู่ระหว่างการใช้งานจริง
             </div>
-            <div class="kpi-icon"><i class="fas fa-exclamation-triangle"></i></div>
         </div>
-        <?php endif; ?>
+
+        <!-- STAT 3: ส่งซ่อมบำรุง -->
+        <div class="group bg-white p-6 rounded-[24px] shadow-sm border border-gray-100 relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-1 animate-slide-up delay-200">
+            <div class="absolute right-0 top-0 w-2 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-gray-500 text-sm font-semibold mb-1 uppercase tracking-wide">ส่งซ่อมบำรุง</p>
+                    <h3 id="kp-maintenance" class="text-4xl font-black text-gray-800 transition-all duration-300"><?= number_format((float)$count_maintenance) ?></h3>
+                </div>
+                <div class="w-14 h-14 bg-amber-50 text-amber-500 rounded-[18px] flex items-center justify-center shadow-inner">
+                    <i class="fa-solid fa-tools text-2xl group-hover:rotate-12 transition-transform"></i>
+                </div>
+            </div>
+            <div class="mt-4 flex items-center gap-2 text-[11px] text-amber-600 font-bold bg-amber-50 w-max px-3 py-1.5 rounded-full border border-amber-100 tracking-wider">
+                <i class="fa-solid fa-triangle-exclamation"></i> ไม่พร้อมสำหรับการใช้งาน
+            </div>
+        </div>
+
+        <!-- STAT 4: เกินกำหนด -->
+        <div class="group bg-gradient-to-br from-[#dc2626] to-[#991b1b] p-6 rounded-[24px] shadow-lg shadow-red-900/20 text-white relative overflow-hidden transition-all duration-300 hover:-translate-y-1 animate-slide-up delay-300 <?= $count_overdue == 0 ? 'opacity-40 grayscale pointer-events-none' : 'hover:shadow-xl' ?>">
+            <div class="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-500"></div>
+            <div class="flex justify-between items-start relative z-10">
+                <div>
+                    <p class="text-red-100 text-sm font-semibold mb-1 uppercase tracking-wide">เกินกำหนดคืน</p>
+                    <h3 id="kp-overdue" class="text-4xl font-black transition-all duration-300"><?= number_format((float)$count_overdue) ?></h3>
+                </div>
+                <div class="w-14 h-14 bg-white/20 backdrop-blur-md rounded-[18px] flex items-center justify-center text-white shadow-inner <?= $count_overdue > 0 ? 'animate-pulse' : '' ?>">
+                    <i class="fa-solid fa-clock-rotate-left text-2xl"></i>
+                </div>
+            </div>
+            <div class="mt-4 flex items-center gap-2 text-[11px] text-red-100 font-bold bg-red-900/40 px-3 py-1.5 rounded-full w-max border border-red-800/40 tracking-wider">
+                <i class="fa-solid fa-bullhorn"></i> ต้องติดตามด่วน (ค่าปรับไหล)
+            </div>
+        </div>
+
     </div>
 
-    <!-- MAIN GRID -->
-    <div class="dash-grid">
-        <!-- LEFT COLUMN -->
-        <div class="col-left">
-
-            <!-- รอดำเนินการ -->
-            <div class="panel">
-                <div class="panel-head">
-                    <i class="fas fa-bell" style="color:#f59e0b; font-size:1.2rem;"></i>
-                    <h3>รออนุมัติ</h3>
-                    <span class="badge"><?php echo count($pending_requests); ?></span>
+    <!-- BOTTOM SECTION: LISTS & ACTIVITY -->
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 animate-slide-up delay-200">
+        
+        <!-- LEFT COLUMN (Span 2) -->
+        <div class="xl:col-span-2 flex flex-col gap-8">
+            
+            <!-- รอดำเนินการ (รออนุมัติ) -->
+            <div class="bg-white rounded-[24px] shadow-sm border border-gray-100 flex flex-col">
+                <div class="p-6 border-b border-gray-50 flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-gray-900 text-lg flex items-center gap-2">
+                            <i class="fas fa-bell text-amber-500"></i> รออนุมัติการยืม
+                        </h3>
+                        <p class="text-xs text-gray-500 mt-1">รายการคำขอยืมอุปกรณ์จากหน้าเว็บที่รอการพิจารณาอนุมัติ</p>
+                    </div>
+                    <span class="bg-amber-100 text-amber-600 font-bold px-3 py-1 mt-1 rounded-full text-sm"><?php echo count($pending_requests); ?></span>
                 </div>
-                
-                <?php if (empty($pending_requests)): ?>
-                    <p class="empty-msg">ไม่มีคำขอยืมที่รอดำเนินการ</p>
-                <?php else: ?>
-                    <?php foreach ($pending_requests as $req): ?>
-                        <div class="list-card">
-                            <div class="list-icon yellow"><i class="fas fa-hourglass-half"></i></div>
-                            <div class="list-info">
-                                <h4><?php echo htmlspecialchars($req['equipment_name']); ?></h4>
-                                <p>ผู้ขอ: <strong><?php echo htmlspecialchars($req['student_name'] ?? '-'); ?></strong></p>
-                                <p>คืนวันที่: <strong><?php echo date('d/m/Y', strtotime($req['due_date'])); ?></strong></p>
-                                
-                                <div style="display:flex; gap:12px; align-items:center;">
-                                    <a href="javascript:void(0)" class="link-detail"
-                                       onclick="openDetailModal(this)"
-                                       data-item="<?php echo htmlspecialchars($req['equipment_name']); ?>"
-                                       data-serial="<?php echo htmlspecialchars($req['serial_number'] ?? '-'); ?>"
-                                       data-requester="<?php echo htmlspecialchars($req['student_name'] ?? '-'); ?>"
-                                       data-borrow="<?php echo date('d/m/Y', strtotime($req['borrow_date'])); ?>"
-                                       data-due="<?php echo date('d/m/Y', strtotime($req['due_date'])); ?>"
-                                       data-reason="<?php echo htmlspecialchars($req['reason_for_borrowing']); ?>"
-                                       data-attachment="<?php echo htmlspecialchars($req['attachment_url'] ?? ''); ?>">
-                                       <i class="fas fa-file-alt"></i> ดูรายละเอียด
-                                    </a>
-                                    <?php if (!empty($req['attachment_url'])): ?>
-                                        <a href="<?php echo htmlspecialchars($req['attachment_url']); ?>" target="_blank" class="link-detail" style="color:#10b981;">
-                                            <i class="fas fa-paperclip"></i> ไฟล์แนบ
-                                        </a>
-                                    <?php endif; ?>
+                <div class="p-4 flex-1 custom-scrollbar" style="max-height: 480px; overflow-y: auto;">
+                    <div class="space-y-3">
+                        <?php if (empty($pending_requests)): ?>
+                            <div class="text-center py-12 flex flex-col items-center">
+                                <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center text-green-400 mb-3">
+                                    <i class="fa-solid fa-check text-4xl"></i>
                                 </div>
+                                <h4 class="font-bold text-gray-800 text-lg">ไม่มีรอดำเนินการ</h4>
+                                <p class="text-gray-500 text-sm mt-1">คุณได้จัดการคำขอทั้งหมดเรียบร้อยแล้ว!</p>
                             </div>
-                            <div class="list-actions">
-                                <button class="btn-sm-action btn-approve" onclick="openApproveSelectionModal(<?php echo $req['transaction_id']; ?>, <?php echo $req['item_id'] ?? 0; ?>, '<?php echo htmlspecialchars($req['equipment_name'], ENT_QUOTES); ?>')"><i class="fas fa-check"></i> อนุมัติ</button>
-                                <button class="btn-sm-action btn-reject" onclick="openRejectPopup(<?php echo $req['transaction_id']; ?>)"><i class="fas fa-times"></i> ปฏิเสธ</button>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+                        <?php else: ?>
+                            <?php foreach ($pending_requests as $req): ?>
+                                <div class="group flex flex-col sm:flex-row justify-between sm:items-center p-4 rounded-2xl bg-white border border-gray-100 shadow-sm hover:border-amber-200 hover:shadow-md transition-all gap-4">
+                                    
+                                    <div class="flex items-start gap-4 flex-1 w-full min-w-0">
+                                        <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center flex-shrink-0 mt-1 sm:mt-0">
+                                            <i class="fas fa-hourglass-half text-lg"></i>
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <h4 class="font-bold text-gray-900 text-[15px] truncate"><?php echo htmlspecialchars($req['equipment_name']); ?></h4>
+                                            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5 text-[13px]">
+                                                <span class="text-gray-600"><i class="fa-solid fa-user-circle text-gray-400 mr-1"></i> <strong class="text-gray-800"><?php echo htmlspecialchars($req['student_name'] ?? '-'); ?></strong></span>
+                                                <span class="text-gray-600"><i class="fas fa-calendar-alt text-gray-400 mr-1"></i> เลิกจ้าง: <strong class="text-gray-800"><?php echo date('d/m/Y', strtotime($req['due_date'])); ?></strong></span>
+                                            </div>
+                                            
+                                            <!-- Subactions -->
+                                            <div class="mt-2.5 flex gap-3 text-[12px]">
+                                                <a href="javascript:void(0)" class="font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded hover:bg-blue-100 transition-colors inline-flex items-center gap-1.5"
+                                                   onclick="openDetailModal(this)"
+                                                   data-item="<?php echo htmlspecialchars($req['equipment_name']); ?>"
+                                                   data-serial="<?php echo htmlspecialchars($req['serial_number'] ?? '-'); ?>"
+                                                   data-requester="<?php echo htmlspecialchars($req['student_name'] ?? '-'); ?>"
+                                                   data-borrow="<?php echo date('d/m/Y', strtotime($req['borrow_date'])); ?>"
+                                                   data-due="<?php echo date('d/m/Y', strtotime($req['due_date'])); ?>"
+                                                   data-reason="<?php echo htmlspecialchars($req['reason_for_borrowing']); ?>"
+                                                   data-attachment="<?php echo htmlspecialchars($req['attachment_url'] ?? ''); ?>">
+                                                   <i class="fas fa-search-plus opacity-70"></i> ข้อมูลเพิ่มเติม
+                                                </a>
+                                                <?php if (!empty($req['attachment_url'])): ?>
+                                                    <a href="<?php echo htmlspecialchars($req['attachment_url']); ?>" target="_blank" class="font-bold text-green-600 bg-green-50 px-2 py-1 rounded hover:bg-green-100 transition-colors inline-flex items-center gap-1.5">
+                                                        <i class="fas fa-paperclip opacity-70"></i> แฟ้มแนบ
+                                                    </a>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- CTA Actions -->
+                                    <div class="flex flex-row sm:flex-col items-stretch gap-2 flex-shrink-0 w-full sm:w-[130px] border-t sm:border-t-0 sm:border-l border-gray-100 pt-3 sm:pt-0 sm:pl-4">
+                                        <button class="flex-1 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white border border-emerald-100 hover:border-emerald-500 rounded-xl px-4 py-2 text-[13px] font-bold transition-all flex items-center justify-center gap-1.5 group/btn" 
+                                                onclick="openApproveSelectionModal(<?php echo $req['transaction_id']; ?>, <?php echo $req['item_id'] ?? 0; ?>, '<?php echo htmlspecialchars($req['equipment_name'], ENT_QUOTES); ?>')">
+                                            <i class="fas fa-check group-hover/btn:scale-125 transition-transform"></i> อนุมัติ
+                                        </button>
+                                        <button class="flex-1 bg-white border border-red-200 text-red-500 hover:bg-red-50 hover:border-red-300 rounded-xl px-4 py-2 text-[13px] font-bold transition-all flex items-center justify-center gap-1.5" 
+                                                onclick="openRejectPopup(<?php echo $req['transaction_id']; ?>)">
+                                            <i class="fas fa-times"></i> ปฏิเสธ
+                                        </button>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
             </div>
 
-            <!-- เกินกำหนดชลอ -->
-            <div class="panel">
-                <div class="panel-head">
-                    <i class="fas fa-exclamation-circle" style="color:#ef4444; font-size:1.2rem;"></i>
-                    <h3>เกินกำหนดคืน</h3>
-                    <span class="badge"><?php echo count($overdue_items); ?></span>
+            <!-- เกินกำหนดคืน -->
+            <div class="bg-white rounded-[24px] shadow-sm border border-gray-100 flex flex-col">
+                <div class="p-6 border-b border-gray-50 flex justify-between items-center bg-red-50/30 rounded-t-[24px]">
+                    <div>
+                        <h3 class="font-bold text-gray-900 text-lg flex items-center gap-2">
+                            <i class="fas fa-exclamation-circle text-red-500"></i> เกินกำหนดคืน 
+                        </h3>
+                        <p class="text-xs text-red-500 mt-1">ค้างส่งคืน ทวงถามและปรับ</p>
+                    </div>
+                    <?php if(count($overdue_items) > 0): ?>
+                    <span class="bg-red-500 text-white shadow-sm font-black px-3 py-1 rounded-full text-[13px] animate-pulse"><?php echo count($overdue_items); ?> รายการ</span>
+                    <?php endif; ?>
                 </div>
-                
-                <?php if (empty($overdue_items)): ?>
-                    <p class="empty-msg">ยอดเยี่ยม! ไม่มีรายการเกินกำหนด</p>
-                <?php else: ?>
-                    <?php foreach ($overdue_items as $item): 
-                        $days_overdue = max(0, (int)$item['days_overdue']);
-                        $fine = $days_overdue * (defined('FINE_RATE_PER_DAY') ? FINE_RATE_PER_DAY : 0);
-                    ?>
-                        <div class="list-card">
-                            <div class="list-icon red"><i class="fas fa-calendar-times"></i></div>
-                            <div class="list-info">
-                                <h4><?php echo htmlspecialchars($item['equipment_name']); ?></h4>
-                                <p>ผู้ยืม: <strong><?php echo htmlspecialchars($item['student_name'] ?? '-'); ?></strong></p>
-                                <p>เบอร์โทร: <?php echo htmlspecialchars($item['phone_number'] ?? '-'); ?></p>
-                                <p style="color:#ef4444; font-weight:700; margin-top:2px;">เลยกำหนดมาแล้ว <?php echo $days_overdue; ?> วัน</p>
+                <div class="p-4 flex-1 custom-scrollbar" style="max-height: 400px; overflow-y: auto;">
+                    <div class="space-y-3">
+                        <?php if (empty($overdue_items)): ?>
+                            <div class="text-center py-10 flex flex-col items-center">
+                                <i class="fa-solid fa-face-smile-wink text-4xl text-gray-300 mb-3 block"></i>
+                                <p class="text-gray-500 text-sm">ยอดเยี่ยม! ไม่มีรายการยืมค้างคืน</p>
                             </div>
-                            <div class="list-actions">
-                                <button class="btn-sm-action btn-fine" style="width:115px;"
-                                    onclick="openFineAndReturnPopup(
-                                        <?php echo $item['transaction_id']; ?>, <?php echo $item['student_id'] ?? 0; ?>,
-                                        '<?php echo htmlspecialchars(addslashes($item['student_name'] ?? '-')); ?>',
-                                        '<?php echo htmlspecialchars(addslashes($item['equipment_name'])); ?>',
-                                        <?php echo $days_overdue; ?>, <?php echo $fine; ?>, <?php echo $item['equipment_id']; ?>
-                                    )">
-                                    <i class="fas fa-coins"></i> คืน/ชำระปรับ
-                                </button>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+                        <?php else: ?>
+                            <?php foreach ($overdue_items as $item): 
+                                $days_overdue = max(0, (int)$item['days_overdue']);
+                                $fine = $days_overdue * (defined('FINE_RATE_PER_DAY') ? FINE_RATE_PER_DAY : 0);
+                            ?>
+                                <div class="group flex flex-col sm:flex-row justify-between sm:items-center p-4 rounded-2xl bg-white border border-red-100 hover:border-red-300 hover:shadow-md hover:bg-red-50/40 transition-all gap-4">
+                                    <div class="flex items-start gap-4 flex-1 min-w-0">
+                                        <div class="w-12 h-12 rounded-xl bg-red-50 text-red-500 border border-red-100 flex items-center justify-center flex-shrink-0">
+                                            <i class="fas fa-calendar-times text-lg"></i>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <h4 class="font-bold text-gray-900 text-[15px] truncate"><?php echo htmlspecialchars($item['equipment_name']); ?></h4>
+                                            <p class="text-[13px] text-gray-600 mt-1 flex items-center gap-2"><i class="fa-solid fa-user-circle text-gray-400"></i> ผู้ยืม: <strong class="text-gray-900"><?php echo htmlspecialchars($item['student_name'] ?? '-'); ?></strong></p>
+                                            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-[12px]">
+                                                <span class="text-gray-500"><i class="fas fa-phone-alt"></i> <?php echo htmlspecialchars($item['phone_number'] ?? '-'); ?></span>
+                                                <span class="font-black text-red-500 bg-red-50 px-2 py-0.5 rounded"><i class="fas fa-clock"></i> เลยกำหนดมาแล้ว <?php echo $days_overdue; ?> วัน</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex-shrink-0 border-t sm:border-t-0 sm:border-l border-red-100 pt-3 sm:pt-0 sm:pl-4 w-full sm:w-auto">
+                                        <button class="w-full bg-red-500 hover:bg-red-600 text-white rounded-xl px-4 py-2.5 text-[13px] font-bold shadow-md shadow-red-500/20 hover:shadow-lg transition-all flex items-center gap-2 justify-center"
+                                            onclick="openFineAndReturnPopup(
+                                                <?php echo $item['transaction_id']; ?>, <?php echo $item['student_id'] ?? 0; ?>,
+                                                '<?php echo htmlspecialchars(addslashes($item['student_name'] ?? '-')); ?>',
+                                                '<?php echo htmlspecialchars(addslashes($item['equipment_name'])); ?>',
+                                                <?php echo $days_overdue; ?>, <?php echo $fine; ?>, <?php echo $item['equipment_id']; ?>
+                                            )">
+                                            <i class="fas fa-coins text-[11px] opacity-80"></i> คืนของ/ชำระค่าปรับ
+                                        </button>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
             </div>
 
         </div>
         
-        <!-- RIGHT COLUMN -->
-        <div class="col-right">
+        <!-- RIGHT COLUMN (Span 1 on XL -> 3) -->
+        <div class="flex flex-col gap-6">
             
+            <!-- Quick Actions คล้าย e-Campaign -->
+            <div class="grid grid-cols-2 lg:grid-cols-2 xl:grid-cols-1 gap-4">
+                
+                <a href="transactions.php" class="relative overflow-hidden bg-white border border-gray-200 p-6 rounded-[24px] flex flex-col justify-between hover:border-emerald-300 hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-1 transition-all group">
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-4 border border-emerald-100">
+                        <i class="fa-solid fa-clipboard-list text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="block font-black text-gray-900 text-[17px] mb-1 group-hover:text-emerald-600 transition-colors">ประวัติธุรกรรม</span>
+                        <span class="text-gray-500 text-[12px] leading-tight block">ติดตามการยืม/คืน อดีตถึงปัจจุบัน</span>
+                    </div>
+                    <i class="fa-solid fa-arrow-right absolute bottom-6 right-6 text-xl text-emerald-500 opacity-0 -translate-x-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0"></i>
+                </a>
+
+                <a href="inventory.php" class="relative overflow-hidden bg-white border border-gray-200 p-6 rounded-[24px] flex flex-col justify-between hover:border-blue-300 hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1 transition-all group">
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-4 border border-blue-100">
+                        <i class="fa-solid fa-cubes-stacked text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="block font-black text-gray-900 text-[17px] mb-1 group-hover:text-blue-600 transition-colors">คลังอุปกรณ์ (Inventory)</span>
+                        <span class="text-gray-500 text-[12px] leading-tight block">จัดการสต็อก เพิ่ม/ลบ อุปกรณ์ในระบบ</span>
+                    </div>
+                    <i class="fa-solid fa-arrow-right absolute bottom-6 right-6 text-xl text-blue-500 opacity-0 -translate-x-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0"></i>
+                </a>
+            </div>
+
             <!-- สัดส่วน Chart -->
-            <div class="panel">
-                <div class="panel-head">
-                    <i class="fas fa-chart-pie" style="color:#3b82f6; font-size:1.2rem;"></i>
-                    <h3>สัดส่วนอุปกรณ์</h3>
+            <div class="bg-white rounded-[24px] shadow-sm border border-gray-100 flex flex-col mt-2">
+                <div class="p-5 border-b border-gray-50 flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-500"><i class="fas fa-chart-pie"></i></div>
+                    <h3 class="font-bold text-gray-900 text-[15px]">สัดส่วนสถานะอุปกรณ์</h3>
                 </div>
-                <div style="width: 100%; max-width: 300px; margin: 0 auto;">
-                    <canvas id="equipmentStatusChart"></canvas>
+                <div class="p-6 flex justify-center pb-8 border-b-[5px] border-b-blue-50">
+                    <div style="width: 100%; max-width: 260px;">
+                        <canvas id="equipmentStatusChart"></canvas>
+                    </div>
                 </div>
             </div>
 
             <!-- Activity Log -->
-            <div class="panel">
-                <div class="panel-head">
-                    <i class="fas fa-history" style="color:#64748b; font-size:1.2rem;"></i>
-                    <h3>ความเคลื่อนไหวล่าสุด</h3>
+            <div class="bg-white rounded-[24px] shadow-sm border border-gray-100 flex flex-col items-stretch overflow-hidden">
+                <div class="p-5 border-b border-gray-50 bg-slate-50/50">
+                    <h3 class="font-bold text-slate-800 text-[15px] flex items-center gap-2">
+                        <i class="fas fa-history text-slate-400"></i> ความเคลื่อนไหวล่าสุด
+                    </h3>
                 </div>
-                <?php if (empty($recent_activity)): ?>
-                    <p class="empty-msg">ยังไม่มีความเคลื่อนไหว</p>
-                <?php else: ?>
-                    <div class="act-list">
-                        <?php foreach ($recent_activity as $act):
-                            $icon = '🔵'; 
-                            $name = htmlspecialchars($act['student_name'] ?? 'N/A');
-                            $eq = htmlspecialchars($act['equipment_name']);
-                            if ($act['approval_status'] == 'pending') { $icon='🟡'; $txt="<strong>$name</strong> ขอยืม $eq"; }
-                            elseif ($act['approval_status'] == 'rejected') { $icon='⚪'; $txt="ปฏิเสธคำขอของ <strong>$name</strong> ($eq)"; }
-                            elseif ($act['status'] == 'returned') { $icon='🟢'; $txt="<strong>$name</strong> คืน $eq แล้ว"; }
-                            elseif ($act['approval_status'] == 'approved') { $icon='🔵'; $txt="อนุมัติให้ <strong>$name</strong> ยืม $eq"; }
-                            elseif ($act['approval_status'] == 'staff_added') { $icon='🟣'; $txt="บันทึก <strong>$name</strong> ยืม $eq (Walk-in)"; }
-                            else { $txt = "อัปเดตสถานะ $eq"; }
-                        ?>
-                            <div class="act-item">
-                                <div class="act-icon"><?= $icon ?></div>
-                                <p class="act-text"><?= $txt ?></p>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
+                <div class="p-2">
+                    <?php if (empty($recent_activity)): ?>
+                        <div class="p-8 text-center text-gray-400 text-sm italic">ยังไม่มีความเคลื่อนไหวในขณะนี้</div>
+                    <?php else: ?>
+                        <div class="flex flex-col">
+                            <?php foreach ($recent_activity as $act):
+                                $icon = '<i class="fas fa-circle text-[8px] text-blue-500"></i>'; 
+                                $name = htmlspecialchars($act['student_name'] ?? 'N/A');
+                                $eq = htmlspecialchars($act['equipment_name']);
+                                if ($act['approval_status'] == 'pending') { $icon='<i class="fas fa-circle text-[8px] text-amber-500"></i>'; $txt="<strong class='text-gray-900'>$name</strong> ขอยืม <u class='decoration-gray-300'>$eq</u>"; }
+                                elseif ($act['approval_status'] == 'rejected') { $icon='<i class="fas fa-circle text-[8px] text-gray-300"></i>'; $txt="ปฏิเสธคำขอของ <strong class='text-gray-900'>$name</strong> (<span class='text-gray-400'>$eq</span>)"; }
+                                elseif ($act['status'] == 'returned') { $icon='<i class="fas fa-circle text-[8px] text-emerald-500 animate-pulse"></i>'; $txt="<strong class='text-gray-900'>$name</strong> ส่งคืนแล้ว ($eq)"; }
+                                elseif ($act['approval_status'] == 'approved') { $icon='<i class="fas fa-circle text-[8px] text-blue-500"></i>'; $txt="อนุมัติให้ <strong class='text-gray-900'>$name</strong> นำออก ($eq)"; }
+                                elseif ($act['approval_status'] == 'staff_added') { $icon='<i class="fas fa-circle text-[8px] text-purple-500"></i>'; $txt="Walk-in <strong class='text-gray-900'>$name</strong> เบิก ($eq)"; }
+                                else { $txt = "อัปเดตสถานะ $eq"; }
+                            ?>
+                                <div class="flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl transition-colors border-b border-gray-50 last:border-0 border-solid mx-2">
+                                    <div class="mt-0.5 flex-shrink-0 w-6 h-6 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center">
+                                        <?= $icon ?>
+                                    </div>
+                                    <p class="text-[12px] text-slate-600 leading-relaxed font-medium"><?= $txt ?></p>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
 
         </div>
@@ -392,7 +440,7 @@ include('../includes/header.php');
 </div>
 
 <script>
-// ฟังก์ชันเปิด Modal รายละเอียด (คอยป้อนค่าให้ Swal)
+// ฟังก์ชันเปิด Modal รายละเอียด แบบ SweetAlert2 พรีเมียม (UI ตามที่โคลนมา)
 function openDetailModal(el) {
     const item = el.getAttribute('data-item');
     const serial = el.getAttribute('data-serial');
@@ -403,27 +451,76 @@ function openDetailModal(el) {
     const attachment = el.getAttribute('data-attachment');
 
     Swal.fire({
-        title: 'รายละเอียดการยืม',
+        title: 'รายละเอียดคำขอ',
         html: `
-            <div style="text-align: left; padding: 10px; font-size:.9rem;">
-                <p><strong>ชื่ออุปกรณ์:</strong> ${item}</p>
-                <p><strong>Serial Number:</strong> ${serial !== '-' ? serial : 'ยังไม่ระบุ'}</p>
-                <p><strong>ผู้ขอ:</strong> ${req}</p>
-                <p><strong>วันที่ยืม:</strong> ${bDate}</p>
-                <p><strong>กำหนดคืน:</strong> <span style="color:#ef4444">${dDate}</span></p>
-                <hr style="margin:10px 0;">
-                <p><strong>เหตุผล:</strong></p>
-                <div style="background:var(--color-page-bg, #f1f5f9); padding:10px; border-radius:8px; white-space:pre-wrap;">${reason}</div>
-                ${attachment ? `<div class="mt-3"><strong><i class="fas fa-paperclip"></i> เอกสาร:</strong> <a href="${attachment}" target="_blank" class="btn btn-sm" style="background:#0ea5e9; color:#fff;">ดูไฟล์แนบ</a></div>` : ''}
+            <div class="text-left font-sans text-[14px] text-gray-700 bg-white">
+                <div class="grid grid-cols-3 border-b border-gray-100 pb-3 mb-3 items-center">
+                    <span class="font-bold text-gray-500 col-span-1"><i class="fas fa-box-open mr-1"></i> อุปกรณ์</span>
+                    <span class="col-span-2 text-gray-900 font-bold">${item}</span>
+                </div>
+                <div class="grid grid-cols-3 border-b border-gray-100 pb-3 mb-3 items-center">
+                    <span class="font-bold text-gray-500 col-span-1"><i class="fas fa-barcode mr-1"></i> S/N</span>
+                    <span class="col-span-2 font-mono text-xs bg-gray-100 px-2 py-1 rounded w-max inline-block">${serial !== '-' ? serial : '<span class="text-gray-400 italic">ไม่ได้เจาะจง S/N</span>'}</span>
+                </div>
+                <div class="grid grid-cols-3 border-b border-gray-100 pb-3 mb-3 items-center">
+                    <span class="font-bold text-gray-500 col-span-1"><i class="fas fa-user-circle mr-1"></i> ผู้ขอ</span>
+                    <span class="col-span-2 text-gray-900 font-semibold">${req}</span>
+                </div>
+                <div class="grid grid-cols-3 border-b border-gray-100 pb-3 mb-3 items-center">
+                    <span class="font-bold text-gray-500 col-span-1"><i class="fas fa-calendar-plus mr-1"></i> ยืมเมื่อ</span>
+                    <span class="col-span-2 text-gray-900">${bDate}</span>
+                </div>
+                <div class="grid grid-cols-3 border-b border-gray-100 pb-3 mb-3 items-center">
+                    <span class="font-bold text-gray-500 col-span-1"><i class="fas fa-calendar-check mr-1"></i> กำหนดคืน</span>
+                    <span class="col-span-2 text-red-500 font-black bg-red-50 px-2 py-0.5 rounded w-max">${dDate}</span>
+                </div>
+                <div class="mt-4 pt-1">
+                    <span class="font-bold text-gray-500 block mb-2"><i class="fas fa-align-left mr-1"></i> เหตุผลการขอยืม:</span>
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 whitespace-pre-wrap leading-relaxed shadow-inner">${reason}</div>
+                </div>
+                ${attachment ? `<div class="mt-5">
+                    <a href="${attachment}" target="_blank" class="flex items-center justify-center gap-2 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-4 py-3 rounded-xl transition-all font-bold w-full border border-blue-100 shadow-sm"><i class="fas fa-file-download"></i> โหลดหรือดูรูปหลักฐานแนบ</a>
+                </div>` : ''}
             </div>
         `,
-        confirmButtonText: 'ปิด', width: '500px',
-        customClass: { popup: document.body.classList.contains('dark-mode') ? 'dark-swal' : '' }
+        confirmButtonText: 'ปิดหน้าต่าง',
+        confirmButtonColor: '#1e293b',
+        width: '520px',
+        customClass: { 
+            popup: 'rounded-3xl shadow-2xl font-sans !p-6 border border-gray-100',
+            confirmButton: 'rounded-xl font-bold px-8 py-3 shadow-md',
+            title: 'text-2xl font-black text-gray-900 !pt-2 pb-2 text-left w-full border-b border-gray-100 mb-4 inline-block',
+            htmlContainer: '!m-0 !mt-0 text-left'
+        }
     });
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    // Chart.js
+    
+    // Animate Number Counting (Same logic as e-Campaign)
+    function animateValue(obj, start, end, duration) {
+        if (!obj) return;
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString();
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+    
+    // Initialize count up animations
+    animateValue(document.getElementById('kp-available'), 0, parseInt(<?= (int)$count_available ?>), 1000);
+    animateValue(document.getElementById('kp-borrowed'), 0, parseInt(<?= (int)$count_borrowed ?>), 1000);
+    animateValue(document.getElementById('kp-maintenance'), 0, parseInt(<?= (int)$count_maintenance ?>), 1000);
+    
+    const overdueEl = document.getElementById('kp-overdue');
+    if(overdueEl) animateValue(overdueEl, 0, parseInt(<?= (int)$count_overdue ?>), 1000);
+
+    // Initializing Chart.js
     const ctx = document.getElementById('equipmentStatusChart');
     if(ctx) {
         const isDark = document.body.classList.contains('dark-mode');
@@ -433,27 +530,31 @@ document.addEventListener("DOMContentLoaded", function() {
                labels: ['พร้อมใช้', 'ถูกยืม', 'ส่งซ่อม'],
                datasets: [{
                    data: [<?= $count_available ?>, <?= $count_borrowed ?>, <?= $count_maintenance ?>],
-                   backgroundColor: ['#22c55e', '#3b82f6', '#f59e0b'],
-                   borderWidth: 0,
-                   hoverOffset: 4
+                   backgroundColor: ['#10b981', '#3b82f6', '#f59e0b'],
+                   borderWidth: 2,
+                   borderColor: '#ffffff',
+                   hoverOffset: 6
                }]
            },
            options: { 
-               responsive: true, cutout: '70%',
-               plugins: { legend: { position: 'bottom', labels: { color: isDark ? '#e2e8f0' : '#475569', font:{size:13} } } } 
+               responsive: true, 
+               cutout: '72%',
+               plugins: { 
+                   legend: { 
+                       position: 'bottom', 
+                       labels: { color: isDark ? '#e2e8f0' : '#64748b', font:{size:13, family: "'Prompt', 'Outfit', sans-serif", weight: '600'} },
+                       padding: 20
+                   },
+                   tooltip: {
+                       backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                       titleFont: {family: "'Prompt', sans-serif"},
+                       bodyFont: {family: "'Prompt', sans-serif", size: 14},
+                       padding: 12,
+                       cornerRadius: 8
+                   }
+               } 
            }
         });
-
-        const toggleBtn = document.getElementById('theme-toggle-btn');
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', () => {
-                setTimeout(() => {
-                    const darkNow = document.body.classList.contains('dark-mode');
-                    equipmentChart.options.plugins.legend.labels.color = darkNow ? '#e2e8f0' : '#475569';
-                    equipmentChart.update();
-                }, 50);
-            });
-        }
     }
 });
 </script>
