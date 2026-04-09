@@ -10,7 +10,7 @@ require_once __DIR__ . '/../includes/header.php';
 if (isset($_SESSION['evax_student_id'])) {
     try {
         $pdo = db();
-        $stmt = $pdo->prepare("SELECT full_name, student_personnel_id, phone_number, status, email FROM sys_users WHERE id = :id LIMIT 1");
+        $stmt = $pdo->prepare("SELECT full_name, student_personnel_id, citizen_id, phone_number, status FROM sys_users WHERE id = :id LIMIT 1");
         $stmt->execute([':id' => $_SESSION['evax_student_id']]);
         $row = $stmt->fetch();
 
@@ -21,9 +21,9 @@ if (isset($_SESSION['evax_student_id'])) {
         $inviteToken = $_SESSION['invite_token'] ?? '';
         $profileComplete = (
             !empty($row['full_name']) &&
+            !empty($row['citizen_id']) &&
             !empty($row['phone_number']) &&
             !empty($row['status']) &&
-            !empty($row['email']) &&
             ($row['status'] === 'other' || !empty($row['student_personnel_id']))
         );
 

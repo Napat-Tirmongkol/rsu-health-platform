@@ -27,9 +27,16 @@ require_once __DIR__ . '/../config.php';
 
 <div class="bg-white p-4 shadow-sm flex justify-between items-center sticky top-0 z-50">
     <div class="font-bold text-[#0052CC] text-lg"><i class="fa-solid fa-qrcode mr-2"></i>Staff Scanner</div>
-    <a href="logout.php" class="bg-red-50 text-red-500 px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-100 transition-colors">
-        ออกจากระบบ
-    </a>
+    <div class="flex items-center gap-3">
+        <?php if (!empty($_SESSION['staff_name'])): ?>
+        <span class="text-xs text-gray-500 font-semibold hidden sm:block">
+            <i class="fa-solid fa-user-tie mr-1 text-gray-400"></i><?= htmlspecialchars($_SESSION['staff_name']) ?>
+        </span>
+        <?php endif; ?>
+        <a href="logout.php" class="bg-red-50 text-red-500 px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-100 transition-colors">
+            ออกจากระบบ
+        </a>
+    </div>
 </div>
 
 <div class="max-w-md mx-auto p-5 mt-4">

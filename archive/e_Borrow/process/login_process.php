@@ -10,7 +10,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         require_once(__DIR__ . '/../../../config/db_connect.php');
         require_once('../includes/log_function.php');
     } catch (Throwable $e) {
-        header("Location: ../admin/login.php?error=db");
+        header("Location: ../admin/staff_login.php?error=db");
         exit;
     }
 
@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // 7.1 ตรวจสอบว่าบัญชีถูกระงับหรือไม่
             if (isset($user['account_status']) && $user['account_status'] == 'disabled') {
-                header("Location: ../admin/login.php?error=disabled");
+                header("Location: ../admin/staff_login.php?error=disabled");
                 exit;
             }
 
@@ -67,19 +67,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         } else {
             // 10. Log in ไม่สำเร็จ
-            header("Location: ../admin/login.php?error=1");
+            header("Location: ../admin/staff_login.php?error=1");
             exit;
         }
 
     } catch (Throwable $e) {
-        header("Location: ../admin/login.php?error=db");
+        header("Location: ../admin/staff_login.php?error=db");
         exit;
     }
 
 } else {
     // ถ้าเข้ามาหน้านี้ตรงๆ
-    // ◀️ (แก้ไข) เพิ่ม ../ ◀️
-    header("Location: ../admin/login.php");
+    header("Location: ../admin/staff_login.php");
     exit;
 }
 ?>

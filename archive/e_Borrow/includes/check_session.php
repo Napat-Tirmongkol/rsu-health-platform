@@ -39,15 +39,32 @@ if (!isset($_SESSION['user_id'])
         $row = $s->fetch();
 
         if ($row) {
-            // Whitelist role ก่อน set session
+            // พบบัญชี sys_staff → ใช้ role จาก staff record
             $allowedRoles = ['admin', 'editor', 'employee', 'librarian'];
             $_SESSION['user_id']   = $row['id'];
             $_SESSION['full_name'] = $row['full_name'];
             $_SESSION['role']      = in_array($row['role'], $allowedRoles, true) ? $row['role'] : 'employee';
         } else {
-            // ไม่มีบัญชี staff → ไม่อนุญาต (แทนที่จะ grant admin โดยอัตโนมัติ)
-            header('Location: ' . _eborrow_abs_url('login.php?error=no_staff_account'));
-            exit;
+            // ไม่มีบัญชี sys_staff → fallback ตรวจสอบ sys_admins
+            // Portal Admin (superadmin/admin) ให้เข้า e-Borrow ได้ในฐานะ admin โดยอัตโนมัติ
+            $adminId   = $_SESSION['admin_id'] ?? null;
+            $adminName = $_SESSION['admin_username'] ?? '';
+            $sa = $p->prepare("SELECT id, full_name FROM sys_admins WHERE id = :id LIMIT 1");
+            $sa->execute([':id' => $adminId]);
+            $adminRow = $sa->fetch();
+
+            if ($adminRow) {
+                // เป็น portal admin จริง → grant e-Borrow access ในฐานะ admin
+                // ใช้ admin_id จาก sys_admins โดยตรง (integer) และ flag is_portal_admin
+                $_SESSION['user_id']         = (int) $adminId;
+                $_SESSION['full_name']       = $adminRow['full_name'];
+                $_SESSION['role']            = 'admin';
+                $_SESSION['is_portal_admin'] = true;
+            } else {
+                // ไม่ใช่ทั้ง staff และ admin → ปฏิเสธ
+                header('Location: ' . _eborrow_abs_url('login.php?error=no_staff_account'));
+                exit;
+            }
         }
     } catch (Exception $e) {
         // DB ไม่พร้อม → ปฏิเสธการเข้าถึงแบบ fail-secure

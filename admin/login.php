@@ -459,7 +459,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </a>
 
         <div class="bottom-links">
-            <span></span>
+            <a href="staff_login.php">
+                <i class="fa-solid fa-user-tie mr-1"></i>Staff Login
+            </a>
             <a href="../portal/manage_admins.php">Register New Admin Account</a>
         </div>
 
