@@ -379,6 +379,9 @@ try {
                         <a href="users.php" class="shortcut-link">
                             <i class="fa-solid fa-users"></i> Users Center
                         </a>
+                        <a href="apps.php" class="shortcut-link">
+                            <i class="fa-solid fa-link"></i> Application URLs
+                        </a>
                         <a href="../admin/campaigns.php" class="shortcut-link">
                             <i class="fa-solid fa-bullhorn"></i> Campaign Manager
                         </a>
@@ -388,38 +391,6 @@ try {
                     </div>
                     <i
                         class="fa-solid fa-screwdriver-wrench absolute -bottom-6 -right-6 text-[6rem] opacity-5 rotate-12 pointer-events-none"></i>
-                </div>
-
-                <!-- Application URLs -->
-                <div class="shortcut-card au d5">
-                    <div class="text-xs font-black uppercase tracking-widest opacity-70 mb-1">Copy & Share</div>
-                    <div class="font-black text-lg mb-4">Application URLs</div>
-                    <div class="space-y-2">
-                        <?php 
-                        // สร้าง Base URL ให้ถูกต้องตามการเข้าถึง (Localhost / Production)
-                        $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'];
-                        $path = dirname($_SERVER['PHP_SELF'], 2); // ถอยกลับ 1 ระดับจาก portal/
-                        $sys_base = rtrim($base_url . $path, '/');
-                        
-                        $appUrls = [
-                            ['icon' => 'fa-hospital-user', 'label' => 'หน้าบ้าน E-Campaign', 'url' => $sys_base . '/'],
-                            ['icon' => 'fa-box-open', 'label' => 'หน้าบ้าน E-Borrow', 'url' => $sys_base . '/archive/e_Borrow/'],
-                            ['icon' => 'fa-shield-halved', 'label' => 'Staff Login Portal', 'url' => $sys_base . '/login.php'],
-                        ];
-                        foreach($appUrls as $app):
-                        ?>
-                        <div class="flex items-center gap-2 bg-white/10 rounded-lg p-2 hover:bg-white/20 transition-all group">
-                            <i class="fa-solid <?= $app['icon'] ?> text-white/50 w-5 text-center text-xs"></i>
-                            <input type="text" value="<?= htmlspecialchars($app['url']) ?>" readonly 
-                                class="bg-transparent border-none text-[11px] font-mono text-white/90 flex-1 outline-none cursor-text w-full truncate p-0 select-all" title="<?= htmlspecialchars($app['label']) ?>">
-                            <button onclick="copyAppUrl(this, '<?= htmlspecialchars($app['url']) ?>')" title="Copy URL"
-                                class="w-7 h-7 flex items-center justify-center bg-white/20 hover:bg-white text-white hover:text-[#2e9e63] rounded transition-all shadow-sm shrink-0">
-                                <i class="fa-regular fa-copy text-xs"></i>
-                            </button>
-                        </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <i class="fa-solid fa-link absolute -bottom-6 -right-6 text-[6rem] opacity-5 rotate-12 pointer-events-none"></i>
                 </div>
 
             </aside>
@@ -437,20 +408,6 @@ try {
     </div>
 
     <script>
-        /* ── 0. Copy Application URLs ───────────────────────────── */
-        window.copyAppUrl = function(btn, txt) {
-            navigator.clipboard.writeText(txt).then(() => {
-                const icon = btn.querySelector('i');
-                const origClass = icon.className;
-                icon.className = 'fa-solid fa-check text-xs';
-                btn.classList.add('!bg-white', '!text-[#2e9e63]');
-                setTimeout(() => {
-                    icon.className = origClass;
-                    btn.classList.remove('!bg-white', '!text-[#2e9e63]');
-                }, 1500);
-            });
-        };
-
         /* ── 1. KPI Number Counter ──────────────────────────────── */
         document.querySelectorAll('[data-counter]').forEach(el => {
             const target = parseInt(el.dataset.counter, 10) || 0;
