@@ -34,6 +34,75 @@ if (!$apiKey) {
     exit;
 }
 
+// ── Quick Suggestions Mode ────────────────────────────────────────────────────
+if (($_POST['mode'] ?? '') === 'suggestions') {
+    $force = !empty($_POST['force']);
+    // Return cached suggestions unless forced regeneration
+    if (!$force && !empty($_SESSION['_ai_suggestions'])) {
+        echo json_encode(['ok' => true, 'suggestions' => $_SESSION['_ai_suggestions']]);
+        exit;
+    }
+
+    // Fetch minimal context for prompt generation
+    $pdoS = db();
+    try {
+        $ovS  = $pdoS->query("SELECT COUNT(*) AS t, COALESCE(SUM(status='active'),0) AS a FROM camp_list")->fetch(PDO::FETCH_ASSOC);
+        $top3 = $pdoS->query("
+            SELECT c.title FROM camp_list c
+            LEFT JOIN camp_bookings b ON b.campaign_id = c.id
+            GROUP BY c.id ORDER BY COUNT(b.id) DESC LIMIT 3
+        ")->fetchAll(PDO::FETCH_COLUMN);
+        $sugCtx = "แคมเปญทั้งหมด {$ovS['t']} รายการ (เปิดอยู่ {$ovS['a']})\n"
+                . "Top 3 ที่มีผู้จองมากสุด: " . implode(', ', $top3);
+    } catch (PDOException $e) {
+        $sugCtx = 'ไม่สามารถดึงข้อมูลได้';
+    }
+
+    $sugPrompt = "คุณเป็น AI วิเคราะห์ข้อมูลแคมเปญสุขภาพ RSU Healthcare\n"
+        . "ข้อมูลปัจจุบัน: {$sugCtx}\n\n"
+        . "สร้างคำถามที่น่าสนใจ 5 ข้อ ที่แอดมินควรถามคุณ ให้หลากหลายประเด็น "
+        . "(เช่น วิเคราะห์ยอดนิยม, แนวโน้ม, โควต้า, การยกเลิก, ข้อเสนอแนะ)\n"
+        . "ตอบเป็น JSON array ภาษาไทยเท่านั้น ห้ามมีข้อความอื่น:\n"
+        . "[\"คำถาม 1\",\"คำถาม 2\",\"คำถาม 3\",\"คำถาม 4\",\"คำถาม 5\"]";
+
+    $sugModel = $_SESSION['_gemini_model'] ?? 'gemini-2.0-flash';
+    $sugUrl   = "https://generativelanguage.googleapis.com/v1beta/models/{$sugModel}:generateContent?key={$apiKey}";
+    $sugBody  = json_encode([
+        'contents'         => [['role' => 'user', 'parts' => [['text' => $sugPrompt]]]],
+        'generationConfig' => ['temperature' => 0.9, 'maxOutputTokens' => 400],
+    ]);
+
+    $ch = curl_init($sugUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => $sugBody,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+        CURLOPT_TIMEOUT        => 20,
+        CURLOPT_SSL_VERIFYPEER => true,
+    ]);
+    $sugRaw  = curl_exec($ch);
+    $sugCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($sugCode === 200) {
+        $sugResult = json_decode($sugRaw, true);
+        $sugText   = $sugResult['candidates'][0]['content']['parts'][0]['text'] ?? '';
+        if (preg_match('/\[[\s\S]*?\]/', $sugText, $m)) {
+            $sugg = json_decode($m[0], true);
+            if (is_array($sugg) && count($sugg) >= 3) {
+                $sugg = array_slice(array_values(array_filter($sugg, 'is_string')), 0, 5);
+                $_SESSION['_ai_suggestions'] = $sugg;
+                echo json_encode(['ok' => true, 'suggestions' => $sugg]);
+                exit;
+            }
+        }
+    }
+
+    echo json_encode(['ok' => false, 'error' => 'ไม่สามารถสร้างคำถามได้']);
+    exit;
+}
+
 // ── Rate Limiting (server-side) ───────────────────────────────────────────────
 const AI_RATE_LIMIT  = 10;  // สูงสุด 10 ครั้ง/นาที (Gemini free tier = 15 RPM)
 const AI_RATE_WINDOW = 60;  // หน้าต่างเวลา (วินาที)

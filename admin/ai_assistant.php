@@ -98,6 +98,18 @@ renderPageHeader(
 }
 .prompt-chip:hover { background:#ede9fe; border-color:#c4b5fd; transform:translateY(-1px); }
 
+/* ── Chip skeleton shimmer ───────────────────────────── */
+.chip-skeleton {
+    height: 34px; border-radius: 99px; display: inline-block;
+    background: linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 50%,#f3f4f6 75%);
+    background-size: 200% 100%;
+    animation: chipShimmer 1.3s infinite linear;
+}
+@keyframes chipShimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
 /* ── Scrollable messages ─────────────────────────── */
 #chatMessages {
     flex: 1;
@@ -207,32 +219,35 @@ renderPageHeader(
 </div>
 <?php endif; ?>
 
-<!-- Quick Prompts -->
+<!-- Quick Prompts (AI-generated) -->
 <div class="mb-4 fade-up" style="animation-delay:.05s">
-    <div class="text-xs font-black uppercase tracking-widest text-gray-400 mb-3">
-        <i class="fa-solid fa-bolt mr-1"></i> คำถามด่วน
+    <div class="text-xs font-black uppercase tracking-widest text-gray-400 mb-3"
+         style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <span>
+            <i class="fa-solid fa-bolt mr-1"></i> คำถามด่วน
+            <span id="chipAiBadge"
+                style="display:inline-flex;align-items:center;gap:4px;margin-left:6px;
+                       padding:2px 8px;border-radius:99px;font-size:.65rem;font-weight:800;
+                       background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;
+                       opacity:0;transition:opacity .4s">
+                <i class="fa-solid fa-robot" style="font-size:.6rem"></i> AI Generated
+            </span>
+        </span>
+        <button id="regenChipsBtn" onclick="loadSuggestions(true)" title="สร้างคำถามใหม่"
+            style="background:#f5f3ff;border:1.5px solid #ede9fe;border-radius:8px;
+                   cursor:pointer;color:#8b5cf6;font-size:.75rem;padding:4px 10px;
+                   display:flex;align-items:center;gap:5px;font-weight:700;
+                   transition:all .18s;white-space:nowrap">
+            <i class="fa-solid fa-rotate-right" id="regenIcon"></i> สร้างใหม่
+        </button>
     </div>
-    <div class="flex flex-wrap gap-2">
-        <button class="prompt-chip" onclick="sendPrompt(this.dataset.q)"
-            data-q="สรุป 10 อันดับแรกที่คนจองเยอะที่สุด พร้อมบอกอัตราการเติมโควต้า">
-            <i class="fa-solid fa-ranking-star"></i> Top 10 ยอดนิยม
-        </button>
-        <button class="prompt-chip" onclick="sendPrompt(this.dataset.q)"
-            data-q="วิเคราะห์ภาพรวมของระบบ ว่ามีแคมเปญ การจอง สถานะอะไรบ้าง ระบุจุดที่น่าเป็นห่วง">
-            <i class="fa-solid fa-chart-pie"></i> ภาพรวมระบบ
-        </button>
-        <button class="prompt-chip" onclick="sendPrompt(this.dataset.q)"
-            data-q="แคมเปญไหนที่โควต้าใกล้เต็มหรือเต็มแล้ว และแคมเปญไหนที่ยังมีที่ว่างเยอะ แนะนำว่าควรโปรโมตแคมเปญไหน">
-            <i class="fa-solid fa-lightbulb"></i> แนะนำแคมเปญที่ควรโปรโมต
-        </button>
-        <button class="prompt-chip" onclick="sendPrompt(this.dataset.q)"
-            data-q="วิเคราะห์แนวโน้มการจอง 7 วันล่าสุด มีทิศทางอย่างไร เพิ่มขึ้นหรือลดลง">
-            <i class="fa-solid fa-arrow-trend-up"></i> แนวโน้ม 7 วัน
-        </button>
-        <button class="prompt-chip" onclick="sendPrompt(this.dataset.q)"
-            data-q="อัตราการยกเลิก (cancellation rate) โดยรวมเป็นเท่าไร แคมเปญไหนมีการยกเลิกสูงที่สุด มีข้อเสนอแนะอะไรไหม">
-            <i class="fa-solid fa-ban"></i> วิเคราะห์การยกเลิก
-        </button>
+    <div id="chipArea" class="flex flex-wrap gap-2">
+        <!-- Skeleton placeholders while loading -->
+        <div class="chip-skeleton" style="width:120px"></div>
+        <div class="chip-skeleton" style="width:90px"></div>
+        <div class="chip-skeleton" style="width:140px"></div>
+        <div class="chip-skeleton" style="width:100px"></div>
+        <div class="chip-skeleton" style="width:110px"></div>
     </div>
 </div>
 
@@ -338,6 +353,76 @@ function showTyping() {
 }
 function hideTyping() {
     document.getElementById('typingIndicator')?.remove();
+}
+
+// ── AI-generated quick suggestions ───────────────────────────────────────────
+const CHIP_ICONS = [
+    'fa-ranking-star','fa-chart-pie','fa-lightbulb',
+    'fa-arrow-trend-up','fa-ban','fa-magnifying-glass-chart',
+    'fa-star','fa-calendar-check','fa-fire','fa-circle-question'
+];
+const DEFAULT_CHIPS = [
+    {icon:'fa-ranking-star', q:'สรุป 10 อันดับแรกที่คนจองเยอะที่สุด พร้อมบอกอัตราการเติมโควต้า'},
+    {icon:'fa-chart-pie',    q:'วิเคราะห์ภาพรวมของระบบ ว่ามีแคมเปญ การจอง สถานะอะไรบ้าง ระบุจุดที่น่าเป็นห่วง'},
+    {icon:'fa-lightbulb',   q:'แคมเปญไหนที่โควต้าใกล้เต็มหรือเต็มแล้ว แนะนำว่าควรโปรโมตแคมเปญไหน'},
+    {icon:'fa-arrow-trend-up', q:'วิเคราะห์แนวโน้มการจอง 7 วันล่าสุด มีทิศทางอย่างไร'},
+    {icon:'fa-ban',          q:'อัตราการยกเลิก (cancellation rate) โดยรวมเป็นเท่าไร มีข้อเสนอแนะอะไรไหม'},
+];
+
+function renderChips(items, isAI = false) {
+    const area    = document.getElementById('chipArea');
+    const badge   = document.getElementById('chipAiBadge');
+    area.innerHTML = '';
+    items.forEach((item, i) => {
+        const q    = typeof item === 'string' ? item : item.q;
+        const icon = typeof item === 'string' ? CHIP_ICONS[i % CHIP_ICONS.length] : item.icon;
+        const btn  = document.createElement('button');
+        btn.className = 'prompt-chip';
+        btn.onclick   = () => sendPrompt(q);
+        btn.title     = q;
+        // Truncate label for display
+        const label = q.length > 28 ? q.substring(0, 26) + '…' : q;
+        btn.innerHTML = `<i class="fa-solid ${icon}"></i> ${escHtml(label)}`;
+        btn.style.animation = `adminSlideUp .35s cubic-bezier(.16,1,.3,1) ${i * 0.06}s both`;
+        area.appendChild(btn);
+    });
+    if (badge) badge.style.opacity = isAI ? '1' : '0';
+}
+
+function showChipSkeleton() {
+    const widths = [120, 90, 145, 100, 115];
+    document.getElementById('chipArea').innerHTML =
+        widths.map(w => `<div class="chip-skeleton" style="width:${w}px"></div>`).join('');
+}
+
+async function loadSuggestions(force = false) {
+    const regenBtn  = document.getElementById('regenChipsBtn');
+    const regenIcon = document.getElementById('regenIcon');
+
+    showChipSkeleton();
+    regenBtn.disabled = true;
+    regenIcon.classList.add('fa-spin');
+
+    try {
+        const fd = new FormData();
+        fd.append('mode',       'suggestions');
+        fd.append('csrf_token', getCsrf());
+        if (force) fd.append('force', '1');
+
+        const res  = await fetch('ajax_ai.php', { method: 'POST', body: fd, credentials: 'same-origin' });
+        const data = await res.json();
+
+        if (data.ok && Array.isArray(data.suggestions) && data.suggestions.length) {
+            renderChips(data.suggestions, true);
+        } else {
+            renderChips(DEFAULT_CHIPS, false);
+        }
+    } catch (e) {
+        renderChips(DEFAULT_CHIPS, false);
+    } finally {
+        regenBtn.disabled = false;
+        regenIcon.classList.remove('fa-spin');
+    }
 }
 
 // ── Rate limit & cooldown state ───────────────────────────────────────────────
@@ -469,9 +554,12 @@ async function sendMessage() {
     }
 }
 
-// Init dots on page load
+// Init rate dots on page load
 initDots(RATE_LIMIT);
 updateRateUI(RATE_LIMIT, RATE_LIMIT);
+
+// Load AI-generated suggestions after page is ready
+document.addEventListener('DOMContentLoaded', () => loadSuggestions(false));
 
 // ── Quick prompt chips ────────────────────────────────────────────────────────
 function sendPrompt(text) {
