@@ -171,7 +171,7 @@ try {
     <footer class="pt-10 pb-4 text-center">
         <div class="flex items-center justify-center gap-2 opacity-25">
             <i class="fa-solid fa-shield-halved" style="color:#2e9e63"></i>
-            <span class="text-[10px] font-black uppercase tracking-[.4em]">Central Command v3.0 · RSU Healthcare</span>
+            <span class="text-[10px] font-black uppercase tracking-[.4em]">Central Command v3.0 · RSU Medical Clinic</span>
         </div>
     </footer>
 

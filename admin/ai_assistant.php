@@ -261,7 +261,7 @@ renderPageHeader(
             <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
             <div class="msg-bubble">
                 <strong>สวัสดีครับ! ผม AI Campaign Analyst</strong> 🤖<br>
-                ผมสามารถวิเคราะห์ข้อมูลแคมเปญ RSU Healthcare ได้แบบเรียลไทม์<br><br>
+                ผมสามารถวิเคราะห์ข้อมูลแคมเปญ RSU Medical Clinic ได้แบบเรียลไทม์<br><br>
                 ลองกดปุ่ม <strong>คำถามด่วน</strong> ด้านบน หรือพิมพ์คำถามของคุณได้เลย เช่น<br>
                 <ul style="margin-top:6px">
                     <li><em>"สรุปข้อมูลแคมเปญ 10 อันดับแรกที่มีคนจองเยอะที่สุด"</em></li>

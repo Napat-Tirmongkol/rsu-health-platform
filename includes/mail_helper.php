@@ -9,7 +9,7 @@
  * 'SMTP_USER'       => 'your@email.com'
  * 'SMTP_PASS'       => 'your_app_password'
  * 'SMTP_FROM_EMAIL' => 'noreply@rsu.ac.th'
- * 'SMTP_FROM_NAME'  => 'RSU Healthcare'
+ * 'SMTP_FROM_NAME'  => 'RSU Medical Clinic'
  * ────────────────────────────────────────────────────────────────────────────
  */
 
@@ -27,7 +27,7 @@ function smtp_send(string $to, string $subject, string $htmlBody, array $cfg): b
     $user    = $cfg['SMTP_USER']       ?? '';
     $pass    = $cfg['SMTP_PASS']       ?? '';
     $from    = $cfg['SMTP_FROM_EMAIL'] ?? $user;
-    $name    = $cfg['SMTP_FROM_NAME']  ?? 'RSU Healthcare';
+    $name    = $cfg['SMTP_FROM_NAME']  ?? 'RSU Medical Clinic';
     $timeout = 15;
 
     // เลือก transport
@@ -127,7 +127,7 @@ function send_campaign_email(string $to, string $subject, string $body): bool {
 
     // Fallback: php mail() (ใช้ได้ถ้า server ตั้งค่า sendmail ไว้)
     $fromEmail = $secrets['SMTP_FROM_EMAIL'] ?? 'no-reply@rsu.ac.th';
-    $fromName  = $secrets['SMTP_FROM_NAME']  ?? 'RSU Healthcare';
+    $fromName  = $secrets['SMTP_FROM_NAME']  ?? 'RSU Medical Clinic';
     $headers   = implode("\r\n", [
         'MIME-Version: 1.0',
         'Content-Type: text/html; charset=UTF-8',
@@ -171,7 +171,7 @@ function get_email_template(string $title, string $message, array $details = [],
             <!-- Header -->
             <div style="background:{$accentColor};padding:28px 32px;text-align:center">
                 <div style="font-size:2.2rem;margin-bottom:8px">{$iconEmoji}</div>
-                <div style="color:#fff;font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;opacity:.8;margin-bottom:4px">RSU Healthcare Services</div>
+                <div style="color:#fff;font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;opacity:.8;margin-bottom:4px">RSU Medical Clinic Services</div>
                 <h1 style="color:#fff;margin:0;font-size:1.35rem;font-weight:900">{$title}</h1>
             </div>
 

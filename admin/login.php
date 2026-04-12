@@ -401,7 +401,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!-- Top brand -->
 <div class="brand-bar">
     <div class="heart"><i class="fa-solid fa-heart"></i></div>
-    <span>RSU Healthcare</span>
+    <span>RSU Medical Clinic</span>
 </div>
 
 <!-- Main card -->

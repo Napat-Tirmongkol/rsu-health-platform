@@ -82,7 +82,7 @@ if (!$success) {
         $pdo = db();
         $tables = $pdo->query("SHOW TABLES")->fetchAll(PDO::FETCH_COLUMN);
 
-        $sql  = "-- RSU Healthcare DB Backup\n";
+        $sql  = "-- RSU Medical Clinic DB Backup\n";
         $sql .= "-- Generated: {$now}\n";
         $sql .= "-- Database: {$dbName}\n\n";
         $sql .= "SET FOREIGN_KEY_CHECKS=0;\n\n";

@@ -186,7 +186,7 @@ if (!function_exists('renderPageHeader')) {
         </div>
         <div>
             <div class="font-black text-gray-900 text-[16px] leading-none">e-Campaign</div>
-            <div class="text-[10px] font-bold tracking-[.14em] uppercase mt-0.5" style="color:#2e9e63">RSU Healthcare</div>
+            <div class="text-[10px] font-bold tracking-[.14em] uppercase mt-0.5" style="color:#2e9e63">RSU Medical Clinic</div>
         </div>
     </div>
 

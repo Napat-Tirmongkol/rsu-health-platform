@@ -38,5 +38,5 @@ return [
     'SMTP_USER'                           => '',
     'SMTP_PASS'                           => '',
     'SMTP_FROM_EMAIL'                     => '',
-    'SMTP_FROM_NAME'                      => 'RSU Healthcare Services',
+    'SMTP_FROM_NAME'                      => 'RSU Medical Clinic Services',
 ];

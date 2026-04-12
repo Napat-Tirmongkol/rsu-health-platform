@@ -32,7 +32,7 @@ $projects = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Tool — RSU Healthcare Portal</title>
+    <title>Admin Tool — RSU Medical Clinic Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/tailwind.min.css">
@@ -106,7 +106,7 @@ $projects = [
                 </div>
                 <div>
                     <div class="font-black text-gray-900 text-[15px] leading-none">Admin Tool</div>
-                    <div class="text-[10px] font-bold tracking-[.15em] uppercase opacity-60 mt-0.5" style="color:#2e9e63">RSU Healthcare Portal</div>
+                    <div class="text-[10px] font-bold tracking-[.15em] uppercase opacity-60 mt-0.5" style="color:#2e9e63">RSU Medical Clinic Portal</div>
                 </div>
             </div>
             <div class="user-pill">

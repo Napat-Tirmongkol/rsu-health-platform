@@ -183,7 +183,7 @@ try {
                 <div class="brand-icon"><i class="fa-solid fa-heart"></i></div>
                 <div>
                     <div class="font-black text-gray-900 text-[15px] sm:text-[17px] leading-none tracking-tight">Central HUB</div>
-                    <div class="hidden sm:block text-[10px] font-bold tracking-[.15em] uppercase opacity-70 mt-0.5" style="color:#2e9e63">RSU Healthcare Portal</div>
+                    <div class="hidden sm:block text-[10px] font-bold tracking-[.15em] uppercase opacity-70 mt-0.5" style="color:#2e9e63">RSU Medical Clinic Portal</div>
                 </div>
             </div>
 
@@ -384,7 +384,7 @@ try {
         <footer class="pt-6 pb-4 text-center">
             <div class="flex items-center justify-center gap-2 opacity-25">
                 <i class="fa-solid fa-shield-halved" style="color:#2e9e63"></i>
-                <span class="text-[10px] font-black uppercase tracking-[.4em]">Central Command v3.0 · RSU Healthcare</span>
+                <span class="text-[10px] font-black uppercase tracking-[.4em]">Central Command v3.0 · RSU Medical Clinic</span>
             </div>
         </footer>
 

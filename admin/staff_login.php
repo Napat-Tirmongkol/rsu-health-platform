@@ -328,7 +328,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!-- Brand bar -->
 <div class="brand-bar">
     <div class="heart"><i class="fa-solid fa-heart"></i></div>
-    <span>RSU Healthcare</span>
+    <span>RSU Medical Clinic</span>
 </div>
 
 <!-- Staff badge -->
@@ -359,7 +359,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Right form panel -->
     <div class="right-panel">
 
-        <p class="welcome-label">RSU Healthcare | เข้าสู่ระบบเจ้าหน้าที่ e-Campaign</p>
+        <p class="welcome-label">RSU Medical Clinic | เข้าสู่ระบบเจ้าหน้าที่ e-Campaign</p>
         <h1 class="main-title">Staff<br>Sign In</h1>
         <p class="sign-in-sub">ใช้ Username และ Password ของเจ้าหน้าที่</p>
 

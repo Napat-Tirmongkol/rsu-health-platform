@@ -58,7 +58,7 @@ if (($_POST['mode'] ?? '') === 'suggestions') {
         $sugCtx = 'ไม่สามารถดึงข้อมูลได้';
     }
 
-    $sugPrompt = "คุณเป็น AI วิเคราะห์ข้อมูลแคมเปญสุขภาพ RSU Healthcare\n"
+    $sugPrompt = "คุณเป็น AI วิเคราะห์ข้อมูลแคมเปญสุขภาพ RSU Medical Clinic\n"
         . "ข้อมูลปัจจุบัน: {$sugCtx}\n\n"
         . "สร้างคำถามที่น่าสนใจ 5 ข้อ ที่แอดมินควรถามคุณ ให้หลากหลายประเด็น "
         . "(เช่น วิเคราะห์ยอดนิยม, แนวโน้ม, โควต้า, การยกเลิก, ข้อเสนอแนะ)\n"
@@ -376,7 +376,7 @@ function geminiError(string $raw, int $httpCode): string {
 
 // ── System prompt (role + rules เท่านั้น ไม่มีข้อมูล hardcode) ────────────────
 $systemPrompt = <<<PROMPT
-คุณคือ AI ผู้เชี่ยวชาญด้านการวิเคราะห์ข้อมูล (Data Analyst Assistant) ประจำระบบ RSU Healthcare
+คุณคือ AI ผู้เชี่ยวชาญด้านการวิเคราะห์ข้อมูล (Data Analyst Assistant) ประจำระบบ RSU Medical Clinic
 หน้าที่ของคุณคือวิเคราะห์ สรุปผล หรือตอบคำถามของแอดมิน โดยยึดกฎเหล็กดังนี้:
 
 [เงื่อนไขการทำงาน]
