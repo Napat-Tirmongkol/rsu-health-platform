@@ -135,7 +135,7 @@ $systemPrompt = <<<PROMPT
 PROMPT;
 
 // ── Call Gemini API ───────────────────────────────────────────────────────────
-$model = 'gemini-2.0-flash-lite';
+$model = 'gemini-2.0-flash';
 $url   = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
 
 $body = json_encode([
@@ -174,9 +174,11 @@ if ($httpCode !== 200) {
     error_log("Gemini API HTTP {$httpCode}: {$raw}");
     $errData = json_decode($raw, true);
     $errMsg  = $errData['error']['message'] ?? "HTTP {$httpCode}";
-    // แปล quota error ให้เข้าใจง่าย
+    // แปล error ให้เข้าใจง่าย
     if ($httpCode === 429 || stripos($errMsg, 'quota') !== false || stripos($errMsg, 'RESOURCE_EXHAUSTED') !== false) {
-        $userMsg = 'API Key หมด quota หรือ free tier ไม่รองรับ — กรุณา:\n1. ตรวจสอบ quota ที่ https://ai.dev/rate-limit\n2. เปิด billing บน Google Cloud project\n3. หรือสร้าง API Key ใหม่จาก https://aistudio.google.com/apikey';
+        $userMsg = "API Key นี้ไม่มี free tier quota (limit = 0)\n\nวิธีแก้: สร้าง API Key ใหม่จาก Google AI Studio โดยตรง\n→ https://aistudio.google.com/apikey\nแล้วนำไปใส่ใน config/secrets.php แทน key เดิม";
+    } elseif (stripos($errMsg, 'not found') !== false || stripos($errMsg, 'no longer available') !== false) {
+        $userMsg = "โมเดล AI ที่ตั้งค่าไว้ไม่พร้อมใช้งาน กรุณาแจ้งผู้ดูแลระบบ";
     } else {
         $userMsg = "Gemini ตอบกลับ: {$errMsg}";
     }
