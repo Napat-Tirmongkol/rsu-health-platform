@@ -192,9 +192,9 @@ $header_actions = '
     <i class="fa-solid fa-trash-can"></i> ลบที่เลือก (<span id="selectedSlotCount">0</span>)
 </button>
 <div class="relative" id="multiSelectContainer">
-    <button type="button" onclick="toggleMultiSelect(event)" class="px-4 py-2 border border-gray-200 rounded-xl bg-white font-prompt text-sm shadow-sm hover:bg-gray-50 text-gray-700 flex items-center justify-between w-56 transition-colors gap-2">
+    <button type="button" onclick="toggleMultiSelect(event)" class="px-4 py-2 border border-gray-200 rounded-xl bg-white font-prompt text-sm shadow-sm hover:bg-gray-50 text-gray-700 flex items-center justify-between transition-colors gap-2" style="min-width:0;max-width:224px;">
         <span id="multiSelectLabel" class="truncate font-semibold text-[#0052CC]">แสดงทุกแคมเปญ</span>
-        <i class="fa-solid fa-chevron-down text-[10px] text-gray-400"></i>
+        <i class="fa-solid fa-chevron-down text-[10px] text-gray-400 flex-shrink-0"></i>
     </button>
     <div id="multiSelectDropdown" class="w-64 bg-white rounded-xl shadow-xl border border-gray-100 flex-col overflow-hidden" style="display:none;position:fixed;z-index:9999" onclick="event.stopPropagation()">
         <div class="p-2 border-b border-gray-100 bg-gray-50">
@@ -228,10 +228,10 @@ $header_actions = '
         <i class="fa-solid fa-list-ul"></i>
     </button>
 </div>
-<button onclick="openAddSlotModal(\'' . date('Y-m-d') . '\')" class="bg-gradient-to-r from-blue-600 to-[#0052CC] text-white px-5 py-2.5 rounded-xl font-prompt text-sm font-bold shadow-md hover:shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex items-center gap-2">
-    <i class="fa-solid fa-plus-circle"></i> สร้างรอบเวลา
+<button id="addSlotBtn" onclick="openAddSlotModal(\'' . date('Y-m-d') . '\')" class="bg-gradient-to-r from-blue-600 to-[#0052CC] text-white px-5 py-2.5 rounded-xl font-prompt text-sm font-bold shadow-md hover:shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex items-center gap-2">
+    <i class="fa-solid fa-plus-circle"></i><span class="btn-add-text"> สร้างรอบเวลา</span>
 </button>
-<select onchange="location.href=\'?month=\'+this.value.split(\'-\')[1]+\'&year=\'+this.value.split(\'-\')[0]" class="px-5 py-2.5 border border-gray-200 rounded-xl bg-white font-prompt text-sm font-bold text-gray-700 outline-none shadow-sm cursor-pointer hover:bg-gray-50">';
+<select id="monthSelect" onchange="location.href=\'?month=\'+this.value.split(\'-\')[1]+\'&year=\'+this.value.split(\'-\')[0]" class="px-4 py-2.5 border border-gray-200 rounded-xl bg-white font-prompt text-sm font-bold text-gray-700 outline-none shadow-sm cursor-pointer hover:bg-gray-50">';
     for($i = -3; $i <= 6; $i++) {
         $d = date('Y-m', strtotime("$i months"));
         $selected = ($d == "$year-".str_pad($month, 2, '0', STR_PAD_LEFT)) ? 'selected' : '';
@@ -388,6 +388,18 @@ renderPageHeader("Campaign Time Slots", "กำหนดช่วงเวลา
 /* ── Modal header strips ─────────────────────── */
 .modal-hdr-blue   { background: linear-gradient(135deg,#0052CC,#0070f3); }
 .modal-hdr-amber  { background: linear-gradient(135deg,#f59e0b,#d97706); }
+
+/* ── Mobile responsive ───────────────────────── */
+@media (max-width: 639px) {
+    .cal-cell    { min-height: 70px; padding: 4px 3px; }
+    .cal-head    { font-size: 9px; padding: 6px 0; }
+    .cal-date    { width: 20px; height: 20px; font-size: 11px; }
+    .slot-card   { padding: 3px 5px; margin-bottom: 3px; }
+    .btn-add-text { display: none; }
+    #addSlotBtn  { padding: 8px 12px !important; }
+    #monthSelect { padding: 8px 10px !important; font-size: 12px; }
+    #multiSelectContainer button { max-width: 160px; min-width: 0; }
+}
 </style>
 
 <div id="calendarViewContainer" class="animate-slide-up delay-100 mb-10">
@@ -790,22 +802,33 @@ function switchView(view) {
 function toggleMultiSelect(e) {
     if (e) e.stopPropagation();
     const dropdown = document.getElementById('multiSelectDropdown');
+    const btn = document.querySelector('#multiSelectContainer button');
     if (dropdown.style.display === 'none' || dropdown.style.display === '') {
-        const btn = document.querySelector('#multiSelectContainer button');
+        // ย้ายไปยัง <body> เพื่อหนีจาก transformed ancestor
+        // (CSS transform สร้าง stacking context ทำให้ position:fixed ไม่ work ถูกต้อง)
+        if (dropdown.parentElement !== document.body) {
+            document.body.appendChild(dropdown);
+        }
         const rect = btn.getBoundingClientRect();
-        dropdown.style.top  = (rect.bottom + 8) + 'px';
-        dropdown.style.right = (window.innerWidth - rect.right) + 'px';
-        dropdown.style.display = 'flex';
+        dropdown.style.position = 'fixed';
+        dropdown.style.zIndex   = '9999';
+        dropdown.style.top      = (rect.bottom + 8) + 'px';
+        dropdown.style.left     = 'auto';
+        dropdown.style.right    = Math.max(4, window.innerWidth - rect.right) + 'px';
+        dropdown.style.display  = 'flex';
     } else {
         dropdown.style.display = 'none';
     }
 }
 
 // ปิด dropdown เมื่อกดคลิกที่อื่น
+// ตรวจสอบทั้ง container และ dropdown (dropdown อาจถูกย้ายไปอยู่ใน body แล้ว)
 document.addEventListener('click', function(event) {
     const container = document.getElementById('multiSelectContainer');
-    if (container && !container.contains(event.target)) {
-        document.getElementById('multiSelectDropdown').style.display = 'none';
+    const dropdown  = document.getElementById('multiSelectDropdown');
+    if (container && !container.contains(event.target) &&
+        dropdown  && !dropdown.contains(event.target)) {
+        dropdown.style.display = 'none';
     }
 });
 
