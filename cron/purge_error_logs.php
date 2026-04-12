@@ -24,13 +24,9 @@ if (!$isCli) {
     header('Content-Type: text/plain; charset=utf-8');
 }
 
-// ── โหลด DB ───────────────────────────────────────────────────────────────────
-require_once __DIR__ . '/../config/db_connect.php';
-
-// โหลด constants (ERROR_LOG_RETENTION_DAYS, ACTIVITY_LOG_RETENTION_DAYS)
-if (file_exists(__DIR__ . '/../config.php')) {
-    require_once __DIR__ . '/../config.php';
-}
+// ── โหลด config (DB + constants + helpers) ───────────────────────────────────
+require_once __DIR__ . '/../config.php';
+// constants ถูก define ใน config.php แล้ว — fallback ไว้กันกรณีรัน standalone
 defined('ERROR_LOG_RETENTION_DAYS')    || define('ERROR_LOG_RETENTION_DAYS',    30);
 defined('ACTIVITY_LOG_RETENTION_DAYS') || define('ACTIVITY_LOG_RETENTION_DAYS', 90);
 

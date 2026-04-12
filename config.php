@@ -1,5 +1,6 @@
 <?php
-// Bridge file: ป้องกันอดีตไฟล์ที่อ้างอิงถึง config.php เดิมพัง
+// config.php — จุดเข้าหลักข���งระบบทุกไฟล์ (canonical entry point)
+// โหลด: DB connection, CSRF, Error Logger และ helper functions
 require_once __DIR__ . '/config/db_connect.php';
 require_once __DIR__ . '/includes/csrf.php';
 require_once __DIR__ . '/includes/error_logger.php';
@@ -10,7 +11,6 @@ defined('ACTIVITY_LOG_RETENTION_DAYS') || define('ACTIVITY_LOG_RETENTION_DAYS', 
 
 /**
  * ฟังก์ชันกลางสำหรับบันทึกกิจกรรมในระบบ (Activity Logging)
- * ย้ายมาไว้ที่ config.php เพื่อเป็นประตูที่เข้าถึงได้จากทุกทิศทาง
  */
 if (!function_exists('log_activity')) {
     function log_activity(string $action, string $description = '', ?int $user_id = null): bool {
@@ -37,7 +37,7 @@ if (!function_exists('log_activity')) {
 }
 
 /**
- * ตรวจสอบว่าผู้ใช้งานกรอกข้อมูลส่วนตัวครบถ้วนหรือไม่ (โดยเฉพาะอีเมล)
+ * ตรวจสอบว่าผู้ใช้งานกรอกข้อมูลส่วนตัวครบถ้วนหรือไม่
  */
 if (!function_exists('check_user_profile')) {
     function check_user_profile(int $studentId): void {

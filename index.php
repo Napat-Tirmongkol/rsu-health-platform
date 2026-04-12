@@ -15,7 +15,7 @@ define('USER_BASE', 'user/');
 
 // ถ้า login อยู่แล้ว → ตรวจสอบสถานะและ redirect
 if (!empty($_SESSION['line_user_id']) || !empty($_SESSION['evax_student_id'])) {
-    require_once __DIR__ . '/config/db_connect.php';
+    require_once __DIR__ . '/config.php';
 
     try {
         $pdo = db();

@@ -32,5 +32,4 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit;
 }
 
-// ดึง config.php จากโฟลเดอร์หลัก (ถอยกลับไป 1 ขั้น) เพื่อให้ใช้ฟังก์ชัน db() ได้
-require_once __DIR__ . '/../../config/db_connect.php';
+require_once __DIR__ . '/../../config.php';
