@@ -412,12 +412,23 @@ for ($iter = 0; $iter < $maxIter; $iter++) {
     $parts      = $geminiResp['candidates'][0]['content']['parts'] ?? [];
     $role       = $geminiResp['candidates'][0]['content']['role'] ?? 'model';
 
+    // ── Fix PHP json_decode issue ──────────────────────────────────────────────
+    // json_decode(..., true) แปลง JSON {} → PHP [] (array)
+    // เมื่อ json_encode กลับ [] กลายเป็น JSON array แทน object
+    // Gemini proto ต้องการ args เป็น object {} ไม่ใช่ array []
+    $normalizedParts = array_map(function ($p) {
+        if (isset($p['functionCall'])) {
+            $p['functionCall']['args'] = (object)($p['functionCall']['args'] ?? []);
+        }
+        return $p;
+    }, $parts);
+
     // เพิ่มคำตอบของ model เข้า conversation
-    $contents[] = ['role' => $role, 'parts' => $parts];
+    $contents[] = ['role' => $role, 'parts' => $normalizedParts];
 
     // แยก functionCall vs text
-    $funcCalls = array_filter($parts, fn($p) => isset($p['functionCall']));
-    $textParts  = array_filter($parts, fn($p) => isset($p['text']));
+    $funcCalls = array_filter($normalizedParts, fn($p) => isset($p['functionCall']));
+    $textParts  = array_filter($normalizedParts, fn($p) => isset($p['text']));
 
     if (empty($funcCalls)) {
         // AI ตอบกลับเป็น text แล้ว → จบ
