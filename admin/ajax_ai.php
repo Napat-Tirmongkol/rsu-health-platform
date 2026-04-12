@@ -134,8 +134,58 @@ $systemPrompt = <<<PROMPT
 คำถามจากแอดมิน: {$query}
 PROMPT;
 
+// ── Auto-discover best available Gemini model ─────────────────────────────────
+function gemini_pick_model(string $apiKey): string {
+    // Cache per-session so we don't call ListModels on every chat message
+    if (!empty($_SESSION['_gemini_model'])) {
+        return $_SESSION['_gemini_model'];
+    }
+
+    $ch = curl_init("https://generativelanguage.googleapis.com/v1beta/models?key={$apiKey}&pageSize=100");
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 10,
+        CURLOPT_SSL_VERIFYPEER => true,
+    ]);
+    $data = json_decode(curl_exec($ch) ?: '{}', true);
+    curl_close($ch);
+
+    $candidates = [];
+    foreach ($data['models'] ?? [] as $m) {
+        $name = $m['name'] ?? '';
+        // Must support generateContent and be a Gemini text model
+        if (!in_array('generateContent', $m['supportedGenerationMethods'] ?? [])) continue;
+        if (!preg_match('/gemini/i', $name)) continue;
+        if (preg_match('/embed|vision|aqa|imagen/i', $name)) continue;
+        $candidates[] = $name; // format: "models/gemini-X.Y-flash-..."
+    }
+
+    if (empty($candidates)) {
+        return 'gemini-2.0-flash'; // last-resort fallback
+    }
+
+    // Score: higher version wins; flash > pro (speed/cost); stable > preview > exp
+    $scored = [];
+    foreach ($candidates as $c) {
+        $score = 0;
+        if (preg_match('/gemini-(\d+)\.(\d+)/i', $c, $mv)) {
+            $score += (int)$mv[1] * 100 + (int)$mv[2] * 10;
+        }
+        if (stripos($c, 'flash') !== false) $score += 5;
+        if (stripos($c, 'preview')  !== false) $score -= 1;
+        if (stripos($c, '-exp')     !== false) $score -= 2;
+        $scored[$c] = $score;
+    }
+    arsort($scored);
+
+    $best = str_replace('models/', '', (string)array_key_first($scored));
+    $_SESSION['_gemini_model'] = $best;
+    error_log("Gemini: selected model = {$best}");
+    return $best;
+}
+
 // ── Call Gemini API ───────────────────────────────────────────────────────────
-$model = 'gemini-2.0-flash';
+$model = gemini_pick_model($apiKey);
 $url   = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
 
 $body = json_encode([
