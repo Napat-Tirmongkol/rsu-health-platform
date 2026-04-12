@@ -43,6 +43,11 @@ if (!function_exists('renderPageHeader')) {
             box-shadow: 2px 0 12px rgba(46,158,99,.07);
             display: flex; flex-direction: column;
             flex-shrink: 0; z-index: 10;
+            /* ไม่ให้ยืดตาม content — ยึดติดกับ viewport */
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
         }
         .sidebar-brand {
             padding: 20px 24px;
