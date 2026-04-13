@@ -452,46 +452,6 @@ foreach ($projects as $p) {
                     <i class="fa-solid fa-arrow-right log-card-arrow text-gray-300 text-sm flex-shrink-0 mt-1"></i>
                 </div>
             </a>
-            <!-- Claude Auto-Fix card -->
-            <?php
-            $claudeFixCount = 0;
-            $claudePrCount  = 0;
-            try {
-                $pdo->exec("CREATE TABLE IF NOT EXISTS sys_sentry_fixes (
-                    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, issue_id VARCHAR(64) NOT NULL DEFAULT '',
-                    error_title VARCHAR(500) NOT NULL DEFAULT '', issue_url VARCHAR(500) NOT NULL DEFAULT '',
-                    file_path VARCHAR(400) NOT NULL DEFAULT '', analysis TEXT NOT NULL DEFAULT '',
-                    fixed_code MEDIUMTEXT NOT NULL DEFAULT '', status VARCHAR(32) NOT NULL DEFAULT 'pending',
-                    note VARCHAR(1000) NOT NULL DEFAULT '', created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-                $claudeFixCount = (int)$pdo->query("SELECT COUNT(*) FROM sys_sentry_fixes")->fetchColumn();
-                $claudePrCount  = (int)$pdo->query("SELECT COUNT(*) FROM sys_sentry_fixes WHERE status='pr_created'")->fetchColumn();
-            } catch (PDOException) {}
-            ?>
-            <a href="../admin/sentry_fixes.php" class="log-card group">
-                <div class="flex items-start gap-4">
-                    <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0
-                                bg-violet-50 text-violet-600 group-hover:scale-105 transition-transform">
-                        <i class="fa-solid fa-robot text-base"></i>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center justify-between gap-2 mb-1">
-                            <span class="font-black text-gray-900 text-sm">Claude Auto-Fix</span>
-                            <?php if ($claudeFixCount > 0): ?>
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border bg-violet-50 text-violet-700 border-violet-200 flex-shrink-0">
-                                <?= $claudePrCount ?> PR สร้างแล้ว
-                            </span>
-                            <?php else: ?>
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border bg-gray-100 text-gray-500 border-gray-200 flex-shrink-0">
-                                ยังไม่มี fix
-                            </span>
-                            <?php endif; ?>
-                        </div>
-                        <p class="text-xs text-gray-400">Sentry webhook → Claude วิเคราะห์ → สร้าง PR อัตโนมัติ</p>
-                    </div>
-                    <i class="fa-solid fa-arrow-right log-card-arrow text-gray-300 text-sm flex-shrink-0 mt-1"></i>
-                </div>
-            </a>
         </section>
 
     </div><!-- /grid -->
