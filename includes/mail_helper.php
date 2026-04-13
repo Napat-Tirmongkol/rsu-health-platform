@@ -32,31 +32,53 @@ function smtp_send(string $to, string $subject, string $htmlBody, array $cfg): b
 
     // เลือก transport
     $useSsl = ($port === 465);
-    $host_connect = ($useSsl ? 'ssl://' : '') . $host;
 
-    $sock = @fsockopen($host_connect, $port, $errno, $errstr, $timeout);
+    // สร้าง SSL context ล่วงหน้า — ปิด verify_peer เพราะ mail server ในองค์กรมักใช้ self-signed cert
+    $sslCtx = stream_context_create(['ssl' => [
+        'verify_peer'       => false,
+        'verify_peer_name'  => false,
+        'allow_self_signed' => true,
+    ]]);
+
+    $proto = $useSsl ? 'ssl' : 'tcp';
+    $sock  = @stream_socket_client("{$proto}://{$host}:{$port}", $errno, $errstr, $timeout, STREAM_CLIENT_CONNECT, $sslCtx);
     if (!$sock) {
         error_log("SMTP connect failed ({$host}:{$port}): {$errstr}");
         return false;
     }
 
-    $read = fn() => fgets($sock, 515);
-    $send = function(string $cmd) use ($sock, &$read): string {
+    // อ่านทุกบรรทัดของ SMTP multi-line response (ดูที่อักษรตัวที่ 4: '-'=ยังมีต่อ, ' '=บรรทัดสุดท้าย)
+    $readAll = function() use ($sock): string {
+        $full = '';
+        while (true) {
+            $line = fgets($sock, 515);
+            if ($line === false || $line === '') break;
+            $full .= $line;
+            if (strlen($line) < 4 || $line[3] !== '-') break;
+        }
+        return $full;
+    };
+    $send = function(string $cmd) use ($sock, $readAll): string {
         fwrite($sock, $cmd . "\r\n");
-        return $read();
+        return $readAll();
     };
 
     try {
-        $read(); // 220 greeting
+        $readAll(); // 220 greeting
 
-        // EHLO
+        // EHLO — อ่านทุกบรรทัดจนบรรทัดสุดท้าย (250 xxx ไม่มีขีด)
         $ehlo = $send("EHLO " . ($_SERVER['SERVER_NAME'] ?? 'localhost'));
 
         // STARTTLS (port 587)
-        if ($port === 587 && str_contains($ehlo . $read() . $read() . $read() . $read(), 'STARTTLS')) {
-            $send("STARTTLS");
+        if ($port === 587 && str_contains($ehlo, 'STARTTLS')) {
+            $startTlsResp = $send("STARTTLS");
+            if (!str_starts_with(trim($startTlsResp), '220')) {
+                error_log("SMTP STARTTLS rejected: {$startTlsResp}");
+                fclose($sock);
+                return false;
+            }
             if (!stream_socket_enable_crypto($sock, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
-                error_log("SMTP STARTTLS failed");
+                error_log("SMTP STARTTLS crypto failed");
                 fclose($sock);
                 return false;
             }

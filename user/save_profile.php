@@ -19,14 +19,20 @@ if ($lineUserId === '') {
 }
 
 // 2. รับค่าและทำความสะอาดข้อมูล (Sanitize)
-$fullName = trim((string) ($_POST['full_name'] ?? ''));
-$idNumber = trim((string) ($_POST['id_number'] ?? ''));
-$citizenId = trim((string) ($_POST['citizen_id'] ?? ''));
+$prefix      = trim((string) ($_POST['prefix']       ?? ''));
+$fullName    = trim((string) ($_POST['full_name']    ?? ''));
+$idNumber    = trim((string) ($_POST['id_number']    ?? ''));
+$citizenId   = trim((string) ($_POST['citizen_id']   ?? ''));
 $phoneNumber = trim((string) ($_POST['phone_number'] ?? ''));
-$status = trim((string) ($_POST['status'] ?? ''));
-$email = trim((string) ($_POST['email'] ?? ''));
-$gender = trim((string) ($_POST['gender'] ?? ''));
+$status      = trim((string) ($_POST['status']       ?? ''));
+$email       = trim((string) ($_POST['email']        ?? ''));
+$gender      = trim((string) ($_POST['gender']       ?? ''));
 $redirectBack = trim((string) ($_POST['redirect_back'] ?? ''));
+
+if (!in_array($prefix, ['นาย','นาง','นางสาว','เด็กชาย','เด็กหญิง'], true)) {
+    header('Location: profile.php?error=no_prefix', true, 303);
+    exit;
+}
 
 if ($status === '') {
     header('Location: profile.php?error=no_status', true, 303);
@@ -52,6 +58,9 @@ if ($status !== 'other' && $idNumber === '') {
 try {
     $pdo = db();
 
+    // Migration: เพิ่ม column prefix ถ้ายังไม่มี
+    try { $pdo->exec("ALTER TABLE sys_users ADD COLUMN IF NOT EXISTS prefix VARCHAR(20) NOT NULL DEFAULT ''"); } catch (PDOException) {}
+
     $sidValue = ($status === 'other') ? null : $idNumber;
 
     // 3. ตรวจสอบว่ามี Record อยู่แล้วหรือไม่
@@ -62,44 +71,33 @@ try {
     if ($existingUser) {
         // --- UPDATE สำหรับผู้ใช้ที่มีอยู่แล้ว ---
         $sql = "UPDATE sys_users
-                SET full_name = :name,
+                SET prefix = :prefix,
+                    full_name = :name,
                     student_personnel_id = :sid,
                     citizen_id = :cid,
                     phone_number = :phone,
                     status = :status,
-                    email = :email
+                    email = :email,
+                    gender = :gender
                 WHERE line_user_id = :line_id";
     } else {
         // --- INSERT สำหรับผู้ใช้ใหม่ที่ยังไม่เคยลงทะเบียน ---
-        $sql = "INSERT INTO sys_users (line_user_id, full_name, student_personnel_id, citizen_id, phone_number, status, email)
-                VALUES (:line_id, :name, :sid, :cid, :phone, :status, :email)";
+        $sql = "INSERT INTO sys_users (line_user_id, prefix, full_name, student_personnel_id, citizen_id, phone_number, status, email, gender)
+                VALUES (:line_id, :prefix, :name, :sid, :cid, :phone, :status, :email, :gender)";
     }
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
+        ':prefix'  => $prefix,
         ':name'    => $fullName,
         ':sid'     => $sidValue,
         ':cid'     => $citizenId,
         ':phone'   => $phoneNumber,
         ':status'  => $status,
         ':email'   => $email,
+        ':gender'  => $gender,
         ':line_id' => $lineUserId,
     ]);
-
-    // บันทึก gender แยก — ถ้า column ยังไม่มีใน DB ข้อมูลหลักยังบันทึกได้ปกติ
-    if ($gender !== '') {
-        try {
-            if ($existingUser) {
-                $gSql = "UPDATE sys_users SET gender = :gender WHERE line_user_id = :line_id";
-            } else {
-                $gSql = "UPDATE sys_users SET gender = :gender WHERE line_user_id = :line_id";
-            }
-            $gStmt = $pdo->prepare($gSql);
-            $gStmt->execute([':gender' => $gender, ':line_id' => $lineUserId]);
-        } catch (PDOException $e) {
-            // column gender ยังไม่ถูก migrate — ข้ามไป
-        }
-    }
 
     // 4. ดึง ID (PK) ของผู้ใช้เพื่อเก็บใส่ Session
     $stmtGetId = $pdo->prepare("SELECT id FROM sys_users WHERE line_user_id = :line_id LIMIT 1");
