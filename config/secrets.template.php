@@ -35,6 +35,18 @@ return [
     // --- Sentry error monitoring (get DSN: sentry.io → Project → Settings → Client Keys) ---
     'SENTRY_DSN'                          => '', // e.g. https://abc123@o0.ingest.sentry.io/456
 
+    // --- Sentry Webhook + Claude Auto-Fix ---
+    // SENTRY_WEBHOOK_SECRET: sentry.io → Project → Settings → Integrations → Webhooks → Secret
+    'SENTRY_WEBHOOK_SECRET'               => '',
+    // ANTHROPIC_API_KEY: console.anthropic.com → API Keys
+    'ANTHROPIC_API_KEY'                   => '',
+    // GITHUB_TOKEN: github.com → Settings → Developer settings → Personal access tokens (repo scope)
+    'GITHUB_TOKEN'                        => '',
+    // GITHUB_REPO: "owner/repo-name" e.g. "napat-tirmongkol/rsu-healthcare-services"
+    'GITHUB_REPO'                         => '',
+    // GITHUB_BASE_BRANCH: branch that PRs target (default: main)
+    'GITHUB_BASE_BRANCH'                  => 'main',
+
     // --- Email System (SMTP) ---
     'SMTP_HOST'                           => '', // e.g., smtp.gmail.com
     'SMTP_PORT'                           => 587,
