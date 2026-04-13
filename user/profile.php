@@ -47,6 +47,24 @@ try {
 // ตรวจสอบว่าเป็นการแก้ไขหรือลงทะเบียนใหม่
 $isEditing = !empty($userData['full_name']);
 
+// ── Profile completeness (แสดงเฉพาะตอนแก้ไข) ────────────────────────────────
+$completenessItems   = [];
+$completenessPercent = 0;
+if ($isEditing) {
+    $completenessItems = [
+        ['label' => 'ชื่อ-นามสกุล',          'done' => !empty($userData['full_name'])],
+        ['label' => 'เบอร์โทรศัพท์',          'done' => !empty($userData['phone'])],
+        ['label' => 'เพศ',                    'done' => !empty($userData['gender'])],
+        ['label' => 'เลขประจำตัว',            'done' => !empty($userData['citizen_id'])],
+    ];
+    if ($userData['status'] !== 'other' && $userData['status'] !== '') {
+        $completenessItems[] = ['label' => 'รหัสนักศึกษา/บุคลากร', 'done' => !empty($userData['id_number'])];
+    }
+    $completenessTotal   = count($completenessItems);
+    $completenessDone    = count(array_filter(array_column($completenessItems, 'done')));
+    $completenessPercent = $completenessTotal > 0 ? (int)round($completenessDone / $completenessTotal * 100) : 0;
+}
+
 // ตรวจสอบว่า citizen_id เป็น passport หรือเลขบัตร (passport = มีตัวอักษรหรือความยาว > 13)
 $citizenIdValue = $userData['citizen_id'];
 $isPassport = ($citizenIdValue !== '' && (!ctype_digit($citizenIdValue) || strlen($citizenIdValue) > 13));
@@ -100,6 +118,31 @@ render_header('ข้อมูลส่วนตัว');
         </a>
         <?php endif; ?>
       </div>
+
+      <?php if ($isEditing): ?>
+      <!-- Profile Completeness Badge -->
+      <div class="bg-white border <?= $completenessPercent === 100 ? 'border-green-100' : 'border-blue-100' ?> rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-2.5">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-chart-simple text-sm <?= $completenessPercent === 100 ? 'text-green-500' : 'text-[#0052CC]' ?>"></i>
+            <span class="text-sm font-bold text-gray-800 font-prompt">ความครบถ้วนของโปรไฟล์</span>
+          </div>
+          <span class="text-sm font-black font-prompt <?= $completenessPercent === 100 ? 'text-green-600' : 'text-[#0052CC]' ?>"><?= $completenessPercent ?>%</span>
+        </div>
+        <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden mb-3">
+          <div class="h-full rounded-full transition-all duration-700 <?= $completenessPercent === 100 ? 'bg-green-500' : 'bg-[#0052CC]' ?>"
+               style="width:<?= $completenessPercent ?>%"></div>
+        </div>
+        <div class="grid grid-cols-2 gap-x-3 gap-y-1.5">
+          <?php foreach ($completenessItems as $item): ?>
+          <div class="flex items-center gap-1.5 text-xs font-prompt <?= $item['done'] ? 'text-gray-700' : 'text-gray-400' ?>">
+            <i class="fa-solid <?= $item['done'] ? 'fa-circle-check text-green-500' : 'fa-circle-xmark text-red-400' ?> text-[11px] flex-shrink-0"></i>
+            <?= htmlspecialchars($item['label']) ?>
+          </div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+      <?php endif; ?>
 
       <div class="space-y-5">
         <div class="space-y-1.5">

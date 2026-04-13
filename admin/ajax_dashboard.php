@@ -10,10 +10,12 @@ try {
     
     // 1. ดึงสถิติภาพรวม
     $stmt = $pdo->query("
-        SELECT 
+        SELECT
             COUNT(*) as total_campaigns,
             (SELECT COUNT(*) FROM camp_bookings WHERE status = 'booked') as pending_count,
-            (SELECT COUNT(*) FROM camp_bookings WHERE status = 'confirmed') as confirmed_count
+            (SELECT COUNT(*) FROM camp_bookings WHERE status = 'confirmed') as confirmed_count,
+            (SELECT COUNT(*) FROM camp_bookings WHERE DATE(created_at) = CURDATE()) as bookings_today,
+            (SELECT COUNT(*) FROM sys_users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) as new_users_7d
         FROM camp_list WHERE status = 'active'
     ");
     $stats = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -64,9 +66,11 @@ try {
     echo json_encode([
         'status' => 'success',
         'stats' => [
-            'total' => number_format((float)$stats['total_campaigns']),
-            'pending' => number_format((float)$stats['pending_count']),
-            'confirmed' => number_format((float)$stats['confirmed_count'])
+            'total'          => number_format((float)$stats['total_campaigns']),
+            'pending'        => number_format((float)$stats['pending_count']),
+            'confirmed'      => number_format((float)$stats['confirmed_count']),
+            'bookings_today' => number_format((float)$stats['bookings_today']),
+            'new_users_7d'   => number_format((float)$stats['new_users_7d']),
         ],
         'popular_html' => $popular_html
     ]);

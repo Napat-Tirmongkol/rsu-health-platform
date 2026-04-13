@@ -7,10 +7,12 @@ $pdo = db();
 
 // โหลดข้อมูลครั้งแรกตอนเปิดหน้าเว็บ
 $stmt = $pdo->query("
-    SELECT 
+    SELECT
         COUNT(*) as total_campaigns,
         (SELECT COUNT(*) FROM camp_bookings WHERE status = 'booked') as pending_count,
-        (SELECT COUNT(*) FROM camp_bookings WHERE status = 'confirmed') as confirmed_count
+        (SELECT COUNT(*) FROM camp_bookings WHERE status = 'confirmed') as confirmed_count,
+        (SELECT COUNT(*) FROM camp_bookings WHERE DATE(created_at) = CURDATE()) as bookings_today,
+        (SELECT COUNT(*) FROM sys_users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) as new_users_7d
     FROM camp_list WHERE status = 'active'
 ");
 $stats = $stmt->fetch();
@@ -37,6 +39,7 @@ require_once __DIR__ . '/includes/header.php';
 .animate-slide-up { animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 .delay-100 { animation-delay: 0.1s; }
 .delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
 
 /* Custom Scrollbar for list */
 .custom-scrollbar::-webkit-scrollbar { width: 6px; }
@@ -55,57 +58,74 @@ $header_title = 'ภาพรวมระบบ (Dashboard)
 renderPageHeader($header_title, "สถิติการลงทะเบียน อัปเดตข้อมูลแบบ Real-time รอบทุกซอกทุกมุม"); 
 ?>
 
-<!-- STATS GRID -->
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-10">
+<!-- STATS GRID — 2 cols on mobile, 4 on desktop -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 mb-6 sm:mb-10">
 
-    <!-- STAT CARD 1 -->
-    <div class="group bg-white p-4 sm:p-6 rounded-[20px] sm:rounded-[24px] shadow-sm border border-gray-100 relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-green-500/10 hover:-translate-y-1 animate-slide-up">
-        <div class="absolute right-0 top-0 w-2 h-full bg-gradient-to-b from-[#2e9e63] to-[#0B6623]"></div>
+    <!-- STAT CARD 1: Active Campaigns -->
+    <div class="group bg-white p-3 sm:p-5 rounded-[18px] sm:rounded-[22px] shadow-sm border border-gray-100 relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-green-500/10 hover:-translate-y-1 animate-slide-up">
+        <div class="absolute right-0 top-0 w-1.5 h-full bg-gradient-to-b from-[#2e9e63] to-[#0B6623]"></div>
         <div class="flex justify-between items-start">
-            <div>
-                <p class="text-gray-500 text-xs sm:text-sm font-semibold mb-1 uppercase tracking-wide">แคมเปญที่เปิดอยู่</p>
-                <h3 id="stat-total" class="text-3xl sm:text-4xl font-black text-gray-800 transition-all duration-300"><?= number_format((float)$stats['total_campaigns']) ?></h3>
+            <div class="min-w-0">
+                <p class="text-gray-500 text-[10px] sm:text-xs font-semibold mb-1 uppercase tracking-wide leading-tight">แคมเปญที่เปิด</p>
+                <h3 id="stat-total" class="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-800 transition-all duration-300"><?= number_format((float)$stats['total_campaigns']) ?></h3>
             </div>
-            <div class="w-10 h-10 sm:w-14 sm:h-14 bg-[#e8f8f0] text-[#2e9e63] rounded-xl sm:rounded-2xl flex items-center justify-center shadow-inner">
-                <i class="fa-solid fa-bullhorn text-lg sm:text-2xl"></i>
+            <div class="w-9 h-9 sm:w-12 sm:h-12 bg-[#e8f8f0] text-[#2e9e63] rounded-xl sm:rounded-2xl flex items-center justify-center shadow-inner flex-shrink-0">
+                <i class="fa-solid fa-bullhorn text-base sm:text-xl"></i>
             </div>
         </div>
-        <div class="mt-3 sm:mt-4 flex items-center gap-2 text-xs text-[#2e9e63] font-semibold bg-[#e8f8f0] w-max px-3 py-1 rounded-full">
-            <i class="fa-solid fa-circle-check"></i> <span class="hidden sm:inline">แคมเปญทั้งหมดที่มีสถานะ Active</span><span class="sm:hidden">Active campaigns</span>
+        <div class="mt-2 sm:mt-3 flex items-center gap-1.5 text-[10px] sm:text-xs text-[#2e9e63] font-semibold bg-[#e8f8f0] w-max px-2.5 py-1 rounded-full">
+            <i class="fa-solid fa-circle-check"></i> Active
         </div>
     </div>
 
-    <!-- STAT CARD 2 -->
-    <div class="group bg-white p-4 sm:p-6 rounded-[20px] sm:rounded-[24px] shadow-sm border border-gray-100 relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-orange-500/10 hover:-translate-y-1 animate-slide-up delay-100">
-        <div class="absolute right-0 top-0 w-2 h-full bg-gradient-to-b from-orange-400 to-amber-500"></div>
+    <!-- STAT CARD 2: Bookings Today -->
+    <div class="group bg-white p-3 sm:p-5 rounded-[18px] sm:rounded-[22px] shadow-sm border border-gray-100 relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1 animate-slide-up delay-100">
+        <div class="absolute right-0 top-0 w-1.5 h-full bg-gradient-to-b from-blue-400 to-blue-600"></div>
         <div class="flex justify-between items-start">
-            <div>
-                <p class="text-gray-500 text-xs sm:text-sm font-semibold mb-1 uppercase tracking-wide">รออนุมัติคิว</p>
-                <h3 id="stat-pending" class="text-3xl sm:text-4xl font-black text-gray-800 transition-all duration-300"><?= number_format((float)$stats['pending_count']) ?></h3>
+            <div class="min-w-0">
+                <p class="text-gray-500 text-[10px] sm:text-xs font-semibold mb-1 uppercase tracking-wide leading-tight">จองวันนี้</p>
+                <h3 id="stat-bookings-today" class="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-800 transition-all duration-300"><?= number_format((float)$stats['bookings_today']) ?></h3>
             </div>
-            <div class="w-10 h-10 sm:w-14 sm:h-14 bg-orange-50 text-orange-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-inner">
-                <i class="fa-solid fa-clock-rotate-left text-lg sm:text-2xl"></i>
+            <div class="w-9 h-9 sm:w-12 sm:h-12 bg-blue-50 text-blue-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-inner flex-shrink-0">
+                <i class="fa-solid fa-calendar-day text-base sm:text-xl"></i>
             </div>
         </div>
-        <div class="mt-3 sm:mt-4 flex items-center gap-2 text-xs text-orange-500 font-semibold bg-orange-50 w-max px-3 py-1 rounded-full">
-            <i class="fa-solid fa-circle-exclamation animate-pulse"></i> ต้องพิจารณาด่วน
+        <div class="mt-2 sm:mt-3 flex items-center gap-1.5 text-[10px] sm:text-xs text-blue-600 font-semibold bg-blue-50 w-max px-2.5 py-1 rounded-full">
+            <i class="fa-solid fa-clock"></i> วันนี้
         </div>
     </div>
 
-    <!-- STAT CARD 3 -->
-    <div class="group bg-white p-4 sm:p-6 rounded-[20px] sm:rounded-[24px] shadow-sm border border-gray-100 relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-green-500/10 hover:-translate-y-1 animate-slide-up delay-200">
-        <div class="absolute right-0 top-0 w-2 h-full bg-gradient-to-b from-[#3bba7a] to-[#2e9e63]"></div>
+    <!-- STAT CARD 3: New Users (7d) -->
+    <div class="group bg-white p-3 sm:p-5 rounded-[18px] sm:rounded-[22px] shadow-sm border border-gray-100 relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10 hover:-translate-y-1 animate-slide-up delay-200">
+        <div class="absolute right-0 top-0 w-1.5 h-full bg-gradient-to-b from-purple-400 to-violet-600"></div>
         <div class="flex justify-between items-start">
-            <div>
-                <p class="text-gray-500 text-xs sm:text-sm font-semibold mb-1 uppercase tracking-wide">อนุมัติแล้วทั้งหมด</p>
-                <h3 id="stat-confirmed" class="text-3xl sm:text-4xl font-black text-gray-800 transition-all duration-300"><?= number_format((float)$stats['confirmed_count']) ?></h3>
+            <div class="min-w-0">
+                <p class="text-gray-500 text-[10px] sm:text-xs font-semibold mb-1 uppercase tracking-wide leading-tight">User ใหม่ 7 วัน</p>
+                <h3 id="stat-new-users" class="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-800 transition-all duration-300"><?= number_format((float)$stats['new_users_7d']) ?></h3>
             </div>
-            <div class="w-10 h-10 sm:w-14 sm:h-14 bg-[#e8f8f0] text-[#2e9e63] rounded-xl sm:rounded-2xl flex items-center justify-center shadow-inner">
-                <i class="fa-solid fa-check-double text-lg sm:text-2xl"></i>
+            <div class="w-9 h-9 sm:w-12 sm:h-12 bg-purple-50 text-purple-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-inner flex-shrink-0">
+                <i class="fa-solid fa-user-plus text-base sm:text-xl"></i>
             </div>
         </div>
-        <div class="mt-3 sm:mt-4 flex items-center gap-2 text-xs text-[#2e9e63] font-semibold bg-[#e8f8f0] w-max px-3 py-1 rounded-full">
-            <i class="fa-solid fa-shield-check"></i> ผู้เข้าร่วมยืนยันสิทธิ์แล้ว
+        <div class="mt-2 sm:mt-3 flex items-center gap-1.5 text-[10px] sm:text-xs text-purple-600 font-semibold bg-purple-50 w-max px-2.5 py-1 rounded-full">
+            <i class="fa-solid fa-arrow-trend-up"></i> 7 วันล่าสุด
+        </div>
+    </div>
+
+    <!-- STAT CARD 4: Pending Approval -->
+    <div class="group bg-white p-3 sm:p-5 rounded-[18px] sm:rounded-[22px] shadow-sm border border-gray-100 relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-orange-500/10 hover:-translate-y-1 animate-slide-up delay-300">
+        <div class="absolute right-0 top-0 w-1.5 h-full bg-gradient-to-b from-orange-400 to-amber-500"></div>
+        <div class="flex justify-between items-start">
+            <div class="min-w-0">
+                <p class="text-gray-500 text-[10px] sm:text-xs font-semibold mb-1 uppercase tracking-wide leading-tight">รออนุมัติ</p>
+                <h3 id="stat-pending" class="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-800 transition-all duration-300"><?= number_format((float)$stats['pending_count']) ?></h3>
+            </div>
+            <div class="w-9 h-9 sm:w-12 sm:h-12 bg-orange-50 text-orange-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-inner flex-shrink-0">
+                <i class="fa-solid fa-clock-rotate-left text-base sm:text-xl"></i>
+            </div>
+        </div>
+        <div class="mt-2 sm:mt-3 flex items-center gap-1.5 text-[10px] sm:text-xs text-orange-500 font-semibold bg-orange-50 w-max px-2.5 py-1 rounded-full">
+            <i class="fa-solid fa-circle-exclamation animate-pulse"></i> ด่วน
         </div>
     </div>
 
@@ -216,13 +236,15 @@ document.addEventListener('DOMContentLoaded', function() {
         window.requestAnimationFrame(step);
     }
     
-    const totalEl = document.getElementById('stat-total');
-    const pendingEl = document.getElementById('stat-pending');
-    const confirmedEl = document.getElementById('stat-confirmed');
-    
-    if(totalEl) animateValue(totalEl, 0, parseInt(<?= (int)$stats['total_campaigns'] ?>), 1000);
-    if(pendingEl) animateValue(pendingEl, 0, parseInt(<?= (int)$stats['pending_count'] ?>), 1000);
-    if(confirmedEl) animateValue(confirmedEl, 0, parseInt(<?= (int)$stats['confirmed_count'] ?>), 1000);
+    const totalEl         = document.getElementById('stat-total');
+    const bookingsTodayEl = document.getElementById('stat-bookings-today');
+    const newUsersEl      = document.getElementById('stat-new-users');
+    const pendingEl       = document.getElementById('stat-pending');
+
+    if (totalEl)         animateValue(totalEl,         0, <?= (int)$stats['total_campaigns'] ?>, 1000);
+    if (bookingsTodayEl) animateValue(bookingsTodayEl, 0, <?= (int)$stats['bookings_today'] ?>,  1000);
+    if (newUsersEl)      animateValue(newUsersEl,      0, <?= (int)$stats['new_users_7d'] ?>,     1000);
+    if (pendingEl)       animateValue(pendingEl,       0, <?= (int)$stats['pending_count'] ?>,    1000);
 
 
     function updateDashboardRealtime() {
@@ -246,9 +268,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     };
 
-                    updateWithFlash('stat-total', data.stats.total);
-                    updateWithFlash('stat-pending', data.stats.pending);
-                    updateWithFlash('stat-confirmed', data.stats.confirmed);
+                    updateWithFlash('stat-total',          data.stats.total);
+                    updateWithFlash('stat-bookings-today', data.stats.bookings_today);
+                    updateWithFlash('stat-new-users',      data.stats.new_users_7d);
+                    updateWithFlash('stat-pending',        data.stats.pending);
                     
                     const container = document.getElementById('popular-camp_list-container');
                     if (container && data.popular_html) {

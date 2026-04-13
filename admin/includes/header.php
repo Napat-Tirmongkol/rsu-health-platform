@@ -303,12 +303,49 @@ function closeMobileSidebar(){
         <div class="topbar-desktop-spacer"></div>
 
         <!-- Right: user info -->
+        <?php
+        // Compute relative URL to ajax_notifications.php from current page
+        $_curDir = rtrim(dirname($_SERVER['PHP_SELF']), '/');
+        $notifAjaxUrl = (substr($_curDir, -6) === '/admin')
+            ? 'ajax_notifications.php'
+            : '../admin/ajax_notifications.php';
+        $notifErrorUrl   = (substr($_curDir, -6) === '/admin') ? 'error_logs.php'   : '../admin/error_logs.php';
+        $notifBookingUrl = (substr($_curDir, -6) === '/admin') ? 'bookings.php'      : '../admin/bookings.php';
+        unset($_curDir);
+        ?>
         <div class="flex items-center gap-3">
             <?php if (!empty($_SESSION['is_ecampaign_staff'])): ?>
             <span class="text-[10px] font-bold px-2.5 py-1 rounded-full" style="background:#e8f8f0;color:#2e7d52;">
                 <i class="fa-solid fa-user-tie mr-1"></i>Staff
             </span>
             <?php endif; ?>
+
+            <!-- Notification Bell -->
+            <div class="relative" id="notif-wrapper">
+                <button id="notif-btn"
+                    class="relative w-9 h-9 flex items-center justify-center rounded-xl border transition-all hover:shadow-sm focus:outline-none"
+                    style="background:#f0faf4;color:#2e9e63;border-color:#c7e8d5;"
+                    aria-label="การแจ้งเตือน">
+                    <i class="fa-solid fa-bell text-sm"></i>
+                    <span id="notif-badge"
+                        class="hidden absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 items-center justify-center text-[10px] font-black text-white bg-red-500 rounded-full leading-none">
+                        0
+                    </span>
+                </button>
+                <!-- Dropdown panel -->
+                <div id="notif-panel"
+                    class="hidden absolute right-0 top-full mt-2 w-72 bg-white border border-gray-100 rounded-2xl overflow-hidden"
+                    style="z-index:200;box-shadow:0 8px 30px rgba(0,0,0,.12);">
+                    <div class="flex items-center justify-between px-4 py-3 border-b border-gray-50">
+                        <span class="text-sm font-bold text-gray-900">การแจ้งเตือน</span>
+                        <span id="notif-total-label" class="hidden text-[10px] font-black px-2 py-0.5 rounded-full" style="background:#fee2e2;color:#b91c1c;"></span>
+                    </div>
+                    <div id="notif-items" class="divide-y divide-gray-50">
+                        <div class="px-4 py-4 text-sm text-gray-400 text-center">กำลังโหลด...</div>
+                    </div>
+                </div>
+            </div>
+
             <div class="user-pill">
                 <div class="user-avatar"><i class="fa-solid fa-user-shield text-[10px]"></i></div>
                 <div class="hidden sm:block">
@@ -322,6 +359,97 @@ function closeMobileSidebar(){
             </div>
         </div>
     </div>
+    <script>
+    (function () {
+        var notifOpen  = false;
+        var btn        = document.getElementById('notif-btn');
+        var panel      = document.getElementById('notif-panel');
+        var badge      = document.getElementById('notif-badge');
+        var totalLabel = document.getElementById('notif-total-label');
+        var items      = document.getElementById('notif-items');
+        var ajaxUrl    = <?= json_encode($notifAjaxUrl) ?>;
+        var errorUrl   = <?= json_encode($notifErrorUrl) ?>;
+        var bookingUrl = <?= json_encode($notifBookingUrl) ?>;
+
+        function renderItems(d) {
+            var html = '';
+            if (d.errors_today > 0) {
+                html += '<a href="' + errorUrl + '" class="flex items-center gap-3 px-4 py-3 hover:bg-red-50 transition-colors">'
+                      + '<div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#fee2e2;color:#ef4444;">'
+                      + '<i class="fa-solid fa-bug text-xs"></i></div>'
+                      + '<div class="min-w-0 flex-1"><div class="text-sm font-semibold text-gray-800">Error Logs วันนี้</div>'
+                      + '<div class="text-xs text-gray-500">' + d.errors_today + ' รายการใหม่</div></div>'
+                      + '<i class="fa-solid fa-chevron-right text-xs text-gray-300 flex-shrink-0"></i></a>';
+            }
+            if (d.pending_bookings > 0) {
+                html += '<a href="' + bookingUrl + '" class="flex items-center gap-3 px-4 py-3 hover:bg-orange-50 transition-colors">'
+                      + '<div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#fff7ed;color:#f97316;">'
+                      + '<i class="fa-solid fa-clock-rotate-left text-xs"></i></div>'
+                      + '<div class="min-w-0 flex-1"><div class="text-sm font-semibold text-gray-800">รอการอนุมัติ</div>'
+                      + '<div class="text-xs text-gray-500">' + d.pending_bookings + ' คิวรอพิจารณา</div></div>'
+                      + '<i class="fa-solid fa-chevron-right text-xs text-gray-300 flex-shrink-0"></i></a>';
+            }
+            if (html === '') {
+                html = '<div class="px-4 py-5 text-center">'
+                     + '<i class="fa-solid fa-circle-check text-2xl text-green-400 mb-1.5 block"></i>'
+                     + '<div class="text-sm text-gray-500">ไม่มีการแจ้งเตือน</div></div>';
+            }
+            items.innerHTML = html;
+        }
+
+        function fetchNotifications() {
+            fetch(ajaxUrl)
+                .then(function (r) { return r.json(); })
+                .then(function (d) {
+                    if (d.status !== 'success') return;
+                    var total = d.total;
+                    if (total > 0) {
+                        badge.textContent = total > 99 ? '99+' : total;
+                        badge.classList.remove('hidden');
+                        badge.classList.add('flex');
+                        totalLabel.textContent = total + ' รายการ';
+                        totalLabel.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                        badge.classList.remove('flex');
+                        totalLabel.classList.add('hidden');
+                    }
+                    if (notifOpen) renderItems(d);
+                })
+                .catch(function () {});
+        }
+
+        if (btn) {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                notifOpen = !notifOpen;
+                if (notifOpen) {
+                    panel.classList.remove('hidden');
+                    items.innerHTML = '<div class="px-4 py-4 text-sm text-gray-400 text-center">กำลังโหลด...</div>';
+                    fetch(ajaxUrl)
+                        .then(function (r) { return r.json(); })
+                        .then(renderItems)
+                        .catch(function () {
+                            items.innerHTML = '<div class="px-4 py-4 text-sm text-red-400 text-center">โหลดข้อมูลไม่สำเร็จ</div>';
+                        });
+                } else {
+                    panel.classList.add('hidden');
+                }
+            });
+        }
+
+        document.addEventListener('click', function (e) {
+            var wrapper = document.getElementById('notif-wrapper');
+            if (notifOpen && wrapper && !wrapper.contains(e.target)) {
+                notifOpen = false;
+                panel.classList.add('hidden');
+            }
+        });
+
+        fetchNotifications();
+        setInterval(fetchNotifications, 30000);
+    })();
+    </script>
     <?php endif; ?>
 
     <!-- Content -->
