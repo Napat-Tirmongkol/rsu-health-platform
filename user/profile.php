@@ -16,6 +16,7 @@ if ($lineUserId === '') {
 
 // 2. ดึงข้อมูลเดิมจากฐานข้อมูล (ถ้ามี) มาแสดงในฟอร์ม
 $userData = [
+  'prefix'   => '',
   'full_name' => '',
   'id_number' => '',
   'citizen_id' => '',
@@ -27,18 +28,22 @@ $userData = [
 
 try {
   $pdo = db();
-  $stmt = $pdo->prepare("SELECT full_name, student_personnel_id, citizen_id, phone_number, status, email, gender FROM sys_users WHERE line_user_id = :line_id LIMIT 1");
+  // เพิ่ม column prefix ถ้ายังไม่มี (migration อัตโนมัติ)
+  try { $pdo->exec("ALTER TABLE sys_users ADD COLUMN IF NOT EXISTS prefix VARCHAR(20) NOT NULL DEFAULT ''"); } catch (PDOException) {}
+
+  $stmt = $pdo->prepare("SELECT prefix, full_name, student_personnel_id, citizen_id, phone_number, status, email, gender FROM sys_users WHERE line_user_id = :line_id LIMIT 1");
   $stmt->execute([':line_id' => $lineUserId]);
   $user = $stmt->fetch();
 
   if ($user) {
-    $userData['full_name'] = $user['full_name'] ?? '';
+    $userData['prefix']    = $user['prefix']              ?? '';
+    $userData['full_name'] = $user['full_name']           ?? '';
     $userData['id_number'] = $user['student_personnel_id'] ?? '';
-    $userData['citizen_id'] = $user['citizen_id'] ?? '';
-    $userData['phone'] = $user['phone_number'] ?? '';
-    $userData['status'] = $user['status'] ?? '';
-    $userData['email'] = $user['email'] ?? '';
-    $userData['gender'] = $user['gender'] ?? '';
+    $userData['citizen_id'] = $user['citizen_id']         ?? '';
+    $userData['phone']     = $user['phone_number']        ?? '';
+    $userData['status']    = $user['status']              ?? '';
+    $userData['email']     = $user['email']               ?? '';
+    $userData['gender']    = $user['gender']              ?? '';
   }
 } catch (PDOException $e) {
   // กรณี Error ให้ปล่อยผ่านไปกรอกใหม่
@@ -52,6 +57,7 @@ $completenessItems   = [];
 $completenessPercent = 0;
 if ($isEditing) {
     $completenessItems = [
+        ['label' => 'คำนำหน้า',               'done' => !empty($userData['prefix'])],
         ['label' => 'ชื่อ-นามสกุล',          'done' => !empty($userData['full_name'])],
         ['label' => 'เบอร์โทรศัพท์',          'done' => !empty($userData['phone'])],
         ['label' => 'เพศ',                    'done' => !empty($userData['gender'])],
@@ -82,7 +88,9 @@ render_header('ข้อมูลส่วนตัว');
   <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 font-prompt flex items-start gap-3">
     <i class="fa-solid fa-circle-exclamation mt-0.5 shrink-0"></i>
     <span>
-      <?php if ($error_param === 'no_status'): ?>
+      <?php if ($error_param === 'no_prefix'): ?>
+        กรุณาเลือกคำนำหน้าชื่อ
+      <?php elseif ($error_param === 'no_status'): ?>
         กรุณาเลือกประเภทผู้ใช้งาน (นักศึกษา / บุคลากร / บุคคลทั่วไป)
       <?php elseif ($error_param === 'no_gender'): ?>
         กรุณาเลือกเพศ
@@ -145,10 +153,29 @@ render_header('ข้อมูลส่วนตัว');
       <?php endif; ?>
 
       <div class="space-y-5">
+
+        <!-- คำนำหน้า -->
+        <div class="space-y-2">
+          <label class="text-sm font-semibold text-gray-700 font-prompt">คำนำหน้า <span class="text-red-500">*</span></label>
+          <div class="grid grid-cols-5 gap-1.5">
+            <?php foreach (['นาย','นาง','นางสาว','เด็กชาย','เด็กหญิง'] as $p): ?>
+            <label class="cursor-pointer">
+              <input type="radio" name="prefix" value="<?= $p ?>" required class="peer hidden"
+                <?= $userData['prefix'] === $p ? 'checked' : '' ?>>
+              <div class="py-2.5 px-1 text-center border border-gray-200 rounded-xl
+                          peer-checked:bg-[#E6F0FF] peer-checked:border-[#0052CC] peer-checked:text-[#0052CC]
+                          font-prompt text-[10px] font-bold transition-all h-full flex items-center justify-center leading-tight">
+                <?= $p ?>
+              </div>
+            </label>
+            <?php endforeach; ?>
+          </div>
+        </div>
+
         <div class="space-y-1.5">
           <label class="text-sm font-semibold text-gray-700 font-prompt" for="full_name">ชื่อ-นามสกุล <span class="text-red-500">*</span></label>
           <input id="full_name" name="full_name" type="text" required
-            value="<?= htmlspecialchars($userData['full_name']) ?>" placeholder="เช่น นายสมชาย ใจดี"
+            value="<?= htmlspecialchars($userData['full_name']) ?>" placeholder="เช่น สมชาย ใจดี"
             class="w-full p-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0052CC] focus:border-transparent outline-none transition-all placeholder:text-gray-400 font-prompt" />
         </div>
 
