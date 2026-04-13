@@ -19,7 +19,10 @@ if ($lineUserId === '') {
 }
 
 // 2. รับค่าและทำความสะอาดข้อมูล (Sanitize)
-$prefix      = trim((string) ($_POST['prefix']       ?? ''));
+// name_title = ค่าจาก select, custom_title = กรณีเลือก "other"
+$_nameTitle  = trim((string) ($_POST['name_title']   ?? ''));
+$_customTitle= trim((string) ($_POST['custom_title'] ?? ''));
+$prefix      = ($_nameTitle === 'other') ? $_customTitle : $_nameTitle;
 $fullName    = trim((string) ($_POST['full_name']    ?? ''));
 $idNumber    = trim((string) ($_POST['id_number']    ?? ''));
 $citizenId   = trim((string) ($_POST['citizen_id']   ?? ''));
@@ -29,7 +32,7 @@ $email       = trim((string) ($_POST['email']        ?? ''));
 $gender      = trim((string) ($_POST['gender']       ?? ''));
 $redirectBack = trim((string) ($_POST['redirect_back'] ?? ''));
 
-if (!in_array($prefix, ['นาย','นาง','นางสาว','เด็กชาย','เด็กหญิง'], true)) {
+if ($prefix === '') {
     header('Location: profile.php?error=no_prefix', true, 303);
     exit;
 }

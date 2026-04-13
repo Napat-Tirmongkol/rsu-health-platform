@@ -155,21 +155,47 @@ render_header('ข้อมูลส่วนตัว');
 
       <div class="space-y-5">
 
-        <!-- คำนำหน้า -->
-        <div class="space-y-2">
-          <label class="text-sm font-semibold text-gray-700 font-prompt">คำนำหน้า <span class="text-red-500">*</span></label>
-          <div class="grid grid-cols-5 gap-1.5">
-            <?php foreach (['นาย','นาง','นางสาว','เด็กชาย','เด็กหญิง'] as $p): ?>
-            <label class="cursor-pointer">
-              <input type="radio" name="prefix" value="<?= $p ?>" required class="peer hidden"
-                <?= $userData['prefix'] === $p ? 'checked' : '' ?>>
-              <div class="py-2.5 px-1 text-center border border-gray-200 rounded-xl
-                          peer-checked:bg-[#E6F0FF] peer-checked:border-[#0052CC] peer-checked:text-[#0052CC]
-                          font-prompt text-[10px] font-bold transition-all h-full flex items-center justify-center leading-tight">
-                <?= $p ?>
-              </div>
-            </label>
-            <?php endforeach; ?>
+        <?php
+        // ตรวจว่า prefix ที่เก็บไว้เป็น custom หรือ standard
+        $_stdPrefixes = ['นาย','นาง','นางสาว','นพ.','พญ.','ทพ.','ทญ.','ภก.','ภญ.','พย.','ดร.','อ.','ผศ.','รศ.','ศ.'];
+        $_isCustomPrefix = ($userData['prefix'] !== '' && !in_array($userData['prefix'], $_stdPrefixes, true));
+        $_selectVal = $_isCustomPrefix ? 'other' : $userData['prefix'];
+        $_customVal = $_isCustomPrefix ? $userData['prefix'] : '';
+        ?>
+
+        <!-- คำนำหน้าชื่อ -->
+        <div class="space-y-1.5">
+          <label for="name_title" class="text-sm font-semibold text-gray-700 font-prompt">คำนำหน้าชื่อ <span class="text-red-500">*</span></label>
+          <select name="name_title" id="name_title" onchange="toggleCustomTitle()" required
+            class="w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0052CC] focus:border-transparent outline-none transition-all text-sm bg-white font-prompt">
+            <option value="" disabled <?= $_selectVal === '' ? 'selected' : '' ?>>-- กรุณาเลือก --</option>
+            <option value="นาย"    <?= $_selectVal === 'นาย'    ? 'selected' : '' ?>>นาย</option>
+            <option value="นาง"    <?= $_selectVal === 'นาง'    ? 'selected' : '' ?>>นาง</option>
+            <option value="นางสาว" <?= $_selectVal === 'นางสาว' ? 'selected' : '' ?>>นางสาว</option>
+            <optgroup label="บุคลากรทางการแพทย์">
+              <option value="นพ." <?= $_selectVal === 'นพ.' ? 'selected' : '' ?>>นพ.</option>
+              <option value="พญ." <?= $_selectVal === 'พญ.' ? 'selected' : '' ?>>พญ.</option>
+              <option value="ทพ." <?= $_selectVal === 'ทพ.' ? 'selected' : '' ?>>ทพ.</option>
+              <option value="ทญ." <?= $_selectVal === 'ทญ.' ? 'selected' : '' ?>>ทญ.</option>
+              <option value="ภก." <?= $_selectVal === 'ภก.' ? 'selected' : '' ?>>ภก.</option>
+              <option value="ภญ." <?= $_selectVal === 'ภญ.' ? 'selected' : '' ?>>ภญ.</option>
+              <option value="พย." <?= $_selectVal === 'พย.' ? 'selected' : '' ?>>พย.</option>
+            </optgroup>
+            <optgroup label="สายวิชาการ">
+              <option value="ดร."  <?= $_selectVal === 'ดร.'  ? 'selected' : '' ?>>ดร.</option>
+              <option value="อ."   <?= $_selectVal === 'อ.'   ? 'selected' : '' ?>>อ.</option>
+              <option value="ผศ."  <?= $_selectVal === 'ผศ.'  ? 'selected' : '' ?>>ผศ.</option>
+              <option value="รศ."  <?= $_selectVal === 'รศ.'  ? 'selected' : '' ?>>รศ.</option>
+              <option value="ศ."   <?= $_selectVal === 'ศ.'   ? 'selected' : '' ?>>ศ.</option>
+            </optgroup>
+            <option value="other" <?= $_selectVal === 'other' ? 'selected' : '' ?>>อื่นๆ (โปรดระบุ)...</option>
+          </select>
+          <div id="custom_title_container" class="<?= $_isCustomPrefix ? '' : 'hidden' ?>">
+            <input type="text" id="custom_title" name="custom_title"
+              value="<?= htmlspecialchars($_customVal) ?>"
+              placeholder="พิมพ์คำนำหน้าชื่อของคุณ..."
+              <?= $_isCustomPrefix ? 'required' : '' ?>
+              class="w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0052CC] focus:border-transparent outline-none transition-all text-sm bg-gray-50 font-prompt mt-2" />
           </div>
         </div>
 
@@ -358,6 +384,21 @@ render_header('ข้อมูลส่วนตัว');
 </div>
 
 <script>
+  function toggleCustomTitle() {
+    const sel = document.getElementById('name_title');
+    const container = document.getElementById('custom_title_container');
+    const input = document.getElementById('custom_title');
+    if (sel.value === 'other') {
+      container.classList.remove('hidden');
+      input.setAttribute('required', 'required');
+      input.focus();
+    } else {
+      container.classList.add('hidden');
+      input.removeAttribute('required');
+      input.value = '';
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     const statusInputs = document.querySelectorAll('input[name="status"]');
     const studentIdBtn = document.getElementById('student_id_container');
