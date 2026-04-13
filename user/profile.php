@@ -16,38 +16,53 @@ if ($lineUserId === '') {
 
 // 2. ดึงข้อมูลเดิมจากฐานข้อมูล (ถ้ามี) มาแสดงในฟอร์ม
 $userData = [
-  'prefix'   => '',
-  'full_name' => '',
-  'id_number' => '',
+  'prefix'     => '',
+  'first_name' => '',
+  'last_name'  => '',
+  'full_name'  => '',
+  'id_number'  => '',
   'citizen_id' => '',
-  'phone' => '',
-  'status' => '',
-  'email' => '',
-  'gender' => '',
+  'phone'      => '',
+  'status'     => '',
+  'email'      => '',
+  'gender'     => '',
 ];
 
 try {
   $pdo = db();
-  // migration อัตโนมัติ — เพิ่ม column prefix และ gender ถ้ายังไม่มี
-  try { $pdo->exec("ALTER TABLE sys_users ADD COLUMN IF NOT EXISTS prefix VARCHAR(20) NOT NULL DEFAULT ''"); } catch (PDOException) {}
-  try { $pdo->exec("ALTER TABLE sys_users ADD COLUMN IF NOT EXISTS gender VARCHAR(20) NOT NULL DEFAULT ''"); } catch (PDOException) {}
+  // migration อัตโนมัติ
+  try { $pdo->exec("ALTER TABLE sys_users ADD COLUMN IF NOT EXISTS prefix     VARCHAR(20)  NOT NULL DEFAULT ''"); } catch (PDOException) {}
+  try { $pdo->exec("ALTER TABLE sys_users ADD COLUMN IF NOT EXISTS gender     VARCHAR(20)  NOT NULL DEFAULT ''"); } catch (PDOException) {}
+  try { $pdo->exec("ALTER TABLE sys_users ADD COLUMN IF NOT EXISTS first_name VARCHAR(100) NOT NULL DEFAULT ''"); } catch (PDOException) {}
+  try { $pdo->exec("ALTER TABLE sys_users ADD COLUMN IF NOT EXISTS last_name  VARCHAR(100) NOT NULL DEFAULT ''"); } catch (PDOException) {}
 
-  $stmt = $pdo->prepare("SELECT prefix, full_name, student_personnel_id, citizen_id, phone_number, status, email, gender FROM sys_users WHERE line_user_id = :line_id LIMIT 1");
+  $stmt = $pdo->prepare("SELECT prefix, first_name, last_name, full_name, student_personnel_id, citizen_id, phone_number, status, email, gender FROM sys_users WHERE line_user_id = :line_id LIMIT 1");
   $stmt->execute([':line_id' => $lineUserId]);
   $user = $stmt->fetch();
 
   if ($user) {
-    $userData['prefix']    = $user['prefix']               ?? '';
-    $userData['full_name'] = $user['full_name']            ?? '';
-    $userData['id_number'] = $user['student_personnel_id'] ?? '';
-    $userData['citizen_id'] = $user['citizen_id']          ?? '';
-    $userData['phone']     = $user['phone_number']         ?? '';
-    $userData['status']    = $user['status']               ?? '';
-    $userData['email']     = $user['email']                ?? '';
-    $userData['gender']    = $user['gender']               ?? '';
+    $userData['prefix']     = $user['prefix']               ?? '';
+    $userData['first_name'] = $user['first_name']           ?? '';
+    $userData['last_name']  = $user['last_name']            ?? '';
+    $userData['full_name']  = $user['full_name']            ?? '';
+    $userData['id_number']  = $user['student_personnel_id'] ?? '';
+    $userData['citizen_id'] = $user['citizen_id']           ?? '';
+    $userData['phone']      = $user['phone_number']         ?? '';
+    $userData['status']     = $user['status']               ?? '';
+    $userData['email']      = $user['email']                ?? '';
+    $userData['gender']     = $user['gender']               ?? '';
   }
 } catch (PDOException $e) {
   // กรณี Error ให้ปล่อยผ่านไปกรอกใหม่
+}
+
+// ── Auto-split full_name → first_name / last_name สำหรับ user เดิม ─────────
+$_nameNeedsReview = false;
+if ($userData['full_name'] !== '' && $userData['first_name'] === '' && $userData['last_name'] === '') {
+    $parts = explode(' ', trim($userData['full_name']), 2);
+    $userData['first_name'] = $parts[0] ?? '';
+    $userData['last_name']  = $parts[1] ?? '';
+    $_nameNeedsReview = true; // แสดง banner ให้ user ตรวจสอบ
 }
 
 // ตรวจสอบว่าเป็นการแก้ไขหรือลงทะเบียนใหม่
@@ -58,11 +73,12 @@ $completenessItems   = [];
 $completenessPercent = 0;
 if ($isEditing) {
     $completenessItems = [
-        ['label' => 'คำนำหน้า',               'done' => !empty($userData['prefix'])],
-        ['label' => 'ชื่อ-นามสกุล',          'done' => !empty($userData['full_name'])],
-        ['label' => 'เบอร์โทรศัพท์',          'done' => !empty($userData['phone'])],
-        ['label' => 'เพศ',                    'done' => !empty($userData['gender'])],
-        ['label' => 'เลขประจำตัว',            'done' => !empty($userData['citizen_id'])],
+        ['label' => 'คำนำหน้า',    'done' => !empty($userData['prefix'])],
+        ['label' => 'ชื่อ',        'done' => !empty($userData['first_name'])],
+        ['label' => 'นามสกุล',     'done' => !empty($userData['last_name'])],
+        ['label' => 'เบอร์โทรศัพท์','done' => !empty($userData['phone'])],
+        ['label' => 'เพศ',         'done' => !empty($userData['gender'])],
+        ['label' => 'เลขประจำตัว', 'done' => !empty($userData['citizen_id'])],
     ];
     if ($userData['status'] !== 'other' && $userData['status'] !== '') {
         $completenessItems[] = ['label' => 'รหัสนักศึกษา/บุคลากร', 'done' => !empty($userData['id_number'])];
@@ -84,6 +100,13 @@ render_header('ข้อมูลส่วนตัว');
 ?>
 
 <div class="p-5 pb-28 flex flex-col min-h-screen animate-in fade-in slide-in-from-right-4 duration-500">
+
+  <?php if ($isEditing && $_nameNeedsReview): ?>
+  <div class="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800 font-prompt flex items-start gap-3">
+    <i class="fa-solid fa-triangle-exclamation mt-0.5 shrink-0 text-amber-500"></i>
+    <span>ระบบได้แยกชื่อและนามสกุลจากข้อมูลเดิมให้อัตโนมัติ กรุณาตรวจสอบและบันทึกใหม่อีกครั้ง</span>
+  </div>
+  <?php endif; ?>
 
   <?php if ($error_param !== ''): ?>
   <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 font-prompt flex items-start gap-3">
@@ -199,11 +222,19 @@ render_header('ข้อมูลส่วนตัว');
           </div>
         </div>
 
-        <div class="space-y-1.5">
-          <label class="text-sm font-semibold text-gray-700 font-prompt" for="full_name">ชื่อ-นามสกุล <span class="text-red-500">*</span></label>
-          <input id="full_name" name="full_name" type="text" required
-            value="<?= htmlspecialchars($userData['full_name']) ?>" placeholder="เช่น สมชาย ใจดี"
-            class="w-full p-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0052CC] focus:border-transparent outline-none transition-all placeholder:text-gray-400 font-prompt" />
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1.5">
+            <label class="text-sm font-semibold text-gray-700 font-prompt" for="first_name">ชื่อ <span class="text-red-500">*</span></label>
+            <input id="first_name" name="first_name" type="text" required
+              value="<?= htmlspecialchars($userData['first_name']) ?>" placeholder="เช่น สมชาย"
+              class="w-full p-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0052CC] focus:border-transparent outline-none transition-all placeholder:text-gray-400 font-prompt" />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-sm font-semibold text-gray-700 font-prompt" for="last_name">นามสกุล <span class="text-red-500">*</span></label>
+            <input id="last_name" name="last_name" type="text" required
+              value="<?= htmlspecialchars($userData['last_name']) ?>" placeholder="เช่น ใจดี"
+              class="w-full p-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0052CC] focus:border-transparent outline-none transition-all placeholder:text-gray-400 font-prompt" />
+          </div>
         </div>
 
         <div class="space-y-2">

@@ -23,7 +23,9 @@ if ($lineUserId === '') {
 $_nameTitle  = trim((string) ($_POST['name_title']   ?? ''));
 $_customTitle= trim((string) ($_POST['custom_title'] ?? ''));
 $prefix      = ($_nameTitle === 'other') ? $_customTitle : $_nameTitle;
-$fullName    = trim((string) ($_POST['full_name']    ?? ''));
+$firstName   = trim((string) ($_POST['first_name']   ?? ''));
+$lastName    = trim((string) ($_POST['last_name']    ?? ''));
+$fullName    = trim($firstName . ' ' . $lastName);  // sync ให้ code เดิมยังใช้ได้
 $idNumber    = trim((string) ($_POST['id_number']    ?? ''));
 $citizenId   = trim((string) ($_POST['citizen_id']   ?? ''));
 $phoneNumber = trim((string) ($_POST['phone_number'] ?? ''));
@@ -47,7 +49,7 @@ if (!in_array($gender, ['male', 'female', 'other'], true)) {
     exit;
 }
 
-if ($fullName === '' || $citizenId === '' || $phoneNumber === '') {
+if ($firstName === '' || $lastName === '' || $citizenId === '' || $phoneNumber === '') {
     header('Location: profile.php?error=empty', true, 303);
     exit;
 }
@@ -61,8 +63,10 @@ if ($status !== 'other' && $idNumber === '') {
 try {
     $pdo = db();
 
-    // Migration: เพิ่ม column prefix ถ้ายังไม่มี
-    try { $pdo->exec("ALTER TABLE sys_users ADD COLUMN IF NOT EXISTS prefix VARCHAR(20) NOT NULL DEFAULT ''"); } catch (PDOException) {}
+    // Migration: เพิ่ม columns ที่ยังไม่มี
+    try { $pdo->exec("ALTER TABLE sys_users ADD COLUMN IF NOT EXISTS prefix     VARCHAR(20)  NOT NULL DEFAULT ''"); } catch (PDOException) {}
+    try { $pdo->exec("ALTER TABLE sys_users ADD COLUMN IF NOT EXISTS first_name VARCHAR(100) NOT NULL DEFAULT ''"); } catch (PDOException) {}
+    try { $pdo->exec("ALTER TABLE sys_users ADD COLUMN IF NOT EXISTS last_name  VARCHAR(100) NOT NULL DEFAULT ''"); } catch (PDOException) {}
 
     $sidValue = ($status === 'other') ? null : $idNumber;
 
@@ -72,34 +76,40 @@ try {
     $existingUser = $stmtCheck->fetch();
 
     if ($existingUser) {
-        // --- UPDATE สำหรับผู้ใช้ที่มีอยู่แล้ว ---
+        // --- UPDATE ---
         $sql = "UPDATE sys_users
                 SET prefix = :prefix,
-                    full_name = :name,
+                    first_name = :first_name,
+                    last_name  = :last_name,
+                    full_name  = :name,
                     student_personnel_id = :sid,
-                    citizen_id = :cid,
+                    citizen_id   = :cid,
                     phone_number = :phone,
                     status = :status,
-                    email = :email,
+                    email  = :email,
                     gender = :gender
                 WHERE line_user_id = :line_id";
     } else {
-        // --- INSERT สำหรับผู้ใช้ใหม่ที่ยังไม่เคยลงทะเบียน ---
-        $sql = "INSERT INTO sys_users (line_user_id, prefix, full_name, student_personnel_id, citizen_id, phone_number, status, email, gender)
-                VALUES (:line_id, :prefix, :name, :sid, :cid, :phone, :status, :email, :gender)";
+        // --- INSERT ---
+        $sql = "INSERT INTO sys_users
+                    (line_user_id, prefix, first_name, last_name, full_name, student_personnel_id, citizen_id, phone_number, status, email, gender)
+                VALUES
+                    (:line_id, :prefix, :first_name, :last_name, :name, :sid, :cid, :phone, :status, :email, :gender)";
     }
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
-        ':prefix'  => $prefix,
-        ':name'    => $fullName,
-        ':sid'     => $sidValue,
-        ':cid'     => $citizenId,
-        ':phone'   => $phoneNumber,
-        ':status'  => $status,
-        ':email'   => $email,
-        ':gender'  => $gender,
-        ':line_id' => $lineUserId,
+        ':prefix'     => $prefix,
+        ':first_name' => $firstName,
+        ':last_name'  => $lastName,
+        ':name'       => $fullName,
+        ':sid'        => $sidValue,
+        ':cid'        => $citizenId,
+        ':phone'      => $phoneNumber,
+        ':status'     => $status,
+        ':email'      => $email,
+        ':gender'     => $gender,
+        ':line_id'    => $lineUserId,
     ]);
 
     // 4. ดึง ID (PK) ของผู้ใช้เพื่อเก็บใส่ Session
