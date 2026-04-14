@@ -13,6 +13,11 @@ if (session_status() === PHP_SESSION_NONE) {
     @session_start();
 }
 
+// ── Language system (e-Campaign pages only) ──────────────────────────────────
+if (!function_exists('__')) {
+    require_once __DIR__ . '/lang.php';
+}
+
 $currentPage = basename($_SERVER['PHP_SELF']);
 $excludedPages = ['profile.php', 'save_profile.php', 'index.php', 'logout.php', 'consent.php'];
 $isUserFolder = (strpos($_SERVER['REQUEST_URI'], '/user/') !== false);
@@ -73,10 +78,18 @@ function render_header(string $title = 'E-Vax'): void {
           <div class="absolute inset-0 rounded-full border-4 border-blue-100"></div>
           <div class="absolute inset-0 rounded-full border-4 border-[#0052CC] border-t-transparent animate-spin"></div>
         </div>
-        <p class="mt-4 text-[#0052CC] font-semibold text-sm animate-pulse font-prompt">กำลังโหลดข้อมูล...</p>
+        <p class="mt-4 text-[#0052CC] font-semibold text-sm animate-pulse font-prompt"><?= htmlspecialchars(__('loading')) ?></p>
       </div>
-      
+
       <main class="w-full max-w-md h-full bg-white shadow-xl relative overflow-y-auto overflow-x-hidden custom-scrollbar">
+
+        <?php if ($isUserFolder): ?>
+        <!-- Language Switcher -->
+        <a href="<?= htmlspecialchars(lang_switch_url()) ?>"
+           class="fixed top-3 right-3 z-[200] flex items-center gap-1.5 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-full px-3 py-1.5 text-[11px] font-bold text-gray-500 hover:text-[#0052CC] hover:border-[#0052CC] shadow-sm transition-all select-none">
+          <i class="fa-solid fa-globe text-[10px]"></i><?= htmlspecialchars(__('lang.switch')) ?>
+        </a>
+        <?php endif; ?>
 
   <?php
 }

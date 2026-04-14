@@ -22,6 +22,20 @@ try {
     $users = (int)$pdo->query("SELECT COUNT(*) FROM sys_users")->fetchColumn();
     $camps = (int)$pdo->query("SELECT COUNT(*) FROM camp_list WHERE status = 'active'")->fetchColumn();
 
+    // Quota & booking rate
+    $total_quota = 0;
+    $used_quota  = 0;
+    try {
+        $quotaRow = $pdo->query("
+            SELECT COALESCE(SUM(c.total_capacity), 0) AS total_quota,
+                   (SELECT COUNT(*) FROM camp_bookings WHERE status IN ('booked','confirmed')) AS used_quota
+            FROM camp_list c WHERE c.status = 'active'
+        ")->fetch(PDO::FETCH_ASSOC);
+        $total_quota = (int)($quotaRow['total_quota'] ?? 0);
+        $used_quota  = (int)($quotaRow['used_quota']  ?? 0);
+    } catch (PDOException $e) { /* silent */ }
+    $booking_rate = $total_quota > 0 ? (int)round($used_quota / $total_quota * 100) : 0;
+
     $borrows = 0;
     if ($pdo->query("SHOW TABLES LIKE 'borrow_records'")->rowCount() > 0) {
         $borrows = (int)$pdo->query(
@@ -42,11 +56,14 @@ try {
     } catch (PDOException $e) { /* table may not exist */ }
 
     echo json_encode([
-        'ok'       => true,
-        'users'    => $users,
-        'camps'    => $camps,
-        'borrows'  => $borrows,
-        'activity' => $activity,
+        'ok'           => true,
+        'users'        => $users,
+        'camps'        => $camps,
+        'borrows'      => $borrows,
+        'total_quota'  => $total_quota,
+        'used_quota'   => $used_quota,
+        'booking_rate' => $booking_rate,
+        'activity'     => $activity,
     ], JSON_UNESCAPED_UNICODE);
 
 } catch (PDOException $e) {

@@ -8,7 +8,6 @@ require_once __DIR__ . '/../includes/footer.php';
 
 session_start();
 
-// 1. ตรวจสอบ Login
 $studentId = isset($_SESSION['evax_student_id']) ? (int)$_SESSION['evax_student_id'] : 0;
 if ($studentId <= 0) {
     header('Location: index.php', true, 303);
@@ -17,15 +16,14 @@ if ($studentId <= 0) {
 
 $pdo = db();
 
-// 2. ดึงข้อมูลการจอง "ล่าสุด" ของผู้ใช้จากตารางแคมเปญ
 $booking = null;
 try {
     $sql = "
-        SELECT 
-            a.id AS appointment_id, 
+        SELECT
+            a.id AS appointment_id,
             c.title AS campaign_title,
-            t.slot_date, 
-            t.start_time, 
+            t.slot_date,
+            t.start_time,
             t.end_time
         FROM camp_bookings a
         JOIN camp_list c ON a.campaign_id = c.id
@@ -38,30 +36,28 @@ try {
     $stmt->execute([':sid' => $studentId]);
     $booking = $stmt->fetch(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    error_log("success.php error: " . $e->getMessage()); header("Location: my_bookings.php"); exit;
+    error_log("success.php error: " . $e->getMessage());
+    header("Location: my_bookings.php");
+    exit;
 }
 
-// ถ้าไม่มีประวัติการจองเลย ให้เด้งกลับไปหน้า My Bookings
 if (!$booking) {
     header('Location: my_bookings.php');
     exit;
 }
 
-// 3. เตรียมตัวแปรสำหรับแสดงผล
-$fullName = (string)($_SESSION['evax_full_name'] ?? 'ไม่ระบุชื่อ');
+$fullName      = (string)($_SESSION['evax_full_name'] ?? 'ไม่ระบุชื่อ');
 $appointmentId = $booking['appointment_id'];
 $campaignTitle = $booking['campaign_title'];
-$slotDate = $booking['slot_date'];
-$startTime = $booking['start_time'];
-$endTime = $booking['end_time'];
+$slotDate      = (string)$booking['slot_date'];
+$startTime     = (string)$booking['start_time'];
+$endTime       = (string)$booking['end_time'];
 
-$dateLabel = date('j F Y', strtotime((string)$slotDate));
-$timeLabel = substr((string)$startTime, 0, 5) . ' - ' . substr((string)$endTime, 0, 5);
-
-// รหัสอ้างอิง
+$dateLabel   = ecampaign_format_date($slotDate);
+$timeLabel   = substr($startTime, 0, 5) . ' - ' . substr($endTime, 0, 5);
 $displayCode = 'CAMP-' . str_pad((string)$appointmentId, 5, '0', STR_PAD_LEFT);
 
-render_header('ยืนยันการจองสำเร็จ');
+render_header(__('success.page_title'));
 ?>
 
 <div class="p-5 flex flex-col h-full bg-[#f4f7fa] animate-in fade-in slide-in-from-bottom-8 duration-700">
@@ -73,8 +69,8 @@ render_header('ยืนยันการจองสำเร็จ');
           <i class="fa-solid fa-check text-5xl text-green-500"></i>
         </div>
       </div>
-      <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight font-prompt">การจองสำเร็จ!</h2>
-      <p class="text-sm font-medium text-gray-500 mt-2 font-prompt">กรุณาแสดง QR Code นี้แก่เจ้าหน้าที่หน้างาน</p>
+      <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight font-prompt"><?= htmlspecialchars(__('success.heading')) ?></h2>
+      <p class="text-sm font-medium text-gray-500 mt-2 font-prompt"><?= htmlspecialchars(__('success.show_qr')) ?></p>
     </div>
 
     <div class="w-full bg-white rounded-[24px] shadow-xl border border-gray-100 overflow-hidden relative">
@@ -83,48 +79,33 @@ render_header('ยืนยันการจองสำเร็จ');
       <div class="absolute left-6 right-6 top-[60%] border-t-2 border-dashed border-gray-200"></div>
 
       <div class="p-7 pb-8">
-        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 text-center">รายละเอียดการจอง</h3>
+        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 text-center">
+            <?= htmlspecialchars(__('success.details_title')) ?>
+        </h3>
 
         <div class="space-y-5">
+          <?php
+          $rows = [
+            ['icon' => 'fa-bullhorn',        'label' => __('success.lbl_campaign'), 'value' => $campaignTitle, 'accent' => true],
+            ['icon' => 'fa-user',            'label' => __('success.lbl_name'),     'value' => $fullName],
+            ['icon' => 'fa-regular fa-calendar','label' => __('success.lbl_date'),  'value' => $dateLabel],
+            ['icon' => 'fa-regular fa-clock','label' => __('success.lbl_time'),     'value' => $timeLabel],
+          ];
+          foreach ($rows as $row): ?>
           <div class="flex gap-4 items-start">
             <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
-              <i class="fa-solid fa-bullhorn text-[#0052CC]"></i>
+              <i class="fa-solid <?= $row['icon'] ?> text-[#0052CC]"></i>
             </div>
             <div>
-              <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">กิจกรรม (Campaign)</p>
-              <p class="font-bold text-[#0052CC] text-lg font-prompt"><?= htmlspecialchars($campaignTitle, ENT_QUOTES, 'UTF-8') ?></p>
+              <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">
+                  <?= htmlspecialchars($row['label']) ?>
+              </p>
+              <p class="font-bold <?= !empty($row['accent']) ? 'text-[#0052CC]' : 'text-gray-900' ?> text-lg font-prompt">
+                  <?= htmlspecialchars($row['value'], ENT_QUOTES, 'UTF-8') ?>
+              </p>
             </div>
           </div>
-
-          <div class="flex gap-4 items-start">
-            <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
-              <i class="fa-solid fa-user text-[#0052CC]"></i>
-            </div>
-            <div>
-              <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">ชื่อ-นามสกุล (Name)</p>
-              <p class="font-bold text-gray-900 text-lg font-prompt"><?= htmlspecialchars($fullName, ENT_QUOTES, 'UTF-8') ?></p>
-            </div>
-          </div>
-
-          <div class="flex gap-4 items-start">
-            <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
-              <i class="fa-regular fa-calendar text-[#0052CC]"></i>
-            </div>
-            <div>
-              <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">วันที่ (Date)</p>
-              <p class="font-bold text-gray-900 text-lg font-prompt"><?= htmlspecialchars($dateLabel, ENT_QUOTES, 'UTF-8') ?></p>
-            </div>
-          </div>
-
-          <div class="flex gap-4 items-start">
-            <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
-              <i class="fa-regular fa-clock text-[#0052CC]"></i>
-            </div>
-            <div>
-              <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">เวลา (Time)</p>
-              <p class="font-bold text-gray-900 text-lg font-prompt"><?= htmlspecialchars($timeLabel, ENT_QUOTES, 'UTF-8') ?></p>
-            </div>
-          </div>
+          <?php endforeach; ?>
         </div>
       </div>
 
@@ -140,11 +121,9 @@ render_header('ยืนยันการจองสำเร็จ');
   </div>
 
   <div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto p-4 bg-white border-t border-gray-100 z-20 flex flex-col gap-3 shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.1)]">
-    <a
-      href="my_bookings.php"
-      class="w-full flex items-center justify-center bg-[#0052CC] hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all shadow-sm font-prompt active:scale-[0.98]"
-    >
-      <i class="fa-solid fa-list-check mr-2"></i> ดูประวัติการจองทั้งหมด
+    <a href="my_bookings.php"
+       class="w-full flex items-center justify-center bg-[#0052CC] hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all shadow-sm font-prompt active:scale-[0.98]">
+      <i class="fa-solid fa-list-check mr-2"></i> <?= htmlspecialchars(__('success.view_all_btn')) ?>
     </a>
   </div>
 </div>
