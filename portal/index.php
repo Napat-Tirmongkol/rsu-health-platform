@@ -17,16 +17,23 @@ $adminRole = $_SESSION['admin_role'] ?? 'admin'; // ตัวแปรบทบ�
 $idSaved  = isset($_GET['saved']) && $_GET['saved'] === '1';
 $idError  = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'portal_edit_user') {
-    $userId   = (int)($_POST['user_id']              ?? 0);
-    $fullName = trim($_POST['full_name']              ?? '');
-    $studentId = trim($_POST['student_personnel_id'] ?? '');
-    $citizenId = trim($_POST['citizen_id']           ?? '');
-    $phone    = trim($_POST['phone_number']           ?? '');
-    $status   = trim($_POST['status']                ?? '');
+    $userId      = (int)($_POST['user_id']              ?? 0);
+    $fullName    = trim($_POST['full_name']              ?? '');
+    $studentId   = trim($_POST['student_personnel_id']  ?? '');
+    $citizenId   = trim($_POST['citizen_id']            ?? '');
+    $phone       = trim($_POST['phone_number']          ?? '');
+    $email       = trim($_POST['email']                 ?? '');
+    $department  = trim($_POST['department']            ?? '');
+    $gender      = trim($_POST['gender']                ?? '');
+    $status      = trim($_POST['status']                ?? '');
+    $statusOther = trim($_POST['status_other']          ?? '');
     if ($userId > 0 && $fullName !== '') {
         try {
-            $pdo->prepare("UPDATE sys_users SET full_name=:n, student_personnel_id=:s, citizen_id=:c, phone_number=:p, status=:st WHERE id=:id")
-                ->execute([':n'=>$fullName,':s'=>$studentId,':c'=>$citizenId,':p'=>$phone,':st'=>$status,':id'=>$userId]);
+            $pdo->prepare("UPDATE sys_users SET full_name=:n, student_personnel_id=:s, citizen_id=:c, phone_number=:p, email=:email, department=:dept, gender=:gender, status=:st, status_other=:sother WHERE id=:id")
+                ->execute([':n'=>$fullName,':s'=>$studentId,':c'=>$citizenId,':p'=>$phone,
+                           ':email'=>$email,':dept'=>$department ?: null,
+                           ':gender'=>$gender ?: null,':st'=>$status,
+                           ':sother'=>$statusOther ?: null,':id'=>$userId]);
             header('Location: index.php?section=identity&saved=1');
             exit;
         } catch (PDOException $e) {
@@ -45,7 +52,7 @@ $idSearch     = trim($_GET['id_search'] ?? '');
 $idUsers      = [];
 $idActiveCount = 0;
 try {
-    $idSql = "SELECT id, full_name, student_personnel_id, citizen_id, phone_number, email, status, created_at FROM sys_users";
+    $idSql = "SELECT id, full_name, student_personnel_id, citizen_id, phone_number, email, department, gender, status, status_other, created_at FROM sys_users";
     if ($idSearch !== '') {
         $idSql .= " WHERE full_name LIKE :s OR student_personnel_id LIKE :s2 OR citizen_id LIKE :s3";
     }
@@ -794,21 +801,45 @@ try {
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
                         <div>
                             <label style="display:block;font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px">รหัสนักศึกษา</label>
-                            <input id="id_edit_sid" name="student_personnel_id" maxlength="7" style="width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:12px;font-size:13px;font-family:inherit;font-weight:600;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e2e8f0'">
+                            <input id="id_edit_sid" name="student_personnel_id" maxlength="15" style="width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:12px;font-size:13px;font-family:inherit;font-weight:600;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e2e8f0'">
                         </div>
                         <div>
                             <label style="display:block;font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px">เบอร์โทร</label>
                             <input id="id_edit_phone" name="phone_number" style="width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:12px;font-size:13px;font-family:inherit;font-weight:600;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e2e8f0'">
                         </div>
                     </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                        <div>
+                            <label style="display:block;font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px">อีเมล</label>
+                            <input id="id_edit_email" name="email" type="email" style="width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:12px;font-size:13px;font-family:inherit;font-weight:600;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e2e8f0'" placeholder="example@rsu.ac.th">
+                        </div>
+                        <div>
+                            <label style="display:block;font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px">เพศ</label>
+                            <select id="id_edit_gender" name="gender" style="width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:12px;font-size:13px;font-family:inherit;font-weight:600;outline:none;background:#fff">
+                                <option value="">-- ไม่ระบุ --</option>
+                                <option value="male">ชาย</option>
+                                <option value="female">หญิง</option>
+                                <option value="other">อื่นๆ</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px">คณะ / หน่วยงาน</label>
+                        <input id="id_edit_dept" name="department" style="width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:12px;font-size:13px;font-family:inherit;font-weight:600;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e2e8f0'" placeholder="เช่น คณะนิเทศศาสตร์">
+                    </div>
                     <div>
                         <label style="display:block;font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px">ประเภท <span style="color:#ef4444">*</span></label>
-                        <select id="id_edit_status" name="status" style="width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:12px;font-size:13px;font-family:inherit;font-weight:600;outline:none;background:#fff">
+                        <select id="id_edit_status" name="status" style="width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:12px;font-size:13px;font-family:inherit;font-weight:600;outline:none;background:#fff"
+                                onchange="document.getElementById('id_edit_sother_wrap').style.display=this.value==='other'?'block':'none'">
                             <option value="">-- เลือก --</option>
                             <option value="student">นักศึกษา</option>
                             <option value="staff">บุคลากร/อาจารย์</option>
                             <option value="other">บุคคลทั่วไป</option>
                         </select>
+                    </div>
+                    <div id="id_edit_sother_wrap" style="display:none">
+                        <label style="display:block;font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px">ระบุสถานภาพ (กรณีเลือก "อื่นๆ")</label>
+                        <input id="id_edit_sother" name="status_other" style="width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:12px;font-size:13px;font-family:inherit;font-weight:600;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e2e8f0'" placeholder="เช่น ศิษย์เก่า, ผู้ปกครอง">
                     </div>
                     <div style="display:flex;gap:10px;padding-top:6px">
                         <button type="button" onclick="document.getElementById('idEditModal').style.display='none'"
@@ -1189,19 +1220,32 @@ function idOpenEdit(u) {
     document.getElementById('id_edit_citizen').value = u.citizen_id  || '';
     document.getElementById('id_edit_sid').value    = u.student_personnel_id || '';
     document.getElementById('id_edit_phone').value  = u.phone_number || '';
+    document.getElementById('id_edit_email').value  = u.email        || '';
+    document.getElementById('id_edit_gender').value = u.gender       || '';
+    document.getElementById('id_edit_dept').value   = u.department   || '';
     document.getElementById('id_edit_status').value = u.status       || '';
+    document.getElementById('id_edit_sother').value = u.status_other || '';
+    document.getElementById('id_edit_sother_wrap').style.display = u.status === 'other' ? 'block' : 'none';
     var m = document.getElementById('idEditModal');
     m.style.display = 'flex';
 }
 function idOpenView(u) {
+    var statusMap = {student:'นักศึกษา', staff:'บุคลากร/อาจารย์', teacher:'อาจารย์', other:'บุคคลทั่วไป'};
+    var genderMap = {male:'ชาย', female:'หญิง', other:'อื่นๆ'};
     var map = [
         ['ชื่อ-นามสกุล', u.full_name],
         ['เลขบัตรประชาชน', u.citizen_id],
         ['รหัสนักศึกษา / บุคลากร', u.student_personnel_id],
         ['เบอร์โทรศัพท์', u.phone_number],
-        ['ประเภท', u.status === 'student' ? 'นักศึกษา' : (u.status === 'staff' ? 'บุคลากร/อาจารย์' : (u.status || '—'))],
-        ['วันที่ลงทะเบียน', u.created_at ? new Date(u.created_at.replace(' ','T')).toLocaleString('th-TH',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '—'],
+        ['อีเมล', u.email],
+        ['เพศ', genderMap[u.gender] || u.gender],
+        ['คณะ / หน่วยงาน', u.department],
+        ['ประเภท', statusMap[u.status] || u.status],
     ];
+    if (u.status === 'other' && u.status_other) {
+        map.push(['ระบุสถานภาพ', u.status_other]);
+    }
+    map.push(['วันที่ลงทะเบียน', u.created_at ? new Date(u.created_at.replace(' ','T')).toLocaleString('th-TH',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '—']);
     document.getElementById('idViewBody').innerHTML = map.map(function(r) {
         return '<div><div style="font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">'+r[0]+'</div>'
              + '<div style="padding:10px 14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;font-size:13px;font-weight:700;color:#0f172a">'+(r[1]||'—')+'</div></div>';

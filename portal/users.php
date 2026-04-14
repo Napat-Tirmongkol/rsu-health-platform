@@ -13,13 +13,17 @@ $pdo = db();
 // POST Handler — PRG pattern (redirect หลัง save ทันที)
 // ==========================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edit_user') {
-    $userId    = (int)($_POST['user_id']               ?? 0);
-    $fullName  = trim($_POST['full_name']               ?? '');
-    $studentId = trim($_POST['student_personnel_id']    ?? '');
-    $citizenId = trim($_POST['citizen_id']              ?? '');
-    $phone     = trim($_POST['phone_number']            ?? '');
-    $status    = trim($_POST['status']                  ?? '');
-    $search    = trim($_POST['search_carry']            ?? '');
+    $userId      = (int)($_POST['user_id']               ?? 0);
+    $fullName    = trim($_POST['full_name']               ?? '');
+    $studentId   = trim($_POST['student_personnel_id']    ?? '');
+    $citizenId   = trim($_POST['citizen_id']              ?? '');
+    $phone       = trim($_POST['phone_number']            ?? '');
+    $email       = trim($_POST['email']                   ?? '');
+    $department  = trim($_POST['department']              ?? '');
+    $gender      = trim($_POST['gender']                  ?? '');
+    $status      = trim($_POST['status']                  ?? '');
+    $statusOther = trim($_POST['status_other']            ?? '');
+    $search      = trim($_POST['search_carry']            ?? '');
 
     if ($userId > 0 && $fullName !== '') {
         try {
@@ -28,10 +32,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edit_
                                student_personnel_id = :sid,
                                citizen_id = :cid,
                                phone_number = :phone,
-                               status = :status
+                               email = :email,
+                               department = :dept,
+                               gender = :gender,
+                               status = :status,
+                               status_other = :sother
                            WHERE id = :id")
                 ->execute([':name'=>$fullName,':sid'=>$studentId,':cid'=>$citizenId,
-                           ':phone'=>$phone,':status'=>$status,':id'=>$userId]);
+                           ':phone'=>$phone,':email'=>$email,':dept'=>$department ?: null,
+                           ':gender'=>$gender ?: null,':status'=>$status,
+                           ':sother'=>$statusOther ?: null,':id'=>$userId]);
             log_activity("Updated User Profile", "แก้ไขรายชื่อ: $fullName (#$studentId)");
             $qs = http_build_query(array_filter(['saved'=>'1','search'=>$search]));
         } catch (PDOException $e) {
@@ -349,22 +359,52 @@ require_once __DIR__ . '/../admin/includes/header.php';
                         <!-- Student/Staff ID -->
                         <div>
                             <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">รหัสนักศึกษา / บุคลากร</label>
-                            <input type="text" id="edit_student_id" name="student_personnel_id" maxlength="15" 
+                            <input type="text" id="edit_student_id" name="student_personnel_id" maxlength="15"
                                    class="premium-input" placeholder="7 หรือ 10 หลัก">
                         </div>
                         <!-- Phone -->
                         <div>
                             <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">เบอร์โทรศัพท์</label>
-                            <input type="text" id="edit_phone" name="phone_number" 
+                            <input type="text" id="edit_phone" name="phone_number"
                                    class="premium-input" placeholder="0XXXXXXXXX">
                         </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <!-- Email -->
+                        <div>
+                            <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">อีเมล</label>
+                            <input type="email" id="edit_email" name="email"
+                                   class="premium-input" placeholder="example@rsu.ac.th">
+                        </div>
+                        <!-- Gender -->
+                        <div>
+                            <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">เพศ</label>
+                            <div class="relative">
+                                <select id="edit_gender" name="gender" class="premium-input appearance-none">
+                                    <option value="">-- ไม่ระบุ --</option>
+                                    <option value="male">ชาย</option>
+                                    <option value="female">หญิง</option>
+                                    <option value="other">อื่นๆ</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none text-xs"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Department -->
+                    <div>
+                        <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">คณะ / หน่วยงาน</label>
+                        <input type="text" id="edit_department" name="department"
+                               class="premium-input" placeholder="เช่น คณะนิเทศศาสตร์, สำนักทะเบียน">
                     </div>
 
                     <!-- User Type -->
                     <div>
                         <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">ประเภทผู้ใช้งาน <span class="text-red-500">*</span></label>
                         <div class="relative">
-                            <select name="status" id="edit_status" required class="premium-input appearance-none">
+                            <select name="status" id="edit_status" required class="premium-input appearance-none"
+                                    onchange="document.getElementById('edit_status_other_wrap').style.display=this.value==='other'?'block':'none'">
                                 <option value="">-- เลือกประเภท --</option>
                                 <option value="student">นักศึกษา (Student)</option>
                                 <option value="staff">บุคลากร/อาจารย์ (Personnel)</option>
@@ -372,6 +412,13 @@ require_once __DIR__ . '/../admin/includes/header.php';
                             </select>
                             <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none text-xs"></i>
                         </div>
+                    </div>
+
+                    <!-- Status Other (conditional) -->
+                    <div id="edit_status_other_wrap" style="display:none">
+                        <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">ระบุสถานภาพ (กรณีเลือก "อื่นๆ")</label>
+                        <input type="text" id="edit_status_other" name="status_other"
+                               class="premium-input" placeholder="เช่น ศิษย์เก่า, ผู้ปกครอง">
                     </div>
                 </div>
 
@@ -435,9 +482,30 @@ require_once __DIR__ . '/../admin/includes/header.php';
                         <span id="view_phone" class="font-bold text-gray-700 text-sm"></span>
                     </div>
                     <div class="flex flex-col gap-1 p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">อีเมล</span>
+                        <span id="view_email" class="font-bold text-gray-700 text-sm break-all"></span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1 p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
                         <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">ประเภท</span>
                         <span id="view_status" class="font-bold text-blue-600 text-sm"></span>
                     </div>
+                    <div class="flex flex-col gap-1 p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">เพศ</span>
+                        <span id="view_gender" class="font-bold text-gray-700 text-sm"></span>
+                    </div>
+                </div>
+
+                <div id="view_dept_wrap" class="flex flex-col gap-1 p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">คณะ / หน่วยงาน</span>
+                    <span id="view_department" class="font-bold text-gray-700 text-sm"></span>
+                </div>
+
+                <div id="view_sother_wrap" class="flex flex-col gap-1 p-4 bg-amber-50/50 rounded-2xl border border-amber-100" style="display:none">
+                    <span class="text-[10px] font-black text-amber-400 uppercase tracking-widest">ระบุสถานภาพ</span>
+                    <span id="view_status_other" class="font-bold text-gray-700 text-sm"></span>
                 </div>
 
                 <div class="flex flex-col gap-1 p-4 bg-blue-50/30 rounded-2xl border border-blue-100/50">
@@ -474,11 +542,16 @@ function closeModal(type) {
 
 function openEditModal(user) {
     document.getElementById('edit_user_id').value = user.id;
-    document.getElementById('edit_full_name').value = user.full_name;
-    document.getElementById('edit_student_id').value = user.student_personnel_id;
-    document.getElementById('edit_citizen_id').value = user.citizen_id;
-    document.getElementById('edit_phone').value = user.phone_number;
-    document.getElementById('edit_status').value = user.status;
+    document.getElementById('edit_full_name').value = user.full_name || '';
+    document.getElementById('edit_student_id').value = user.student_personnel_id || '';
+    document.getElementById('edit_citizen_id').value = user.citizen_id || '';
+    document.getElementById('edit_phone').value = user.phone_number || '';
+    document.getElementById('edit_email').value = user.email || '';
+    document.getElementById('edit_gender').value = user.gender || '';
+    document.getElementById('edit_department').value = user.department || '';
+    document.getElementById('edit_status').value = user.status || '';
+    document.getElementById('edit_status_other').value = user.status_other || '';
+    document.getElementById('edit_status_other_wrap').style.display = user.status === 'other' ? 'block' : 'none';
     
     const modal    = document.getElementById('editModal');
     const modalBox = document.getElementById('editModalBox');
@@ -490,11 +563,21 @@ function openEditModal(user) {
 }
 
 function openViewModal(user) {
-    document.getElementById('view_full_name').innerText = user.full_name || '-';
-    document.getElementById('view_citizen_id').innerText = user.citizen_id || '-';
-    document.getElementById('view_student_id').innerText = user.student_personnel_id || '-';
-    document.getElementById('view_phone').innerText = user.phone_number || '-';
-    document.getElementById('view_status').innerText = user.status ? (user.status === 'student' ? 'นักศึกษา' : (user.status === 'staff' ? 'บุคลากร/อาจารย์' : 'บุคคลทั่วไป')) : '-';
+    var statusMap = {student:'นักศึกษา', staff:'บุคลากร/อาจารย์', teacher:'อาจารย์', other:'บุคคลทั่วไป'};
+    var genderMap = {male:'ชาย', female:'หญิง', other:'อื่นๆ'};
+    document.getElementById('view_full_name').innerText    = user.full_name || '-';
+    document.getElementById('view_citizen_id').innerText   = user.citizen_id || '-';
+    document.getElementById('view_student_id').innerText   = user.student_personnel_id || '-';
+    document.getElementById('view_phone').innerText        = user.phone_number || '-';
+    document.getElementById('view_email').innerText        = user.email || '-';
+    document.getElementById('view_status').innerText       = statusMap[user.status] || user.status || '-';
+    document.getElementById('view_gender').innerText       = genderMap[user.gender] || (user.gender ? user.gender : '-');
+    document.getElementById('view_department').innerText   = user.department || '-';
+    var sow = document.getElementById('view_sother_wrap');
+    if (user.status === 'other' && user.status_other) {
+        document.getElementById('view_status_other').innerText = user.status_other;
+        sow.style.display = '';
+    } else { sow.style.display = 'none'; }
     document.getElementById('view_created_at').innerText = new Date(user.created_at).toLocaleString('th-TH', {
         year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
     });
