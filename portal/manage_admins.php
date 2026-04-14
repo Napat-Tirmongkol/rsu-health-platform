@@ -545,9 +545,9 @@ renderPageHeader("System Governance", "Hub บริหารจัดการ:
                             <i class="fa-solid fa-wand-magic-sparkles"></i> เจนรหัสอัตโนมัติ
                         </button>
                     </div>
-                    <div class="relative">
+                    <div class="relative w-full">
                         <input type="password" name="password" id="modalPassword" class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none font-medium text-sm pr-12" placeholder="********">
-                        <button type="button" onclick="togglePasswordVisibility()" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 px-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors">
                             <i id="passwordToggleIcon" class="fa-solid fa-eye-slash text-sm"></i>
                         </button>
                     </div>
@@ -621,9 +621,9 @@ renderPageHeader("System Governance", "Hub บริหารจัดการ:
                                     <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i> สร้างอัตโนมัติ
                                 </button>
                             </div>
-                            <div class="relative">
-                                <input type="password" name="sf_password" id="sfPassword" class="premium-input pr-11" placeholder="••••••••">
-                                <button type="button" onclick="toggleSfPw()" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+                            <div class="relative w-full">
+                                <input type="password" name="sf_password" id="sfPassword" class="premium-input pr-12" placeholder="••••••••">
+                                <button type="button" onclick="toggleSfPw()" class="absolute inset-y-0 right-0 px-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors">
                                     <i id="sfEyeIcon" class="fa-solid fa-eye-slash text-sm"></i>
                                 </button>
                             </div>
