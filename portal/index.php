@@ -178,8 +178,8 @@ $projects = [
         'allowed_roles' => ['admin', 'superadmin'],
         'badges'        => [ 'Monitoring', 'Debug' ],
         'actions'       => [
-            ['label' => 'Error Logs',    'url' => '../admin/error_logs.php',    'primary' => true],
-            ['label' => 'Activity Logs', 'url' => '../admin/activity_logs.php', 'primary' => false],
+            ['label' => 'Error Logs',    'url' => 'error_logs.php',    'primary' => true],
+            ['label' => 'Activity Logs', 'url' => 'activity_logs.php', 'primary' => false],
         ]
     ],
     [
@@ -327,11 +327,11 @@ try {
                     <div class="psb-icon"><i class="fa-solid fa-gear"></i></div>
                     <span class="psb-label">Settings</span>
                 </button>
-                <a href="../admin/activity_logs.php" class="psb-item" style="text-decoration:none; display:flex;">
+                <a href="activity_logs.php" class="psb-item" style="text-decoration:none; display:flex;">
                     <div class="psb-icon"><i class="fa-solid fa-file-lines"></i></div>
                     <span class="psb-label">บันทึกกิจกรรมระบบ</span>
                 </a>
-                <a href="../admin/error_logs.php" class="psb-item" style="text-decoration:none; display:flex;">
+                <a href="error_logs.php" class="psb-item" style="text-decoration:none; display:flex;">
                     <div class="psb-icon"><i class="fa-solid fa-bug"></i></div>
                     <span class="psb-label">Error Logs</span>
                 </a>
@@ -578,7 +578,7 @@ try {
                                 <p class="text-[11px] font-bold uppercase tracking-widest">No activity yet</p>
                             </div>
                         <?php endif; ?>
-                        <a href="../admin/activity_logs.php"
+                        <a href="activity_logs.php"
                            class="flex items-center justify-center gap-1.5 py-3 text-[10px] font-black uppercase tracking-wider transition-colors border-t border-gray-50 hover:bg-green-50" style="color:#2e9e63">
                             View all logs <i class="fa-solid fa-chevron-right text-[9px]"></i>
                         </a>
@@ -596,7 +596,7 @@ try {
                         <a href="../admin/campaigns.php" class="shortcut-link">
                             <i class="fa-solid fa-bullhorn"></i> Campaign Manager
                         </a>
-                        <a href="../admin/error_logs.php" class="shortcut-link">
+                        <a href="error_logs.php" class="shortcut-link">
                             <i class="fa-solid fa-bug"></i> Error Logs
                         </a>
                     </div>
