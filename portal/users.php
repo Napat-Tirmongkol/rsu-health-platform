@@ -85,25 +85,44 @@ require_once __DIR__ . '/../admin/includes/header.php';
 ?>
 
 <style>
-/* Animations & Glass Effects */
-@keyframes slideUpFade {
-    0% { opacity: 0; transform: translateY(15px); }
-    100% { opacity: 1; transform: translateY(0); }
-}
-.animate-slide-up { animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-.delay-100 { animation-delay: 0.1s; }
+    /* ── Premium UI Elements ── */
+    @keyframes slideUpFade {
+        0% { opacity: 0; transform: translateY(20px) scale(0.98); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .animate-slide-up { animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-.custom-scrollbar::-webkit-scrollbar { width: 6px; }
-.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .premium-input {
+        width: 100%;
+        padding: 0.875rem 1.25rem;
+        background-color: #f9fafb;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 1.25rem;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: #111827;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        outline: none;
+    }
 
-.glass-modal {
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-}
+    .premium-input:focus {
+        background-color: #ffffff;
+        border-color: #f59e0b; /* Orange-ish for users */
+        box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .premium-modal-header {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    /* Custom Scrollbar */
+    .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #d1d5db; }
 </style>
 
 <div class="max-w-6xl mx-auto px-4 py-8">
@@ -281,107 +300,173 @@ require_once __DIR__ . '/../admin/includes/header.php';
     </div>
 </div>
 
-<div id="editModal" class="fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="glass-modal rounded-[24px] w-full max-w-lg overflow-hidden animate-slide-up border border-white/50 shadow-2xl">
-        <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-white/50">
-            <h3 class="text-xl font-black text-amber-600 flex items-center gap-3">
-                <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-[14px] flex items-center justify-center text-lg shadow-inner"><i class="fa-solid fa-user-pen"></i></div>
-                แก้ไขข้อมูลผู้ใช้งาน
-            </h3>
-            <button onclick="document.getElementById('editModal').classList.add('hidden')" class="w-8 h-8 flex items-center justify-center bg-gray-100 text-gray-500 rounded-full hover:bg-gray-200 hover:text-gray-800 transition-colors shadow-sm focus:outline-none">
-                <i class="fa-solid fa-times font-bold"></i>
-            </button>
-        </div>
-        <form method="POST" class="flex flex-col">
-            <div class="p-6 space-y-5 flex-1 bg-gray-50/30">
-                <input type="hidden" name="action" value="edit_user">
-                <input type="hidden" name="user_id" id="edit_user_id">
-                
-                <div>
-                    <label class="block text-xs uppercase tracking-wider font-bold text-gray-500 mb-1.5">ชื่อ-นามสกุล <span class="text-red-500">*</span></label>
-                    <input type="text" id="edit_full_name" name="full_name" required class="w-full px-4 py-3 bg-white border border-gray-200 rounded-[14px] focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 outline-none font-prompt text-gray-800 font-bold shadow-sm transition-all focus:shadow-md">
-                </div>
-                
-                <div>
-                    <label class="block text-xs uppercase tracking-wider font-bold text-gray-500 mb-1.5">เลขบัตรประชาชน (13 หลัก) <span class="text-red-500">*</span></label>
-                    <input type="text" id="edit_citizen_id" name="citizen_id" required maxlength="13" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-[14px] focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 outline-none font-prompt text-gray-800 font-bold shadow-sm transition-all focus:shadow-md tracking-wider">
-                </div>
+<div id="editModal" class="fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4" style="z-index:200;">
+    <div id="editModalBox" class="bg-white rounded-[32px] shadow-2xl w-full max-w-lg overflow-hidden transform transition-all scale-95 opacity-0 duration-300">
+        <form method="POST">
+            <?php csrf_field(); ?>
+            <input type="hidden" name="action" value="edit_user">
+            <input type="hidden" name="user_id" id="edit_user_id">
 
-                <div>
-                    <label class="block text-xs uppercase tracking-wider font-bold text-gray-500 mb-1.5">รหัสนักศึกษา / บุคลากร (7 หลัก)</label>
-                    <input type="text" id="edit_student_id" name="student_personnel_id" maxlength="7" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-[14px] focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 outline-none font-prompt text-gray-800 font-bold shadow-sm transition-all focus:shadow-md tracking-wider">
+            <!-- Header -->
+            <div class="px-8 py-6 premium-modal-header flex justify-between items-center sticky top-0 z-10">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center shadow-inner">
+                        <i class="fa-solid fa-user-pen text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-[900] text-gray-900 tracking-tight">แก้ไขข้อมูลผู้ใช้งาน</h3>
+                        <p class="text-[11px] text-gray-400 font-bold uppercase tracking-wider">ปรับปรุงรายละเอียดส่วนบุคคลและสถานะ</p>
+                    </div>
                 </div>
-
-                <div>
-                    <label class="block text-xs uppercase tracking-wider font-bold text-gray-500 mb-1.5">เบอร์โทรศัพท์ (ไม่บังคับ)</label>
-                    <input type="text" id="edit_phone" name="phone_number" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-[14px] focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 outline-none font-prompt text-gray-800 font-bold shadow-sm transition-all focus:shadow-md tracking-wider">
-                </div>
-
-                <div>
-                    <label class="block text-xs uppercase tracking-wider font-bold text-gray-500 mb-1.5">ประเภทผู้ใช้งาน <span class="text-red-500">*</span></label>
-                    <select name="status" id="edit_status" required class="w-full px-4 py-3 bg-white border border-gray-200 rounded-[14px] focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 outline-none font-prompt text-gray-800 font-bold shadow-sm transition-all focus:shadow-md">
-                        <option value="">-- เลือกประเภท --</option>
-                        <option value="student">นักศึกษา</option>
-                        <option value="staff">บุคลากร/อาจารย์</option>
-                        <option value="other">บุคคลทั่วไป</option>
-                    </select>
-                </div>
+                <button type="button" onclick="closeModal('edit')" class="w-10 h-10 flex items-center justify-center rounded-2xl hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-all duration-200">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
             </div>
 
-            <div class="p-5 border-t border-gray-100 bg-white flex gap-3">
-                <button type="button" onclick="document.getElementById('editModal').classList.add('hidden')" class="w-1/3 bg-gray-50 text-gray-700 font-bold border-2 border-gray-200 py-3.5 rounded-[14px] hover:bg-gray-100 transition-colors shadow-sm">ยกเลิก</button>
-                <button type="submit" class="w-2/3 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold py-3.5 rounded-[14px] hover:shadow-lg hover:shadow-amber-500/30 hover:-translate-y-0.5 transition-all text-base tracking-wide shadow-sm flex items-center justify-center gap-2"><i class="fa-solid fa-save"></i> บันทึกข้อมูล</button>
+            <div class="px-8 py-7 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar bg-white/50">
+                
+                <div class="grid grid-cols-1 gap-5">
+                    <!-- Full Name -->
+                    <div>
+                        <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">ชื่อ-นามสกุล <span class="text-red-500">*</span></label>
+                        <input type="text" id="edit_full_name" name="full_name" required 
+                               class="premium-input" placeholder="ระบุชื่อจริง-นามสกุล">
+                    </div>
+
+                    <!-- Citizen ID -->
+                    <div>
+                        <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">เลขบัตรประชาชน (13 หลัก) <span class="text-red-500">*</span></label>
+                        <input type="text" id="edit_citizen_id" name="citizen_id" required maxlength="13" 
+                               class="premium-input tracking-[0.1em]" placeholder="X-XXXX-XXXXX-XX-X">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <!-- Student/Staff ID -->
+                        <div>
+                            <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">รหัสนักศึกษา / บุคลากร</label>
+                            <input type="text" id="edit_student_id" name="student_personnel_id" maxlength="15" 
+                                   class="premium-input" placeholder="7 หรือ 10 หลัก">
+                        </div>
+                        <!-- Phone -->
+                        <div>
+                            <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">เบอร์โทรศัพท์</label>
+                            <input type="text" id="edit_phone" name="phone_number" 
+                                   class="premium-input" placeholder="0XXXXXXXXX">
+                        </div>
+                    </div>
+
+                    <!-- User Type -->
+                    <div>
+                        <label class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">ประเภทผู้ใช้งาน <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <select name="status" id="edit_status" required class="premium-input appearance-none">
+                                <option value="">-- เลือกประเภท --</option>
+                                <option value="student">นักศึกษา (Student)</option>
+                                <option value="staff">บุคลากร/อาจารย์ (Personnel)</option>
+                                <option value="other">บุคคลทั่วไป (External)</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="px-8 py-6 border-t border-gray-100 flex gap-4 bg-gray-50/80 backdrop-blur-md">
+                <button type="button" onclick="closeModal('edit')" 
+                        class="px-8 py-3.5 rounded-2xl font-black text-gray-500 bg-white border border-gray-200 hover:bg-gray-100 hover:text-gray-700 transition-all duration-200 active:scale-95 text-sm uppercase tracking-widest shadow-sm">
+                    ยกเลิก
+                </button>
+                <button type="submit" 
+                        class="flex-1 py-3.5 rounded-2xl font-black text-white text-sm uppercase tracking-widest active:scale-95 transition-all duration-300 shadow-xl"
+                        style="background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 8px 25px rgba(245, 158, 11, 0.35);">
+                    <i class="fa-solid fa-save mr-2"></i> บันทึกข้อมูล
+                </button>
             </div>
         </form>
     </div>
 </div>
 
 <!-- View Modal -->
-<div id="viewModal" class="fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="glass-modal rounded-[24px] w-full max-w-lg overflow-hidden animate-slide-up border border-white/50 shadow-2xl">
-        <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-white/50">
-            <h3 class="text-xl font-black text-blue-600 flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-[14px] flex items-center justify-center text-lg shadow-inner"><i class="fa-solid fa-user-circle"></i></div>
-                ข้อมูลผู้ใช้งาน
-            </h3>
-            <button onclick="document.getElementById('viewModal').classList.add('hidden')" class="w-8 h-8 flex items-center justify-center bg-gray-100 text-gray-500 rounded-full hover:bg-gray-200 hover:text-gray-800 transition-colors shadow-sm focus:outline-none">
-                <i class="fa-solid fa-times font-bold"></i>
+<div id="viewModal" class="fixed inset-0 z-50 bg-gray-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4" style="z-index:200;">
+    <div id="viewModalBox" class="bg-white rounded-[32px] shadow-2xl w-full max-w-lg overflow-hidden transform transition-all scale-95 opacity-0 duration-300">
+        <div class="px-8 py-6 premium-modal-header flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center shadow-inner">
+                    <i class="fa-solid fa-id-card-clip text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-[900] text-gray-900 tracking-tight">ข้อมูลผู้ใช้งาน</h3>
+                    <p class="text-[11px] text-gray-400 font-bold uppercase tracking-wider">ตรวจสอบประวัติและการลงทะเบียน</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeModal('view')" class="w-10 h-10 flex items-center justify-center rounded-2xl hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-all duration-200">
+                <i class="fa-solid fa-xmark text-lg"></i>
             </button>
         </div>
-        <div class="p-6 space-y-5 flex-1 bg-gray-50/30">
-            <div>
-                <label class="block text-xs uppercase tracking-wider font-bold text-gray-500 mb-1.5">ชื่อ-นามสกุล</label>
-                <p id="view_full_name" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-[14px] font-prompt text-gray-800 font-bold shadow-sm"></p>
-            </div>
-            <div>
-                <label class="block text-xs uppercase tracking-wider font-bold text-gray-500 mb-1.5">เลขบัตรประชาชน (13 หลัก)</label>
-                <p id="view_citizen_id" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-[14px] font-prompt text-gray-800 font-bold shadow-sm tracking-wider"></p>
-            </div>
-            <div>
-                <label class="block text-xs uppercase tracking-wider font-bold text-gray-500 mb-1.5">รหัสนักศึกษา / บุคลากร (7 หลัก)</label>
-                <p id="view_student_id" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-[14px] font-prompt text-gray-800 font-bold shadow-sm tracking-wider"></p>
-            </div>
-            <div>
-                <label class="block text-xs uppercase tracking-wider font-bold text-gray-500 mb-1.5">เบอร์โทรศัพท์</label>
-                <p id="view_phone" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-[14px] font-prompt text-gray-800 font-bold shadow-sm tracking-wider"></p>
-            </div>
-            <div>
-                <label class="block text-xs uppercase tracking-wider font-bold text-gray-500 mb-1.5">ประเภทผู้ใช้งาน</label>
-                <p id="view_status" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-[14px] font-prompt text-gray-800 font-bold shadow-sm"></p>
-            </div>
-            <div>
-                <label class="block text-xs uppercase tracking-wider font-bold text-gray-500 mb-1.5">วันที่ลงทะเบียน</label>
-                <p id="view_created_at" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-[14px] font-prompt text-gray-800 font-bold shadow-sm"></p>
+        
+        <div class="px-8 py-7 space-y-5 bg-white/50">
+            <div class="grid grid-cols-1 gap-4">
+                <div class="flex flex-col gap-1 p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">ชื่อ-นามสกุล</span>
+                    <span id="view_full_name" class="font-black text-gray-900 text-lg tracking-tight"></span>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1 p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">เลขบัตรประชาชน</span>
+                        <span id="view_citizen_id" class="font-bold text-gray-700 tracking-wider text-sm"></span>
+                    </div>
+                    <div class="flex flex-col gap-1 p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">รหัสประจำตัว</span>
+                        <span id="view_student_id" class="font-bold text-gray-700 text-sm"></span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1 p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">เบอร์โทรศัพท์</span>
+                        <span id="view_phone" class="font-bold text-gray-700 text-sm"></span>
+                    </div>
+                    <div class="flex flex-col gap-1 p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">ประเภท</span>
+                        <span id="view_status" class="font-bold text-blue-600 text-sm"></span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-1 p-4 bg-blue-50/30 rounded-2xl border border-blue-100/50">
+                    <span class="text-[10px] font-black text-blue-400 uppercase tracking-widest">วันที่ลงทะเบียนเข้าระบบ</span>
+                    <span id="view_created_at" class="font-bold text-gray-600 text-sm"></span>
+                </div>
             </div>
         </div>
-        <div class="p-5 border-t border-gray-100 bg-white flex justify-end">
-            <button type="button" onclick="document.getElementById('viewModal').classList.add('hidden')" class="bg-gray-50 text-gray-700 font-bold border-2 border-gray-200 px-6 py-3.5 rounded-[14px] hover:bg-gray-100 transition-colors shadow-sm">ปิด</button>
+
+        <div class="px-8 py-6 border-t border-gray-100 bg-gray-50/80 flex justify-end">
+            <button type="button" onclick="closeModal('view')" 
+                    class="px-10 py-3.5 rounded-2xl font-black text-gray-600 bg-white border border-gray-200 hover:bg-gray-100 transition-all duration-200 active:scale-95 text-sm uppercase tracking-widest shadow-sm">
+                รับทราบ
+            </button>
         </div>
     </div>
 </div>
 
 <script>
-// ฟังก์ชันโยนข้อมูลลงในช่องตอนเปิด Modal
+// Premium Modal Controls
+function closeModal(type) {
+    const modal    = document.getElementById(type + 'Modal');
+    const modalBox = document.getElementById(type + 'ModalBox');
+    
+    if (modalBox) {
+        modalBox.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    } else {
+        modal.classList.add('hidden');
+    }
+}
+
 function openEditModal(user) {
     document.getElementById('edit_user_id').value = user.id;
     document.getElementById('edit_full_name').value = user.full_name;
@@ -390,7 +475,13 @@ function openEditModal(user) {
     document.getElementById('edit_phone').value = user.phone_number;
     document.getElementById('edit_status').value = user.status;
     
-    document.getElementById('editModal').classList.remove('hidden');
+    const modal    = document.getElementById('editModal');
+    const modalBox = document.getElementById('editModalBox');
+    
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+        modalBox.classList.remove('scale-95', 'opacity-0');
+    }, 10);
 }
 
 function openViewModal(user) {
@@ -402,7 +493,14 @@ function openViewModal(user) {
     document.getElementById('view_created_at').innerText = new Date(user.created_at).toLocaleString('th-TH', {
         year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
     });
-    document.getElementById('viewModal').classList.remove('hidden');
+    
+    const modal    = document.getElementById('viewModal');
+    const modalBox = document.getElementById('viewModalBox');
+    
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+        modalBox.classList.remove('scale-95', 'opacity-0');
+    }, 10);
 }
 
 function filterUsers(val) {
@@ -414,17 +512,9 @@ function filterUsers(val) {
     });
 }
 
-// Close modal on click outside (for both modals)
-document.getElementById('editModal').addEventListener('click', (e) => {
-    if (e.target === document.getElementById('editModal')) {
-        document.getElementById('editModal').classList.add('hidden');
-    }
-});
-document.getElementById('viewModal').addEventListener('click', (e) => {
-    if (e.target === document.getElementById('viewModal')) {
-        document.getElementById('viewModal').classList.add('hidden');
-    }
-});
+// Close on backdrop click
+document.getElementById('editModal').addEventListener('click', e => { if (e.target.id === 'editModal') closeModal('edit'); });
+document.getElementById('viewModal').addEventListener('click', e => { if (e.target.id === 'viewModal') closeModal('view'); });
 </script>
 
 <?php require_once __DIR__ . '/../admin/includes/footer.php'; ?>
