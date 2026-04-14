@@ -191,7 +191,7 @@ try {
     <link rel="stylesheet" href="../assets/css/tailwind.min.css">
     <link rel="stylesheet" href="../assets/css/portal.css">
 </head>
-<body class="font-sans text-gray-800" style="min-height:100vh">
+<body class="font-sans text-gray-800" style="min-height:100vh;display:flex;flex-direction:column">
 
     <!-- Ambient background dots -->
     <div class="amb-dot" style="width:320px;height:320px;background:rgba(46,158,99,.1);top:5%;left:10%;--dur:16s;--delay:0s;--dx:40px;--dy:-30px"></div>
@@ -249,8 +249,48 @@ try {
         </div>
     </header>
 
-    <!-- ══════════════════ PAGE BODY ══════════════════ -->
-    <div class="max-w-[1280px] mx-auto px-5 md:px-8 py-8 space-y-8">
+    <!-- ══════════════════ APP SHELL ══════════════════ -->
+    <div id="app-shell" style="display:flex;flex:1;min-height:0">
+
+        <!-- ── Collapsible Sidebar ── -->
+        <nav id="portal-sidebar">
+            <!-- Brand / Toggle -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;border-bottom:1px solid #f0faf4;min-height:52px">
+                <span id="psb-brand-text" style="font-size:13px;font-weight:900;color:#0f172a;white-space:nowrap;transition:opacity .2s,width .28s">Portal</span>
+                <button onclick="toggleSidebar()" id="sidebar-toggle" title="Toggle sidebar"
+                        style="width:28px;height:28px;border-radius:8px;border:none;cursor:pointer;background:#f0faf4;color:#2e9e63;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .18s">
+                    <i id="sidebar-toggle-icon" class="fa-solid fa-chevron-left" style="font-size:11px;transition:transform .3s"></i>
+                </button>
+            </div>
+
+            <!-- Nav items -->
+            <div style="padding:10px;flex:1;overflow:hidden">
+                <button class="psb-item psb-active" data-section="dashboard" onclick="switchSection('dashboard',this)">
+                    <div class="psb-icon"><i class="fa-solid fa-chart-pie"></i></div>
+                    <span class="psb-label">Dashboard</span>
+                </button>
+                <button class="psb-item" data-section="identity" onclick="switchSection('identity',this)">
+                    <div class="psb-icon"><i class="fa-solid fa-id-card-clip"></i></div>
+                    <span class="psb-label">Identity & Governance</span>
+                </button>
+                <button class="psb-item" data-section="settings" onclick="switchSection('settings',this)">
+                    <div class="psb-icon"><i class="fa-solid fa-gear"></i></div>
+                    <span class="psb-label">Settings</span>
+                </button>
+            </div>
+
+            <!-- Bottom version note -->
+            <div id="psb-version" style="padding:10px 14px;font-size:9px;color:#cbd5e1;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-top:1px solid #f0faf4;white-space:nowrap;overflow:hidden;transition:opacity .2s">
+                v3.0 · RSU
+            </div>
+        </nav>
+
+        <!-- ── Main Content ── -->
+        <main id="portal-main" style="flex:1;overflow-y:auto;min-width:0">
+
+        <!-- ════════════ SECTION: DASHBOARD ════════════ -->
+        <div id="section-dashboard" class="portal-section">
+        <div class="max-w-[1280px] mx-auto px-5 md:px-8 py-8 space-y-8">
 
         <!-- KPI STRIP -->
         <?php $borrowUrgent = $kpis['borrows'] > 0; ?>
@@ -487,7 +527,147 @@ try {
             </div>
         </footer>
 
-    </div>
+        </div><!-- /section-dashboard inner -->
+        </div><!-- /section-dashboard -->
+
+        <!-- ════════════ SECTION: IDENTITY & GOVERNANCE ════════════ -->
+        <div id="section-identity" class="portal-section" style="display:none">
+        <div class="max-w-[1280px] mx-auto px-5 md:px-8 py-8 space-y-8">
+
+            <div class="au d1">
+                <div class="sec-title mb-1">Identity &amp; Governance</div>
+                <p style="font-size:13px;color:#64748b;margin-bottom:24px">ศูนย์กลางจัดการผู้ใช้งาน สิทธิ์การเข้าถึง และความปลอดภัยของระบบ</p>
+
+                <!-- Quick-access cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+                    <a href="users.php" class="proj-card" style="text-decoration:none;display:flex;flex-direction:column;gap:10px">
+                        <div class="proj-card-header">
+                            <div class="proj-card-icon bg-amber-50 text-amber-500 border-amber-100">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <div class="proj-card-badges"><span class="proj-badge">Directory</span></div>
+                        </div>
+                        <div class="proj-card-body">
+                            <h3 class="text-[15px] font-black text-gray-900 mb-1">Users Center</h3>
+                            <p class="text-[12px] text-gray-500">ค้นหา แก้ไข และจัดการข้อมูลผู้ใช้งานทั้งหมด</p>
+                        </div>
+                        <div class="proj-card-actions">
+                            <span class="proj-action primary"><i class="fa-solid fa-arrow-up-right-from-square mr-1.5 text-[10px]"></i>เปิด Users Center</span>
+                        </div>
+                    </a>
+                    <?php if ($adminRole === 'superadmin'): ?>
+                    <a href="manage_admins.php" class="proj-card" style="text-decoration:none;display:flex;flex-direction:column;gap:10px">
+                        <div class="proj-card-header">
+                            <div class="proj-card-icon bg-red-50 text-red-500 border-red-100">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                            <div class="proj-card-badges"><span class="proj-badge">Superadmin</span></div>
+                        </div>
+                        <div class="proj-card-body">
+                            <h3 class="text-[15px] font-black text-gray-900 mb-1">Manage Admins</h3>
+                            <p class="text-[12px] text-gray-500">เพิ่ม แก้ไข หรือลบบัญชีแอดมินและกำหนดสิทธิ์</p>
+                        </div>
+                        <div class="proj-card-actions">
+                            <span class="proj-action primary"><i class="fa-solid fa-arrow-up-right-from-square mr-1.5 text-[10px]"></i>จัดการแอดมิน</span>
+                        </div>
+                    </a>
+                    <?php endif; ?>
+                    <a href="../admin/activity_logs.php" class="proj-card" style="text-decoration:none;display:flex;flex-direction:column;gap:10px">
+                        <div class="proj-card-header">
+                            <div class="proj-card-icon bg-slate-100 text-slate-600 border-slate-200">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                            </div>
+                            <div class="proj-card-badges"><span class="proj-badge">Audit</span></div>
+                        </div>
+                        <div class="proj-card-body">
+                            <h3 class="text-[15px] font-black text-gray-900 mb-1">Activity Logs</h3>
+                            <p class="text-[12px] text-gray-500">ดูประวัติการใช้งาน การเปลี่ยนแปลง และเหตุการณ์สำคัญ</p>
+                        </div>
+                        <div class="proj-card-actions">
+                            <span class="proj-action secondary">ดู Audit Trail</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Stats summary -->
+                <div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:16px;padding:20px 24px;display:flex;gap:32px;flex-wrap:wrap">
+                    <div>
+                        <div style="font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">ผู้ใช้งานทั้งหมด</div>
+                        <div style="font-size:28px;font-weight:900;color:#0f172a" id="id-users-count"><?= number_format($kpis['users']) ?></div>
+                    </div>
+                    <div style="width:1px;background:#e2e8f0;align-self:stretch"></div>
+                    <div>
+                        <div style="font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">แคมเปญ Active</div>
+                        <div style="font-size:28px;font-weight:900;color:#0f172a"><?= number_format($kpis['camps']) ?></div>
+                    </div>
+                    <div style="width:1px;background:#e2e8f0;align-self:stretch"></div>
+                    <div>
+                        <div style="font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">โควต้าที่จองแล้ว</div>
+                        <div style="font-size:28px;font-weight:900;color:#0f172a"><?= number_format($kpis['used_quota']) ?> <span style="font-size:14px;font-weight:600;color:#94a3b8">/ <?= number_format($kpis['total_quota']) ?></span></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        </div><!-- /section-identity -->
+
+        <!-- ════════════ SECTION: SETTINGS ════════════ -->
+        <div id="section-settings" class="portal-section" style="display:none">
+        <div class="max-w-[1280px] mx-auto px-5 md:px-8 py-8 space-y-8">
+
+            <div class="au d1">
+                <div class="sec-title mb-1">Settings</div>
+                <p style="font-size:13px;color:#64748b;margin-bottom:24px">การตั้งค่าระบบและข้อมูลสภาพแวดล้อม</p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- System Info -->
+                    <div style="background:#fff;border:1.5px solid #e2e8f0;border-radius:20px;padding:24px">
+                        <div style="font-size:11px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.12em;margin-bottom:16px">System Information</div>
+                        <div style="display:flex;flex-direction:column;gap:12px">
+                            <?php $sysInfo = [
+                                ['PHP Version',    phpversion()],
+                                ['Server',         $_SERVER['SERVER_SOFTWARE'] ?? 'N/A'],
+                                ['Memory Limit',   ini_get('memory_limit')],
+                                ['Max Upload',     ini_get('upload_max_filesize')],
+                                ['Date / Time',    date('d M Y · H:i')],
+                            ]; ?>
+                            <?php foreach ($sysInfo as [$label, $val]): ?>
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9">
+                                <span style="font-size:12px;font-weight:700;color:#64748b"><?= htmlspecialchars($label) ?></span>
+                                <span style="font-size:12px;font-weight:800;color:#0f172a;font-family:monospace"><?= htmlspecialchars($val) ?></span>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div style="background:#fff;border:1.5px solid #e2e8f0;border-radius:20px;padding:24px">
+                        <div style="font-size:11px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.12em;margin-bottom:16px">Quick Actions</div>
+                        <div style="display:flex;flex-direction:column;gap:10px">
+                            <?php if ($adminRole === 'superadmin'): ?>
+                            <button onclick="triggerGitPull()" id="btnGitPull"
+                                    style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;border:1.5px solid #d1fae5;background:#f0fdf4;color:#16a34a;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;text-align:left">
+                                <i class="fa-solid fa-code-branch"></i> <span>Git Pull — Update System</span>
+                            </button>
+                            <?php endif; ?>
+                            <a href="../admin/error_logs.php"
+                               style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#374151;font-size:13px;font-weight:700;text-decoration:none;transition:all .2s">
+                                <i class="fa-solid fa-bug" style="color:#94a3b8"></i> Error Logs
+                            </a>
+                            <a href="logout.php"
+                               style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;border:1.5px solid #fee2e2;background:#fff1f2;color:#dc2626;font-size:13px;font-weight:700;text-decoration:none;transition:all .2s">
+                                <i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        </div><!-- /section-settings -->
+
+        </main><!-- /portal-main -->
+    </div><!-- /app-shell -->
 
 <script>
 /* ── 1. KPI Number Counter ──────────────────────────────── */
@@ -769,6 +949,25 @@ function poll() {
         });
     }
 })();
+
+/* ── Sidebar Controls ────────────────────────────────────────────────────── */
+function toggleSidebar() {
+    var sidebar = document.getElementById('portal-sidebar');
+    var icon    = document.getElementById('sidebar-toggle-icon');
+    var version = document.getElementById('psb-version');
+    sidebar.classList.toggle('collapsed');
+    var collapsed = sidebar.classList.contains('collapsed');
+    icon.style.transform  = collapsed ? 'rotate(180deg)' : '';
+    if (version) version.style.opacity = collapsed ? '0' : '1';
+}
+
+function switchSection(sectionId, btn) {
+    document.querySelectorAll('.portal-section').forEach(function (s) { s.style.display = 'none'; });
+    var target = document.getElementById('section-' + sectionId);
+    if (target) target.style.display = '';
+    document.querySelectorAll('.psb-item').forEach(function (b) { b.classList.remove('psb-active'); });
+    btn.classList.add('psb-active');
+}
 
 // Pause when tab hidden, resume when visible
 document.addEventListener('visibilitychange', () => {

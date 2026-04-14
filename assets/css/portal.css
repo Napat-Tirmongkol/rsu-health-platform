@@ -217,11 +217,58 @@ body {
 .shortcut-link:hover { background: rgba(255,255,255,.25); }
 .shortcut-link i { width: 16px; text-align: center; opacity: .85; }
 
-/* ── LIVE badge ───────────────────────────────────────── */
+/* ── Live badge ───────────────────────────────────────── */
 .live-badge {
     font-size: 10px; font-weight: 800;
     color: #2e9e63; background: #e8f8f0;
     padding: 2px 8px; border-radius: 6px;
+}
+
+/* ── Portal Sidebar ──────────────────────────────────── */
+#portal-sidebar {
+    width: 220px; background: #fff;
+    border-right: 1.5px solid #c7e8d5;
+    display: flex; flex-direction: column; flex-shrink: 0;
+    position: sticky; top: 0;
+    height: 100vh; overflow-y: auto; overflow-x: hidden;
+    transition: width .28s cubic-bezier(.4,0,.2,1);
+    z-index: 30;
+    box-shadow: 2px 0 12px rgba(46,158,99,.05);
+}
+#portal-sidebar.collapsed { width: 64px; }
+#portal-sidebar.collapsed #psb-brand-text { opacity: 0; width: 0; overflow: hidden; }
+#portal-sidebar.collapsed .psb-label { opacity: 0; width: 0; overflow: hidden; }
+#portal-sidebar.collapsed .psb-item { padding: 10px; justify-content: center; gap: 0; }
+#portal-sidebar.collapsed .psb-section-label { opacity: 0; }
+
+.psb-item {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; padding: 9px 12px; border-radius: 12px;
+    border: none; background: transparent; cursor: pointer;
+    text-align: left; font-family: inherit;
+    font-size: 13px; font-weight: 600; color: #64748b;
+    transition: background .18s, color .18s, padding .28s, gap .28s;
+    margin-bottom: 2px; overflow: hidden;
+}
+.psb-item:hover  { background: #f0faf4; color: #2e9e63; }
+.psb-item.psb-active { background: #e8f8f0; color: #2e9e63; font-weight: 700; }
+.psb-icon {
+    width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 14px;
+    background: transparent; transition: background .18s;
+}
+.psb-item.psb-active .psb-icon { background: #c7e8d5; }
+.psb-item:hover .psb-icon { background: #d6f0e2; }
+.psb-label { transition: opacity .2s, width .28s; white-space: nowrap; overflow: hidden; }
+.psb-section-label {
+    font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .14em;
+    color: #94a3b8; padding: 0 12px; margin: 16px 0 4px;
+    transition: opacity .2s; white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+    #portal-sidebar { display: none; }
+    #app-shell { flex-direction: column; }
 }
 
 /* ── Scrollbar ────────────────────────────────────────── */
