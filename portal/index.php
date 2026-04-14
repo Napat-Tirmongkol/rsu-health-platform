@@ -49,7 +49,7 @@ try {
     if ($idSearch !== '') {
         $idSql .= " WHERE full_name LIKE :s OR student_personnel_id LIKE :s2 OR citizen_id LIKE :s3";
     }
-    $idSql .= " ORDER BY created_at DESC";
+    $idSql .= " ORDER BY created_at DESC LIMIT 25";
     $idStmt = $pdo->prepare($idSql);
     if ($idSearch !== '') {
         $like = "%{$idSearch}%";
