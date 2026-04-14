@@ -79,6 +79,8 @@ try {
     error_log("portal users error: " . $e->getMessage()); $users = [];
 }
 
+// portal/users.php ไม่แสดง admin sidebar ของ e-campaign
+$_GET['layout'] = 'none';
 require_once __DIR__ . '/../admin/includes/header.php';
 ?>
 
