@@ -153,6 +153,16 @@ $projects = [
     ]
 ];
 
+// Category assignments for filter tabs
+$categoryMap = [
+    'identity_governance' => 'core',
+    'e_campaign'          => 'core',
+    'e_borrow'            => 'core',
+    'system_logs'         => 'tools',
+    'admin_tool'          => 'tools',
+    'future_app'          => 'dev',
+];
+
 /**
  * (3) RECENT ACTIVITY FETCH
  * ดึงความเคลื่อนไหวล่าสุดจาก sys_activity_logs มาแสดงที่ Dashboard
@@ -319,32 +329,76 @@ try {
 
             <!-- PROJECT CARDS (8/12) -->
             <section class="lg:col-span-8 au d2">
-                <div class="sec-title mb-5">Project Command Grid</div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+                <!-- Control Bar -->
+                <div style="margin-bottom:20px">
+                    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px">
+                        <div class="sec-title">Project Command Grid</div>
+
+                        <div style="display:flex;align-items:center;gap:10px">
+                            <!-- Search -->
+                            <div style="position:relative">
+                                <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:11px;pointer-events:none"></i>
+                                <input type="text" id="search-project" placeholder="ค้นหาระบบ..."
+                                       style="padding:7px 12px 7px 30px;border:1.5px solid #d0ead9;border-radius:12px;font-size:12px;outline:none;width:180px;font-family:inherit;color:#374151;background:#fff;transition:border-color .2s,box-shadow .2s"
+                                       onfocus="this.style.borderColor='#2e9e63';this.style.boxShadow='0 0 0 3px rgba(46,158,99,.1)'"
+                                       onblur="this.style.borderColor='#d0ead9';this.style.boxShadow='none'">
+                            </div>
+                            <!-- View toggle -->
+                            <div style="display:flex;background:#f1f5f9;border-radius:10px;padding:3px;gap:2px">
+                                <button id="btn-grid" onclick="projSetView('grid')" title="มุมมองการ์ด"
+                                        style="padding:5px 10px;border-radius:8px;border:none;cursor:pointer;background:#fff;color:#2e9e63;box-shadow:0 1px 4px rgba(0,0,0,.08);transition:all .2s">
+                                    <i class="fa-solid fa-border-all" style="font-size:12px"></i>
+                                </button>
+                                <button id="btn-list" onclick="projSetView('list')" title="มุมมองรายการ"
+                                        style="padding:5px 10px;border-radius:8px;border:none;cursor:pointer;background:transparent;color:#94a3b8;transition:all .2s">
+                                    <i class="fa-solid fa-list" style="font-size:12px"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filter tabs -->
+                    <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px">
+                        <button class="proj-tab active" data-filter="all"   onclick="projSetFilter(this)">ทั้งหมด</button>
+                        <button class="proj-tab"        data-filter="core"  onclick="projSetFilter(this)">ระบบหลัก (Core)</button>
+                        <button class="proj-tab"        data-filter="tools" onclick="projSetFilter(this)">เครื่องมือ (Tools)</button>
+                        <button class="proj-tab"        data-filter="dev"   onclick="projSetFilter(this)">กำลังพัฒนา (Dev Stage)</button>
+                    </div>
+                </div>
+
+                <!-- Cards -->
+                <div id="project-container" class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <?php $cardIdx = 0; foreach($projects as $proj):
                         if (!in_array($adminRole, $proj['allowed_roles'])) continue;
                         $cardDelay = round(0.1 + $cardIdx * 0.12, 2);
                         $cardIdx++;
+                        $cat      = $categoryMap[$proj['id']] ?? 'core';
+                        $keywords = strtolower(implode(' ', $proj['badges']) . ' ' . $proj['title']);
                     ?>
-                    <div class="proj-card" style="animation-delay:<?= $cardDelay ?>s">
-                        <!-- Card top row -->
-                        <div class="flex items-start justify-between mb-4">
+                    <div class="proj-card"
+                         data-category="<?= $cat ?>"
+                         data-name="<?= htmlspecialchars(strtolower($proj['title'])) ?>"
+                         data-keywords="<?= htmlspecialchars($keywords) ?>"
+                         style="animation-delay:<?= $cardDelay ?>s">
+
+                        <div class="proj-card-header">
                             <div class="proj-card-icon <?= $proj['bg_color'] ?> <?= $proj['icon_color'] ?> <?= $proj['border_color'] ?>">
                                 <i class="fa-solid <?= $proj['icon'] ?>"></i>
                             </div>
-                            <div class="flex flex-wrap justify-end gap-1">
+                            <div class="proj-card-badges">
                                 <?php foreach($proj['badges'] as $b): ?>
                                     <span class="proj-badge"><?= $b ?></span>
                                 <?php endforeach; ?>
                             </div>
                         </div>
 
-                        <!-- Title & description -->
-                        <h3 class="text-[15px] font-black text-gray-900 mb-1.5 leading-tight"><?= $proj['title'] ?></h3>
-                        <p class="text-[12px] text-gray-500 leading-relaxed mb-5 flex-1"><?= $proj['description'] ?></p>
+                        <div class="proj-card-body">
+                            <h3 class="text-[15px] font-black text-gray-900 mb-1.5 leading-tight"><?= $proj['title'] ?></h3>
+                            <p class="text-[12px] text-gray-500 leading-relaxed"><?= $proj['description'] ?></p>
+                        </div>
 
-                        <!-- Actions -->
-                        <div class="flex gap-2 mt-auto">
+                        <div class="proj-card-actions">
                             <?php foreach($proj['actions'] as $act): ?>
                                 <a href="<?= $act['url'] ?>" class="proj-action <?= $act['primary'] ? 'primary' : 'secondary' ?>">
                                     <?php if($act['primary']): ?><i class="fa-solid fa-arrow-up-right-from-square mr-1.5 text-[10px]"></i><?php endif; ?>
@@ -354,7 +408,15 @@ try {
                         </div>
                     </div>
                     <?php endforeach; ?>
+
+                    <!-- Empty state -->
+                    <div id="proj-empty" style="display:none;grid-column:1/-1;padding:48px 24px;text-align:center">
+                        <i class="fa-solid fa-magnifying-glass" style="font-size:2rem;color:#cbd5e1;margin-bottom:12px;display:block"></i>
+                        <p style="font-size:13px;font-weight:700;color:#94a3b8">ไม่พบระบบที่ค้นหา</p>
+                        <p style="font-size:11px;color:#cbd5e1;margin-top:4px">ลองเปลี่ยนคำค้นหาหรือล้างตัวกรอง</p>
+                    </div>
                 </div>
+
             </section>
 
             <!-- SIDEBAR (4/12) -->
@@ -650,6 +712,63 @@ function poll() {
         })
         .catch(() => setBadge('offline'));
 }
+
+/* ── Project Grid Controls ────────────────────────────────────────────────── */
+(function () {
+    var currentFilter = 'all';
+    var searchQuery   = '';
+
+    function applyFilters() {
+        var cards   = document.querySelectorAll('#project-container .proj-card');
+        var visible = 0;
+        cards.forEach(function (card) {
+            var name     = (card.dataset.name     || '').toLowerCase();
+            var keywords = (card.dataset.keywords || '').toLowerCase();
+            var category =  card.dataset.category || '';
+            var matchSearch = !searchQuery || name.includes(searchQuery) || keywords.includes(searchQuery);
+            var matchFilter = currentFilter === 'all' || category === currentFilter;
+            if (matchSearch && matchFilter) {
+                card.style.display = ''; visible++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        var empty = document.getElementById('proj-empty');
+        if (empty) empty.style.display = visible === 0 ? 'block' : 'none';
+    }
+
+    window.projSetFilter = function (btn) {
+        document.querySelectorAll('.proj-tab').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
+        applyFilters();
+    };
+
+    window.projSetView = function (view) {
+        var container = document.getElementById('project-container');
+        var btnGrid   = document.getElementById('btn-grid');
+        var btnList   = document.getElementById('btn-list');
+        var activeStyle   = 'padding:5px 10px;border-radius:8px;border:none;cursor:pointer;background:#fff;color:#2e9e63;box-shadow:0 1px 4px rgba(0,0,0,.08);transition:all .2s';
+        var inactiveStyle = 'padding:5px 10px;border-radius:8px;border:none;cursor:pointer;background:transparent;color:#94a3b8;transition:all .2s';
+        if (view === 'list') {
+            container.classList.add('list-mode');
+            btnGrid.style.cssText = inactiveStyle;
+            btnList.style.cssText = activeStyle;
+        } else {
+            container.classList.remove('list-mode');
+            btnGrid.style.cssText = activeStyle;
+            btnList.style.cssText = inactiveStyle;
+        }
+    };
+
+    var searchInput = document.getElementById('search-project');
+    if (searchInput) {
+        searchInput.addEventListener('input', function () {
+            searchQuery = this.value.toLowerCase().trim();
+            applyFilters();
+        });
+    }
+})();
 
 // Pause when tab hidden, resume when visible
 document.addEventListener('visibilitychange', () => {
