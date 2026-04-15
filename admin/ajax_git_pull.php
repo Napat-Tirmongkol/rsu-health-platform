@@ -21,8 +21,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// 3. เรียก Plesk webhook ผ่าน localhost (bypass external network/VPN)
-//    Plesk รันบนเครื่องเดียวกัน → localhost:8443 ใช้งานได้เสมอ
+// 3. เตรียมข้อมูลก่อนเริ่ม Pull
+$oldHash = '';
+try {
+    $oldHash = trim(shell_exec('git rev-parse HEAD 2>&1') ?: '');
+} catch (Exception $e) {}
+
+// 4. เรียก Plesk webhook ผ่าน localhost
 $webhookUuid = 'dd095230-b1b5-111b-594e-1ce4dd1ec34f';
 $webhookUrl  = 'https://127.0.0.1:8443/modules/git/public/web-hook.php?uuid=' . $webhookUuid;
 
@@ -43,11 +48,42 @@ $curlErr  = curl_error($ch);
 curl_close($ch);
 
 $isSuccess = !$curlErr && ($httpCode >= 200 && $httpCode < 300);
+
+// 5. ดึงข้อมูลหลัง Pull (ลองวนลูปสั้นๆ เผื่อ Plesk ใช้เวลาอัปเดตไฟล์สักครู่)
+$newHash = $oldHash;
+$changes = '';
+if ($isSuccess) {
+    for ($i = 0; $i < 3; $i++) {
+        clearstatcache();
+        $current = trim(shell_exec('git rev-parse HEAD 2>&1') ?: '');
+        if ($current && $current !== $oldHash) {
+            $newHash = $current;
+            break;
+        }
+        usleep(500000); // รอ 0.5s
+    }
+
+    if ($oldHash && $newHash && $oldHash !== $newHash) {
+        // ดึงรายการ commit ที่อัปเดตมา
+        $changes = trim(shell_exec("git log --oneline --no-merges {$oldHash}..{$newHash} 2>&1") ?: '');
+    }
+}
+
 $logStatus  = $isSuccess ? 'success' : 'error';
 $logMessage = $curlErr
     ? 'เชื่อมต่อ Plesk ไม่ได้: ' . $curlErr
     : ($isSuccess ? 'Git Pull สำเร็จ' : 'Plesk webhook ตอบกลับ HTTP ' . $httpCode);
-$logDetail  = $curlErr ? 'curl error' : ('HTTP ' . $httpCode . ($result ? ' — ' . mb_substr($result, 0, 500) : ''));
+
+// ปรับปรุง logDetail ให้บอกรายละเอียดที่อัปเดต
+if ($isSuccess) {
+    if ($changes) {
+        $logDetail = "Updated: " . mb_substr($oldHash, 0, 7) . " → " . mb_substr($newHash, 0, 7) . "\n" . $changes;
+    } else {
+        $logDetail = ($oldHash === $newHash) ? "Already up to date (HEAD: " . mb_substr($oldHash, 0, 7) . ")" : "Plesk webhook success (HTTP $httpCode)";
+    }
+} else {
+    $logDetail = $curlErr ? 'curl error' : ('HTTP ' . $httpCode . ($result ? ' — ' . mb_substr($result, 0, 500) : ''));
+}
 
 // บันทึกลง DB
 try {

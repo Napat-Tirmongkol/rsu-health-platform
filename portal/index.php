@@ -1407,7 +1407,9 @@ try {
                                                 <i class="fa-solid fa-user"
                                                     style="font-size:9px;margin-right:3px"></i><?= htmlspecialchars($log['triggered_by']) ?>
                                                 <span style="margin:0 6px;opacity:.4">·</span>
-                                                <?= htmlspecialchars($log['detail'] ?? '') ?>
+                                                <div style="margin-top:4px; opacity:0.8; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; line-height: 1.4; white-space: pre-wrap; font-size: 10px;">
+                                                    <?= nl2br(htmlspecialchars($log['detail'] ?? '')) ?>
+                                                </div>
                                             </div>
                                         </div>
                                         <!-- Timestamp -->
