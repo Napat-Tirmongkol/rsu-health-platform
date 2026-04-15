@@ -197,14 +197,14 @@ require_once __DIR__ . '/includes/header.php';
     .glass-table-container {
         background: #fff;
         border-radius: 20px;
-        box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 8px 32px rgba(0,82,204,.05);
+        box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 8px 32px rgba(46,158,99,.05);
         border: 1px solid #e8eef7;
         overflow: hidden;
     }
 
     /* Gradient thead strip */
     .glass-table-container thead tr {
-        background: linear-gradient(135deg, #0052CC 0%, #1565d8 60%, #2474e8 100%);
+        background: linear-gradient(135deg, #2e9e63 0%, #10b981 60%, #34d399 100%);
     }
     .glass-table-container thead th {
         color: rgba(255,255,255,0.85) !important;
@@ -225,8 +225,8 @@ require_once __DIR__ . '/includes/header.php';
     /* ── Row hover ────────────────────────────────────────────── */
     .glass-tr { transition: background .18s ease, box-shadow .18s ease; }
     .glass-tr:hover {
-        background: #f5f8ff !important;
-        box-shadow: inset 3px 0 0 #0052CC;
+        background: #f0fdf4 !important;
+        box-shadow: inset 3px 0 0 #2e9e63;
     }
 
     /* ── Campaign-type icon ───────────────────────────────────── */
@@ -242,7 +242,7 @@ require_once __DIR__ . '/includes/header.php';
     /* ── Capacity bar ─────────────────────────────────────────── */
     .cap-bar-wrap {
         width: 64px; height: 6px;
-        background: #e8f0fe;
+        background: #ecfdf5;
         border-radius: 99px;
         overflow: hidden;
         margin: 0 auto;
@@ -335,7 +335,7 @@ require_once __DIR__ . '/includes/header.php';
         border-radius: 22px;
     }
     .modal-header {
-        background: linear-gradient(135deg, #0052CC 0%, #1a6fe8 100%);
+        background: linear-gradient(135deg, #2e9e63 0%, #34d399 100%);
         padding: 22px 24px;
         border-bottom: none;
     }
@@ -407,8 +407,8 @@ require_once __DIR__ . '/includes/header.php';
     }
     .form-input:focus {
         background: #fff;
-        border-color: #0052CC;
-        box-shadow: 0 0 0 3px rgba(0,82,204,.1);
+        border-color: #2e9e63;
+        box-shadow: 0 0 0 3px rgba(46,158,99,.1);
     }
     .form-input-no-icon {
         padding-left: 14px;
@@ -445,11 +445,11 @@ require_once __DIR__ . '/includes/header.php';
         box-shadow: 0 1px 4px rgba(0,0,0,.04);
         transition: border-color .15s, box-shadow .15s;
     }
-    .toggle-label:hover { border-color: #0052CC; box-shadow: 0 2px 8px rgba(0,82,204,.1); }
+    .toggle-label:hover { border-color: #2e9e63; box-shadow: 0 2px 8px rgba(46,158,99,.1); }
 </style>
 
 <?php
-$header_actions = '<button onclick="openAddModal()" class="bg-gradient-to-r from-[#0052CC] to-[#0043a8] hover:from-[#0043a8] hover:to-[#003688] text-white px-6 py-3 rounded-2xl font-bold transition-all shadow-lg hover:shadow-blue-900/20 hover:-translate-y-1 flex items-center gap-2">
+$header_actions = '<button onclick="openAddModal()" class="bg-gradient-to-r from-[#2e9e63] to-[#059669] hover:from-[#059669] hover:to-[#047857] text-white px-6 py-3 rounded-2xl font-bold transition-all shadow-lg hover:shadow-emerald-900/20 hover:-translate-y-1 flex items-center gap-2">
     <i class="fa-solid fa-plus-circle text-lg"></i> สร้างแคมเปญใหม่
 </button>';
 renderPageHeader("จัดการแคมเปญ", "สร้างแคมเปญใหม่, กำหนดโควต้า, และตั้งเวลารับลงทะเบียน", $header_actions);
@@ -468,7 +468,7 @@ renderPageHeader("จัดการแคมเปญ", "สร้างแค�
     <label for="toggleInactive" class="toggle-label">
         <div class="relative">
             <input type="checkbox" id="toggleInactive" class="sr-only peer" onchange="toggleInactiveCampaigns()">
-            <div class="w-10 h-5 bg-gray-200 rounded-full peer peer-checked:bg-[#0052CC] after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border after:border-gray-300 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5 peer-checked:after:border-white"></div>
+            <div class="w-10 h-5 bg-gray-200 rounded-full peer peer-checked:bg-[#2e9e63] after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border after:border-gray-300 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5 peer-checked:after:border-white"></div>
         </div>
         <i id="toggleIcon" class="fa-solid fa-eye-slash text-gray-400 text-xs"></i>
         <span id="toggleLabel">แสดงแคมเปญที่ปิด/หมดเขต</span>
@@ -490,7 +490,7 @@ renderPageHeader("จัดการแคมเปญ", "สร้างแค�
                 <th class="px-4 py-[18px] text-center whitespace-nowrap"><i class="fa-regular fa-calendar mr-1"></i> เปิดรับถึงวันที่</th>
                 <th class="px-4 py-[18px] text-center whitespace-nowrap"><i class="fa-solid fa-users-viewfinder mr-1"></i> ที่นั่งคงเหลือ</th>
                 <th class="px-4 py-[18px] text-center whitespace-nowrap"><i class="fa-solid fa-toggle-on mr-1"></i> สถานะ</th>
-                <th class="px-4 py-[18px] text-center whitespace-nowrap sticky right-0 z-20" style="background:linear-gradient(135deg,#0052CC,#2474e8);">
+                <th class="px-4 py-[18px] text-center whitespace-nowrap sticky right-0 z-20" style="background:linear-gradient(135deg,#2e9e63,#34d399);">
                     <i class="fa-solid fa-gear mr-1"></i> จัดการ</th>
             </tr>
         </thead>
@@ -504,7 +504,7 @@ renderPageHeader("จัดการแคมเปญ", "สร้างแค�
                             </div>
                             <p class="font-medium text-gray-500">ยังไม่มีแคมเปญในระบบ</p>
                             <button onclick="openAddModal()"
-                                class="mt-4 text-[#0052CC] font-bold text-sm hover:underline">คลิกที่นี่เพื่อสร้างแคมเปญแรก</button>
+                                class="mt-4 text-[#2e9e63] font-bold text-sm hover:underline">คลิกที่นี่เพื่อสร้างแคมเปญแรก</button>
                         </div>
                     </td>
                 </tr>
@@ -588,7 +588,7 @@ renderPageHeader("จัดการแคมเปญ", "สร้างแค�
                             <?php endif; ?>
                             </div>
                         </td>
-                        <td class="px-3 py-4 text-center sticky right-0 bg-white group-hover:bg-[#f5f8ff] z-10 transition-colors" style="box-shadow:-4px 0 12px rgba(0,0,0,.04); border-left:1px solid #f0f4fa">
+                        <td class="px-3 py-4 text-center sticky right-0 bg-white group-hover:bg-[#f0fdf4] z-10 transition-colors" style="box-shadow:-4px 0 12px rgba(0,0,0,.04); border-left:1px solid #f0f4fa">
                             <div class="flex items-center justify-center gap-2">
                                 <!-- Campaign Scanner button -->
                                 <a href="../staff/scan.php?campaign_id=<?= $c['id'] ?>"
@@ -777,7 +777,7 @@ renderPageHeader("จัดการแคมเปญ", "สร้างแค�
                 <button type="button" onclick="document.getElementById('campaignModal').style.display='none'"
                     class="flex-none px-5 py-2.5 bg-white border-2 border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all text-sm">ยกเลิก</button>
                 <button type="submit" id="modal_submit_btn"
-                    class="flex-1 bg-gradient-to-r from-[#0052CC] to-[#1a6fe8] text-white font-bold py-2.5 rounded-xl hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-0.5 transition-all text-sm shadow-sm flex items-center justify-center gap-2">
+                    class="flex-1 bg-gradient-to-r from-[#2e9e63] to-[#34d399] text-white font-bold py-2.5 rounded-xl hover:shadow-lg hover:shadow-emerald-500/30 hover:-translate-y-0.5 transition-all text-sm shadow-sm flex items-center justify-center gap-2">
                     <i class="fa-solid fa-save"></i> <span>สร้างแคมเปญ</span>
                 </button>
             </div>
@@ -797,7 +797,7 @@ renderPageHeader("จัดการแคมเปญ", "สร้างแค�
             r.classList.toggle('hidden', !show);
         });
         document.getElementById('toggleIcon').className = show
-            ? 'fa-solid fa-eye text-[#0052CC] text-xs'
+            ? 'fa-solid fa-eye text-[#2e9e63] text-xs'
             : 'fa-solid fa-eye-slash text-gray-400 text-xs';
         document.getElementById('toggleLabel').textContent = show
             ? 'ซ่อนแคมเปญที่ปิด/หมดเขต'
@@ -856,7 +856,7 @@ renderPageHeader("จัดการแคมเปญ", "สร้างแค�
 
         let btn = document.getElementById('modal_submit_btn');
         btn.innerHTML = '<i class="fa-solid fa-plus-circle"></i> <span>สร้างแคมเปญ</span>';
-        btn.style.background = 'linear-gradient(135deg,#0052CC,#1a6fe8)';
+        btn.style.background = 'linear-gradient(135deg,#2e9e63,#34d399)';
 
         document.querySelector('.modal-header').style.background = '';
         showModal();

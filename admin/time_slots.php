@@ -9,7 +9,7 @@ $activeCampaigns = $pdo->query("SELECT id, title FROM camp_list WHERE status = '
 $allCampaigns    = $pdo->query("SELECT id, title FROM camp_list ORDER BY title ASC")->fetchAll();
 
 $colors = [
-    ['bg' => 'bg-blue-50', 'border' => 'border-blue-100', 'text' => 'text-blue-700', 'badge' => 'text-blue-500'],
+    ['bg' => 'bg-emerald-50', 'border' => 'border-emerald-100', 'text' => 'text-emerald-700', 'badge' => 'text-emerald-500'],
     ['bg' => 'bg-green-50', 'border' => 'border-green-100', 'text' => 'text-green-700', 'badge' => 'text-green-500'],
     ['bg' => 'bg-purple-50', 'border' => 'border-purple-100', 'text' => 'text-purple-700', 'badge' => 'text-purple-500'],
     ['bg' => 'bg-orange-50', 'border' => 'border-orange-100', 'text' => 'text-orange-700', 'badge' => 'text-orange-500'],
@@ -206,26 +206,26 @@ $header_actions = '
 </button>
 <div class="relative" id="multiSelectContainer">
     <button type="button" onclick="toggleMultiSelect(event)" class="px-4 py-2 border border-gray-200 rounded-xl bg-white font-prompt text-sm shadow-sm hover:bg-gray-50 text-gray-700 flex items-center justify-between transition-colors gap-2" style="min-width:0;max-width:224px;">
-        <span id="multiSelectLabel" class="truncate font-semibold text-[#0052CC]">แสดงทุกแคมเปญ</span>
+        <span id="multiSelectLabel" class="truncate font-semibold text-[#2e9e63]">แสดงทุกแคมเปญ</span>
         <i class="fa-solid fa-chevron-down text-[10px] text-gray-400 flex-shrink-0"></i>
     </button>
     <div id="multiSelectDropdown" class="w-64 bg-white rounded-xl shadow-xl border border-gray-100 flex-col overflow-hidden" style="display:none;position:fixed;z-index:9999" onclick="event.stopPropagation()">
         <div class="p-2 border-b border-gray-100 bg-gray-50">
             <div class="relative">
                 <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                <input type="text" id="multiSelectSearch" onkeyup="searchCampaigns(this.value)" placeholder="ค้นหาแคมเปญ..." class="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-[#0052CC] font-prompt transition-shadow">
+                <input type="text" id="multiSelectSearch" onkeyup="searchCampaigns(this.value)" placeholder="ค้นหาแคมเปญ..." class="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-[#2e9e63] font-prompt transition-shadow">
             </div>
         </div>
         <div class="max-h-60 overflow-y-auto p-2 space-y-0.5" id="multiSelectList">
-            <label class="flex items-center gap-3 px-2 py-2 hover:bg-blue-50/50 rounded-lg cursor-pointer transition-colors group">
-                <input type="checkbox" id="selectAllCamps" checked onchange="toggleAllCampaigns(this)" class="w-4 h-4 text-[#0052CC] rounded border-gray-300 focus:ring-[#0052CC] transition-colors cursor-pointer">
-                <span class="text-sm font-bold text-gray-800 group-hover:text-[#0052CC] transition-colors">เลือกทั้งหมด</span>
+            <label class="flex items-center gap-3 px-2 py-2 hover:bg-emerald-50/50 rounded-lg cursor-pointer transition-colors group">
+                <input type="checkbox" id="selectAllCamps" checked onchange="toggleAllCampaigns(this)" class="w-4 h-4 text-[#2e9e63] rounded border-gray-300 focus:ring-[#2e9e63] transition-colors cursor-pointer">
+                <span class="text-sm font-bold text-gray-800 group-hover:text-[#2e9e63] transition-colors">เลือกทั้งหมด</span>
             </label>
             <div class="h-px bg-gray-100 my-1"></div>';
             foreach ($activeCampaigns as $ac) {
                 $header_actions .= '
                 <label class="camp-label-item flex items-center gap-3 px-2 py-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors group" data-title="' . htmlspecialchars(strtolower($ac['title'])) . '">
-                    <input type="checkbox" value="' . $ac['id'] . '" checked onchange="updateMultiSelectFilter()" class="camp-checkbox w-4 h-4 text-[#0052CC] rounded border-gray-300 focus:ring-[#0052CC] transition-colors cursor-pointer">
+                    <input type="checkbox" value="' . $ac['id'] . '" checked onchange="updateMultiSelectFilter()" class="camp-checkbox w-4 h-4 text-[#2e9e63] rounded border-gray-300 focus:ring-[#2e9e63] transition-colors cursor-pointer">
                     <span class="text-sm text-gray-600 line-clamp-1 break-all group-hover:text-gray-900 transition-colors">' . htmlspecialchars($ac['title']) . '</span>
                 </label>';
             }
@@ -234,14 +234,14 @@ $header_actions = '
     </div>
 </div>
 <div class="flex items-center bg-gray-100 p-1 rounded-xl">
-    <button onclick="switchView(\'calendar\')" id="btnViewCalendar" class="px-3 py-1.5 text-sm font-bold rounded-lg bg-white shadow-sm text-[#0052CC] transition-all" title="มุมมองปฏิทิน">
+    <button onclick="switchView(\'calendar\')" id="btnViewCalendar" class="px-3 py-1.5 text-sm font-bold rounded-lg bg-white shadow-sm text-[#2e9e63] transition-all" title="มุมมองปฏิทิน">
         <i class="fa-solid fa-calendar-alt"></i>
     </button>
     <button onclick="switchView(\'table\')" id="btnViewTable" class="px-3 py-1.5 text-sm font-bold rounded-lg text-gray-500 hover:text-gray-700 hover:bg-white transition-all" title="มุมมองตาราง">
         <i class="fa-solid fa-list-ul"></i>
     </button>
 </div>
-<button id="addSlotBtn" onclick="openAddSlotModal(\'' . date('Y-m-d') . '\')" class="bg-gradient-to-r from-blue-600 to-[#0052CC] text-white px-5 py-2.5 rounded-xl font-prompt text-sm font-bold shadow-md hover:shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex items-center gap-2">
+<button id="addSlotBtn" onclick="openAddSlotModal(\'' . date('Y-m-d') . '\')" class="bg-gradient-to-r from-emerald-600 to-[#2e9e63] text-white px-5 py-2.5 rounded-xl font-prompt text-sm font-bold shadow-md hover:shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex items-center gap-2">
     <i class="fa-solid fa-plus-circle"></i><span class="btn-add-text"> สร้างรอบเวลา</span>
 </button>
 <select id="monthSelect" onchange="location.href=\'?month=\'+this.value.split(\'-\')[1]+\'&year=\'+this.value.split(\'-\')[0]" class="px-4 py-2.5 border border-gray-200 rounded-xl bg-white font-prompt text-sm font-bold text-gray-700 outline-none shadow-sm cursor-pointer hover:bg-gray-50">';
@@ -282,7 +282,7 @@ renderPageHeader("Campaign Time Slots", "กำหนดช่วงเวลา
 
 /* ── Day-header row ──────────────────────────── */
 .cal-head {
-    background: linear-gradient(135deg, #0052CC 0%, #0070f3 100%);
+    background: linear-gradient(135deg, #2e9e63 0%, #10b981 100%);
     color: #fff;
     padding: 10px 0;
     text-align: center;
@@ -317,7 +317,7 @@ renderPageHeader("Campaign Time Slots", "กำหนดช่วงเวลา
     flex-shrink: 0;
 }
 .cal-date.today {
-    background: linear-gradient(135deg, #0052CC, #0070f3);
+    background: linear-gradient(135deg, #2e9e63, #10b981);
     color: #fff;
     box-shadow: 0 2px 8px rgba(0,82,204,.35);
 }
@@ -326,7 +326,7 @@ renderPageHeader("Campaign Time Slots", "กำหนดช่วงเวลา
 .cal-add-btn {
     opacity: 0; transition: opacity .15s;
     width: 24px; height: 24px;
-    background: #e8f0fe; color: #0052CC;
+    background: #e8f0fe; color: #2e9e63;
     border-radius: 7px; border: none; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     font-size: 11px;
@@ -367,7 +367,7 @@ renderPageHeader("Campaign Time Slots", "กำหนดช่วงเวลา
 /* ── Table ───────────────────────────────────── */
 .slots-table { width: 100%; border-collapse: separate; border-spacing: 0; }
 .slots-table thead th {
-    background: linear-gradient(135deg, #0052CC 0%, #0070f3 100%);
+    background: linear-gradient(135deg, #2e9e63 0%, #10b981 100%);
     color: rgba(255,255,255,.85);
     font-size: 11px; font-weight: 800;
     letter-spacing: .08em; text-transform: uppercase;
@@ -399,7 +399,7 @@ renderPageHeader("Campaign Time Slots", "กำหนดช่วงเวลา
 }
 
 /* ── Modal header strips ─────────────────────── */
-.modal-hdr-blue   { background: linear-gradient(135deg,#0052CC,#0070f3); }
+.modal-hdr-blue   { background: linear-gradient(135deg,#2e9e63,#10b981); }
 .modal-hdr-amber  { background: linear-gradient(135deg,#f59e0b,#d97706); }
 
 /* ── Mobile responsive ───────────────────────── */
@@ -424,7 +424,7 @@ renderPageHeader("Campaign Time Slots", "กำหนดช่วงเวลา
     <p class="text-gray-500 font-medium mb-6 text-center text-sm max-w-sm">
         เลือกเดือนและปี จากแถบเครื่องมือด้านบน<br>แล้วกดสร้างรอบเวลาแคมเปญ เพื่อเริ่มต้นเพิ่มคิวจอง
     </p>
-    <button onclick="openAddSlotModal('<?= date('Y-m-d') ?>')" class="bg-[#0052CC] text-white px-6 py-2.5 rounded-xl font-prompt text-sm font-bold shadow-md hover:shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex items-center gap-2">
+    <button onclick="openAddSlotModal('<?= date('Y-m-d') ?>')" class="bg-[#2e9e63] text-white px-6 py-2.5 rounded-xl font-prompt text-sm font-bold shadow-md hover:shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex items-center gap-2">
         <i class="fa-solid fa-plus-circle"></i> สร้างรอบเวลาแรก
     </button>
 </div>
@@ -453,7 +453,7 @@ renderPageHeader("Campaign Time Slots", "กำหนดช่วงเวลา
                 <div class="flex justify-between items-center mb-2">
                     <div class="flex items-center gap-1.5">
                         <input type="checkbox" class="day-select-cb w-3.5 h-3.5 text-red-500 rounded border-gray-300 focus:ring-red-500 cursor-pointer opacity-40 hover:opacity-100 checked:opacity-100 transition-opacity" onchange="toggleDaySlots(this)" title="เลือกทั้งหมดในวันนี้">
-                        <span class="cal-date <?= $isToday ? 'today' : '' ?> <?= isset($calendarData[$currentDate]) ? 'cursor-pointer hover:ring-2 hover:ring-[#0052CC]/40' : '' ?>"
+                        <span class="cal-date <?= $isToday ? 'today' : '' ?> <?= isset($calendarData[$currentDate]) ? 'cursor-pointer hover:ring-2 hover:ring-[#2e9e63]/40' : '' ?>"
                               <?= isset($calendarData[$currentDate]) ? "onclick=\"openDailyModal('{$currentDate}')\" title=\"ดูรอบวันนี้\"" : '' ?>><?= $day ?></span>
                     </div>
                     <button onclick="openAddSlotModal('<?= $currentDate ?>')" class="cal-add-btn" title="เพิ่มรอบ">
@@ -549,13 +549,13 @@ renderPageHeader("Campaign Time Slots", "กำหนดช่วงเวลา
                 ?>
                 <tr data-camp-id="<?= $s['campaign_id'] ?>">
                     <td class="text-center">
-                        <input type="checkbox" value="<?= $s['id'] ?>" class="slot-select-cb table-slot-cb w-4 h-4 text-[#0052CC] rounded border-gray-300 focus:ring-[#0052CC] cursor-pointer opacity-50 hover:opacity-100 checked:opacity-100 transition-opacity" onchange="toggleSlotSelection(this)">
+                        <input type="checkbox" value="<?= $s['id'] ?>" class="slot-select-cb table-slot-cb w-4 h-4 text-[#2e9e63] rounded border-gray-300 focus:ring-[#2e9e63] cursor-pointer opacity-50 hover:opacity-100 checked:opacity-100 transition-opacity" onchange="toggleSlotSelection(this)">
                     </td>
                     <td data-sort="<?= $s['slot_date'] ?>">
                         <span class="font-bold text-gray-800"><?= $dateObj->format('d/m/Y') ?></span>
                     </td>
                     <td>
-                        <span class="font-black text-[#0052CC] bg-blue-50 px-2.5 py-1 rounded-lg text-[12px]"><?= substr($s['start_time'],0,5) ?> – <?= substr($s['end_time'],0,5) ?></span>
+                        <span class="font-black text-[#2e9e63] bg-emerald-50 px-2.5 py-1 rounded-lg text-[12px]"><?= substr($s['start_time'],0,5) ?> – <?= substr($s['end_time'],0,5) ?></span>
                     </td>
                     <td class="text-gray-600 font-medium max-w-[220px] truncate"><?= htmlspecialchars($s['campaign_title']) ?></td>
                     <td class="text-center" data-sort="<?= $percent ?>">
@@ -598,7 +598,7 @@ renderPageHeader("Campaign Time Slots", "กำหนดช่วงเวลา
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">เลือกแคมเปญ <span class="text-red-500">*</span></label>
                 <div class="relative">
-                    <select name="campaign_id" required class="w-full px-4 py-2 border border-gray-200 rounded-xl font-prompt text-sm outline-none focus:ring-2 focus:ring-[#0052CC] bg-white appearance-none">
+                    <select name="campaign_id" required class="w-full px-4 py-2 border border-gray-200 rounded-xl font-prompt text-sm outline-none focus:ring-2 focus:ring-[#2e9e63] bg-white appearance-none">
                         <option value="" disabled selected>-- เลือกกิจกรรม --</option>
                         <?php foreach ($activeCampaigns as $ac): ?>
                             <option value="<?= $ac['id'] ?>"><?= htmlspecialchars($ac['title']) ?></option>
@@ -610,44 +610,44 @@ renderPageHeader("Campaign Time Slots", "กำหนดช่วงเวลา
 
             <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">
                 <label class="block text-[11px] uppercase tracking-wider font-bold text-gray-500 mb-1">เลือกวันที่ต้องการจัดกิจกรรม (เลือกได้หลายวัน) <span class="text-red-500">*</span></label>
-                <input type="text" name="selected_dates" id="modal_selected_dates" placeholder="คลิกเพื่อเลือกจากปฏิทิน..." required class="w-full px-3 py-2 border border-blue-200 bg-white rounded-lg font-prompt text-sm outline-none focus:ring-2 focus:ring-[#0052CC] cursor-pointer shadow-inner">
+                <input type="text" name="selected_dates" id="modal_selected_dates" placeholder="คลิกเพื่อเลือกจากปฏิทิน..." required class="w-full px-3 py-2 border border-emerald-200 bg-white rounded-lg font-prompt text-sm outline-none focus:ring-2 focus:ring-[#2e9e63] cursor-pointer shadow-inner">
             </div>
 
             <!-- โซนสร้างช่วงเวลาอัตโนมัติ -->
-            <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-100">
+            <div class="bg-emerald-50/50 p-3 rounded-xl border border-emerald-100">
                 <div class="flex justify-between items-center cursor-pointer" onclick="document.getElementById('autoGenBody').classList.toggle('hidden'); document.getElementById('autoGenIcon').classList.toggle('fa-chevron-down'); document.getElementById('autoGenIcon').classList.toggle('fa-chevron-up');">
-                    <label class="text-[13px] font-bold text-[#0052CC] cursor-pointer flex items-center gap-2 m-0">
+                    <label class="text-[13px] font-bold text-[#2e9e63] cursor-pointer flex items-center gap-2 m-0">
                         <i class="fa-solid fa-wand-magic-sparkles"></i> สร้างช่วงเวลาย่อยอัตโนมัติ
                     </label>
-                    <i id="autoGenIcon" class="fa-solid fa-chevron-down text-blue-400 text-xs"></i>
+                    <i id="autoGenIcon" class="fa-solid fa-chevron-down text-emerald-400 text-xs"></i>
                 </div>
                 
-                <div id="autoGenBody" class="hidden space-y-3 pt-3 border-t border-blue-100 mt-2">
+                <div id="autoGenBody" class="hidden space-y-3 pt-3 border-t border-emerald-100 mt-2">
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-[11px] font-bold text-gray-500 mb-1">เริ่มงาน</label>
-                            <input type="time" id="auto_start" value="09:00" class="w-full px-3 py-2 border border-blue-200 rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-[#0052CC]">
+                            <input type="time" id="auto_start" value="09:00" class="w-full px-3 py-2 border border-emerald-200 rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-[#2e9e63]">
                         </div>
                         <div>
                             <label class="block text-[11px] font-bold text-gray-500 mb-1">เลิกงาน</label>
-                            <input type="time" id="auto_end" value="16:00" class="w-full px-3 py-2 border border-blue-200 rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-[#0052CC]">
+                            <input type="time" id="auto_end" value="16:00" class="w-full px-3 py-2 border border-emerald-200 rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-[#2e9e63]">
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-[11px] font-bold text-gray-500 mb-1">เวลาย่อยต่อรอบ (นาที)</label>
-                            <input type="number" id="auto_duration" value="60" min="5" step="5" class="w-full px-3 py-2 border border-blue-200 rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-[#0052CC]">
+                            <input type="number" id="auto_duration" value="60" min="5" step="5" class="w-full px-3 py-2 border border-emerald-200 rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-[#2e9e63]">
                         </div>
                         <div>
                             <label class="block text-[11px] font-bold text-gray-500 mb-1">พักเบรก (ถ้ามี)</label>
-                            <div class="flex items-center gap-1 bg-white border border-blue-200 rounded-lg overflow-hidden pr-2 focus-within:ring-2 focus-within:ring-[#0052CC]">
+                            <div class="flex items-center gap-1 bg-white border border-emerald-200 rounded-lg overflow-hidden pr-2 focus-within:ring-2 focus-within:ring-[#2e9e63]">
                                 <input type="time" id="auto_break_start" value="12:00" class="w-full px-1 py-2 text-sm border-none outline-none">
                                 <span class="text-gray-400 text-xs">-</span>
                                 <input type="time" id="auto_break_end" value="13:00" class="w-full px-1 py-2 text-sm border-none outline-none">
                             </div>
                         </div>
                     </div>
-                    <button type="button" onclick="generateTimeSlots()" class="w-full py-2 bg-blue-100/80 text-[#0052CC] font-bold rounded-lg hover:bg-blue-200 transition-colors text-[13px] border border-blue-200">
+                    <button type="button" onclick="generateTimeSlots()" class="w-full py-2 bg-emerald-100/80 text-[#2e9e63] font-bold rounded-lg hover:bg-emerald-200 transition-colors text-[13px] border border-emerald-200">
                         <i class="fa-solid fa-bolt mr-1"></i> เลื่อนลงช่องด้านล่างอัตโนมัติ
                     </button>
                 </div>
@@ -657,31 +657,31 @@ renderPageHeader("Campaign Time Slots", "กำหนดช่วงเวลา
                 <div class="time-slot-row flex items-end gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100 relative group overflow-hidden">
                     <div class="flex-1">
                         <label class="block text-[11px] uppercase tracking-wider font-bold text-gray-500 mb-1">เวลาเริ่ม <span class="text-red-500">*</span></label>
-                        <input type="time" name="start_time[]" required class="w-full px-3 py-2 border border-gray-200 rounded-lg font-prompt text-sm outline-none focus:ring-2 focus:ring-[#0052CC] bg-white">
+                        <input type="time" name="start_time[]" required class="w-full px-3 py-2 border border-gray-200 rounded-lg font-prompt text-sm outline-none focus:ring-2 focus:ring-[#2e9e63] bg-white">
                     </div>
                     <div class="flex-1">
                         <label class="block text-[11px] uppercase tracking-wider font-bold text-gray-500 mb-1">เวลาสิ้นสุด <span class="text-red-500">*</span></label>
-                        <input type="time" name="end_time[]" required class="w-full px-3 py-2 border border-gray-200 rounded-lg font-prompt text-sm outline-none focus:ring-2 focus:ring-[#0052CC] bg-white">
+                        <input type="time" name="end_time[]" required class="w-full px-3 py-2 border border-gray-200 rounded-lg font-prompt text-sm outline-none focus:ring-2 focus:ring-[#2e9e63] bg-white">
                     </div>
                     <button type="button" onclick="removeTimeSlot(this)" class="remove-time-btn hidden w-10 h-[38px] min-w-[40px] bg-white border border-gray-200 text-red-500 hover:text-white hover:bg-red-500 hover:border-red-500 rounded-lg flex items-center justify-center transition-colors shadow-sm">
                         <i class="fa-solid fa-trash"></i>
                     </button>
                 </div>
             </div>
-            <button type="button" onclick="addTimeSlot()" class="w-full py-2 border border-dashed border-[#0052CC] text-[#0052CC] font-bold rounded-xl hover:bg-blue-50 transition-colors text-sm flex items-center justify-center gap-2">
+            <button type="button" onclick="addTimeSlot()" class="w-full py-2 border border-dashed border-[#2e9e63] text-[#2e9e63] font-bold rounded-xl hover:bg-emerald-50 transition-colors text-sm flex items-center justify-center gap-2">
                 <i class="fa-solid fa-plus-circle"></i> เพิ่มช่วงเวลาอีก
             </button>
 
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">จำนวนรับรวมต่อวัน (ระบบจะหารเฉลี่ยให้ทุกรอบเวลา) <span class="text-red-500">*</span></label>
-                <input type="number" name="max_capacity" value="50" min="1" required class="w-full px-4 py-2 border border-gray-200 rounded-xl font-prompt text-sm outline-none focus:ring-2 focus:ring-[#0052CC]">
+                <input type="number" name="max_capacity" value="50" min="1" required class="w-full px-4 py-2 border border-gray-200 rounded-xl font-prompt text-sm outline-none focus:ring-2 focus:ring-[#2e9e63]">
             </div>
 
             </div>
             
             <div class="p-5 border-t border-gray-100 bg-gray-50/50 shrink-0 flex gap-3">
                 <button type="button" onclick="document.getElementById('slotModal').classList.add('hidden')" class="w-1/3 bg-white border-2 border-gray-200 text-gray-700 font-bold py-3.5 rounded-2xl hover:bg-gray-50 hover:border-gray-300 transition-colors shadow-sm">ยกเลิก</button>
-                <button type="submit" class="w-2/3 bg-gradient-to-r from-blue-600 to-[#0052CC] text-white font-bold py-3.5 rounded-2xl hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-0.5 transition-all text-lg tracking-wide shadow-sm flex items-center justify-center gap-2"><i class="fa-solid fa-save"></i> บันทึกรอบเวลา</button>
+                <button type="submit" class="w-2/3 bg-gradient-to-r from-emerald-600 to-[#2e9e63] text-white font-bold py-3.5 rounded-2xl hover:shadow-lg hover:shadow-emerald-500/30 hover:-translate-y-0.5 transition-all text-lg tracking-wide shadow-sm flex items-center justify-center gap-2"><i class="fa-solid fa-save"></i> บันทึกรอบเวลา</button>
             </div>
         </form>
     </div>
@@ -765,7 +765,7 @@ renderPageHeader("Campaign Time Slots", "กำหนดช่วงเวลา
     font-family: inherit;
 }
 .dataTable-input:focus, .dataTable-selector:focus {
-    border-color: #0052CC;
+    border-color: #2e9e63;
     box-shadow: 0 0 0 2px rgba(0, 82, 204, 0.2);
 }
 .dataTable-info, .dataTable-bottom {
@@ -815,13 +815,13 @@ function switchView(view) {
         document.getElementById('calendarViewContainer').classList.remove('hidden');
         document.getElementById('tableViewContainer').classList.add('hidden');
         
-        document.getElementById('btnViewCalendar').className = "px-3 py-1.5 text-sm font-bold rounded-lg bg-white shadow-sm text-[#0052CC] transition-all";
+        document.getElementById('btnViewCalendar').className = "px-3 py-1.5 text-sm font-bold rounded-lg bg-white shadow-sm text-[#2e9e63] transition-all";
         document.getElementById('btnViewTable').className = "px-3 py-1.5 text-sm font-bold rounded-lg text-gray-500 hover:text-gray-700 hover:bg-white transition-all";
     } else {
         document.getElementById('calendarViewContainer').classList.add('hidden');
         document.getElementById('tableViewContainer').classList.remove('hidden');
         
-        document.getElementById('btnViewTable').className = "px-3 py-1.5 text-sm font-bold rounded-lg bg-white shadow-sm text-[#0052CC] transition-all";
+        document.getElementById('btnViewTable').className = "px-3 py-1.5 text-sm font-bold rounded-lg bg-white shadow-sm text-[#2e9e63] transition-all";
         document.getElementById('btnViewCalendar').className = "px-3 py-1.5 text-sm font-bold rounded-lg text-gray-500 hover:text-gray-700 hover:bg-white transition-all";
     }
 }
@@ -1001,7 +1001,7 @@ document.getElementById('slotForm').addEventListener('submit', function(e) {
                 title: 'สำเร็จ!',
                 text: data.message,
                 icon: 'success',
-                confirmButtonColor: '#0052CC',
+                confirmButtonColor: '#2e9e63',
                 customClass: { title: 'font-prompt', popup: 'font-prompt rounded-2xl' }
             }).then(() => {
                 location.reload();
@@ -1025,7 +1025,7 @@ document.getElementById('editSlotForm').addEventListener('submit', function(e) {
     .then(r => r.json())
     .then(data => {
         if (data.status === 'success') {
-            Swal.fire({ title: 'สำเร็จ!', text: data.message, icon: 'success', confirmButtonColor: '#0052CC', customClass: { title: 'font-prompt', popup: 'font-prompt rounded-2xl' }
+            Swal.fire({ title: 'สำเร็จ!', text: data.message, icon: 'success', confirmButtonColor: '#2e9e63', customClass: { title: 'font-prompt', popup: 'font-prompt rounded-2xl' }
             }).then(() => location.reload());
         } else {
             Swal.fire('เกิดข้อผิดพลาด', data.message, 'error');
@@ -1239,11 +1239,11 @@ function generateTimeSlots() {
         row.innerHTML = `
             <div class="flex-1">
                 <label class="block text-[11px] uppercase tracking-wider font-bold text-gray-500 mb-1">เวลาเริ่ม <span class="text-red-500">*</span></label>
-                <input type="time" name="start_time[]" value="${slot.st}" required class="w-full px-3 py-2 border border-gray-200 rounded-lg font-prompt text-sm outline-none focus:ring-2 focus:ring-[#0052CC] bg-white">
+                <input type="time" name="start_time[]" value="${slot.st}" required class="w-full px-3 py-2 border border-gray-200 rounded-lg font-prompt text-sm outline-none focus:ring-2 focus:ring-[#2e9e63] bg-white">
             </div>
             <div class="flex-1">
                 <label class="block text-[11px] uppercase tracking-wider font-bold text-gray-500 mb-1">เวลาสิ้นสุด <span class="text-red-500">*</span></label>
-                <input type="time" name="end_time[]" value="${slot.et}" required class="w-full px-3 py-2 border border-gray-200 rounded-lg font-prompt text-sm outline-none focus:ring-2 focus:ring-[#0052CC] bg-white">
+                <input type="time" name="end_time[]" value="${slot.et}" required class="w-full px-3 py-2 border border-gray-200 rounded-lg font-prompt text-sm outline-none focus:ring-2 focus:ring-[#2e9e63] bg-white">
             </div>
             <button type="button" onclick="removeTimeSlot(this)" class="remove-time-btn w-10 h-[38px] min-w-[40px] bg-white border border-gray-200 text-red-500 hover:text-white hover:bg-red-500 hover:border-red-500 rounded-lg flex items-center justify-center transition-colors shadow-sm">
                 <i class="fa-solid fa-trash"></i>
@@ -1370,7 +1370,7 @@ function deleteSelectedSlots() {
                         title: 'ดำเนินการเสร็จสิ้น',
                         text: data.message,
                         icon: 'success',
-                        confirmButtonColor: '#0052CC',
+                        confirmButtonColor: '#2e9e63',
                         customClass: { title: 'font-prompt', popup: 'font-prompt rounded-2xl' }
                     }).then(() => {
                         location.reload();
@@ -1413,7 +1413,7 @@ function deleteSelectedSlots() {
         <!-- Body -->
         <div class="overflow-y-auto flex-1 p-5" id="dailyModalBody">
             <div class="flex items-center justify-center py-12 text-gray-400">
-                <i class="fa-solid fa-spinner fa-spin text-2xl mr-3 text-[#0052CC]"></i>
+                <i class="fa-solid fa-spinner fa-spin text-2xl mr-3 text-[#2e9e63]"></i>
                 <span class="font-prompt">กำลังโหลด...</span>
             </div>
         </div>
@@ -1446,7 +1446,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDailyMo
 function loadDailySlots(date) {
     document.getElementById('dailyModalBody').innerHTML = `
         <div class="flex items-center justify-center py-12 text-gray-400">
-            <i class="fa-solid fa-spinner fa-spin text-2xl mr-3 text-[#0052CC]"></i>
+            <i class="fa-solid fa-spinner fa-spin text-2xl mr-3 text-[#2e9e63]"></i>
             <span class="font-prompt">กำลังโหลด...</span>
         </div>`;
 
@@ -1478,7 +1478,7 @@ function renderDailySlots(slots, date) {
                 <i class="fa-solid fa-calendar-xmark text-4xl text-gray-300 mb-3 block"></i>
                 <p class="text-gray-400 font-prompt">ไม่มีรอบเวลาในวันนี้</p>
                 <button onclick="openAddSlotModal('${date}'); closeDailyModal();"
-                    class="mt-4 px-5 py-2 bg-[#0052CC] text-white rounded-xl text-sm font-bold font-prompt hover:bg-blue-700 transition-colors">
+                    class="mt-4 px-5 py-2 bg-[#2e9e63] text-white rounded-xl text-sm font-bold font-prompt hover:bg-blue-700 transition-colors">
                     <i class="fa-solid fa-plus mr-1"></i> สร้างรอบเวลา
                 </button>
             </div>`;
@@ -1498,7 +1498,7 @@ function renderDailySlots(slots, date) {
                 <span class="font-semibold text-gray-800 text-sm">${escHtml(s.campaign_title)}</span>
             </td>
             <td class="px-4 py-3" style="white-space:nowrap">
-                <span class="font-black text-[#0052CC] bg-blue-50 px-2.5 py-1 rounded-lg text-xs" style="white-space:nowrap;display:inline-block">
+                <span class="font-black text-[#2e9e63] bg-emerald-50 px-2.5 py-1 rounded-lg text-xs" style="white-space:nowrap;display:inline-block">
                     ${s.start_time.slice(0,5)} – ${s.end_time.slice(0,5)}
                 </span>
             </td>
@@ -1531,14 +1531,14 @@ function renderDailySlots(slots, date) {
         <div class="flex justify-between items-center mb-4">
             <p class="text-sm text-gray-500 font-prompt">พบ <b class="text-gray-800">${slots.length}</b> รอบเวลา</p>
             <button onclick="openAddSlotModal('${date}'); closeDailyModal();"
-                class="px-4 py-1.5 bg-[#0052CC] text-white rounded-xl text-xs font-bold font-prompt hover:bg-blue-700 transition-colors flex items-center gap-1.5">
+                class="px-4 py-1.5 bg-[#2e9e63] text-white rounded-xl text-xs font-bold font-prompt hover:bg-blue-700 transition-colors flex items-center gap-1.5">
                 <i class="fa-solid fa-plus"></i> สร้างรอบเวลา
             </button>
         </div>
         <div class="overflow-x-auto rounded-xl border border-gray-100">
             <table class="w-full text-left">
                 <thead>
-                    <tr style="background:linear-gradient(135deg,#0052CC,#0070f3)">
+                    <tr style="background:linear-gradient(135deg,#2e9e63,#10b981)">
                         <th class="px-4 py-3 text-xs font-bold text-white/80 uppercase tracking-wider">แคมเปญ</th>
                         <th class="px-4 py-3 text-xs font-bold text-white/80 uppercase tracking-wider" style="white-space:nowrap;width:120px">เวลา</th>
                         <th class="px-4 py-3 text-xs font-bold text-white/80 uppercase tracking-wider" style="white-space:nowrap;width:160px">ยอดจอง</th>
@@ -1562,19 +1562,19 @@ function dailyEditRow(id, start, end, cap) {
         <td class="px-4 py-2" colspan="2">
             <div class="flex gap-2 items-center flex-wrap">
                 <input type="time" id="de_start_${id}" value="${start}"
-                    class="border border-gray-200 rounded-lg px-2 py-1.5 text-sm outline-none focus:ring-2 focus:ring-[#0052CC]">
+                    class="border border-gray-200 rounded-lg px-2 py-1.5 text-sm outline-none focus:ring-2 focus:ring-[#2e9e63]">
                 <span class="text-gray-400 text-sm">–</span>
                 <input type="time" id="de_end_${id}" value="${end}"
-                    class="border border-gray-200 rounded-lg px-2 py-1.5 text-sm outline-none focus:ring-2 focus:ring-[#0052CC]">
+                    class="border border-gray-200 rounded-lg px-2 py-1.5 text-sm outline-none focus:ring-2 focus:ring-[#2e9e63]">
                 <input type="number" id="de_cap_${id}" value="${cap}" min="1"
-                    class="border border-gray-200 rounded-lg px-2 py-1.5 text-sm outline-none focus:ring-2 focus:ring-[#0052CC] w-20"
+                    class="border border-gray-200 rounded-lg px-2 py-1.5 text-sm outline-none focus:ring-2 focus:ring-[#2e9e63] w-20"
                     placeholder="ที่นั่ง">
             </div>
         </td>
         <td class="px-4 py-2" colspan="2">
             <div class="flex gap-2 justify-end">
                 <button onclick="dailySaveEdit(${id})"
-                    class="px-3 py-1.5 bg-[#0052CC] text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition-colors font-prompt">
+                    class="px-3 py-1.5 bg-[#2e9e63] text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition-colors font-prompt">
                     <i class="fa-solid fa-save mr-1"></i>บันทึก
                 </button>
                 <button onclick="loadDailySlots('${_dailyDate}')"
@@ -1591,7 +1591,7 @@ function dailySaveEdit(id) {
     const cap   = document.getElementById('de_cap_'   + id)?.value;
 
     if (!start || !end || !cap) {
-        Swal.fire({ icon:'warning', title:'กรอกข้อมูลให้ครบ', confirmButtonColor:'#0052CC', customClass:{title:'font-prompt'} });
+        Swal.fire({ icon:'warning', title:'กรอกข้อมูลให้ครบ', confirmButtonColor:'#2e9e63', customClass:{title:'font-prompt'} });
         return;
     }
 

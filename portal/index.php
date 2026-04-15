@@ -452,129 +452,108 @@ try {
     </style>
 </head>
 
-<body class="font-sans text-gray-800" style="height:100vh;overflow:hidden;display:flex;flex-direction:column">
+<body class="font-sans text-gray-800 bg-[#f4f7f5]" style="height:100vh;overflow:hidden;display:flex;flex-direction:row">
 
-    <!-- ══════════════════ HEADER ══════════════════ -->
-    <header class="portal-header au">
-        <div class="max-w-[1280px] mx-auto px-3 sm:px-6 py-3 flex items-center justify-between gap-2 sm:gap-4">
-            <!-- Brand -->
-            <div class="flex items-center gap-2 sm:gap-3">
-                <div class="brand-icon"><i class="fa-solid fa-heart"></i></div>
+    <!-- ── Collapsible Sidebar ── -->
+    <nav id="portal-sidebar">
+        <!-- Brand / Toggle -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;border-bottom:1px solid #f0faf4;min-height:60px">
+            <div class="flex items-center gap-2" id="psb-brand-text">
+                <div class="brand-icon" style="width:30px;height:30px;font-size:12px;border-radius:10px;"><i class="fa-solid fa-heart"></i></div>
                 <div>
-                    <div class="font-black text-gray-900 text-[15px] sm:text-[17px] leading-none tracking-tight">Central
-                        HUB</div>
-                    <div class="hidden sm:block text-[10px] font-bold tracking-[.15em] uppercase opacity-70 mt-0.5"
-                        style="color:#2e9e63">RSU Medical Clinic Portal</div>
+                    <div class="font-black text-gray-900 text-[15px] leading-tight tracking-tight">Central HUB</div>
                 </div>
             </div>
-
-            <!-- Right: user + logout -->
-            <div class="flex items-center gap-2 sm:gap-3">
-
-                <?php if ($adminRole === 'superadmin'): ?>
-                    <!-- Git Pull Button (Superadmin only) -->
-                    <button id="btnGitPull" onclick="triggerGitPull()" title="Pull โค้ดล่าสุดจาก Git"
-                        style="display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:10px;border:1px solid #d1fae5;background:#f0fdf4;color:#16a34a;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;">
-                        <i class="fa-solid fa-code-branch"></i>
-                        <span class="hidden sm:inline">Git Pull</span>
-                    </button>
-                <?php endif; ?>
-
-                <!-- Live connection badge -->
-                <div id="ws-badge" title="Real-time connection status"
-                    style="display:flex;align-items:center;gap:5px;padding:5px 8px;border-radius:8px;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;border:1px solid #c7e8d5;background:#f0fdf4;color:#16a34a;transition:all .3s">
-                    <span id="ws-dot"
-                        style="width:7px;height:7px;border-radius:50%;background:#22c55e;display:inline-block;animation:livePulse 1.6s infinite"></span>
-                    <span id="ws-label" class="hidden sm:inline">Live</span>
-                </div>
-            </div>
+            <button onclick="toggleSidebar()" id="sidebar-toggle" title="Toggle sidebar"
+                style="width:28px;height:28px;border-radius:8px;border:none;cursor:pointer;background:#f0faf4;color:#2e9e63;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .18s">
+                <i id="sidebar-toggle-icon" class="fa-solid fa-chevron-left" style="font-size:11px;transition:transform .3s"></i>
+            </button>
         </div>
-    </header>
 
-    <!-- ══════════════════ APP SHELL ══════════════════ -->
-    <div id="app-shell" style="display:flex;flex:1;min-height:0;overflow:hidden">
+        <!-- Nav items -->
+        <div style="padding:10px;flex:1;overflow:hidden">
+            <button class="psb-item psb-active" data-section="dashboard" onclick="switchSection('dashboard',this)">
+                <div class="psb-icon"><i class="fa-solid fa-chart-pie"></i></div>
+                <span class="psb-label">Dashboard</span>
+            </button>
+            <button class="psb-item" data-section="identity" onclick="switchSection('identity',this)">
+                <div class="psb-icon"><i class="fa-solid fa-id-card-clip"></i></div>
+                <span class="psb-label">Identity & Governance</span>
+            </button>
+            <button class="psb-item" data-section="activity_logs" onclick="switchSection('activity_logs',this)">
+                <div class="psb-icon"><i class="fa-solid fa-file-lines"></i></div>
+                <span class="psb-label">Activity Logs</span>
+            </button>
+            <button class="psb-item" data-section="error_logs" onclick="switchSection('error_logs',this)">
+                <div class="psb-icon"><i class="fa-solid fa-bug"></i></div>
+                <span class="psb-label">Error Logs</span>
+            </button>
+            <button class="psb-item" data-section="settings" onclick="switchSection('settings',this)">
+                <div class="psb-icon"><i class="fa-solid fa-gear"></i></div>
+                <span class="psb-label">Settings</span>
+            </button>
+        </div>
+    </nav>
 
-        <!-- ── Collapsible Sidebar ── -->
-        <nav id="portal-sidebar">
-            <!-- Brand / Toggle -->
-            <div
-                style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;border-bottom:1px solid #f0faf4;min-height:52px">
-                <span id="psb-brand-text"
-                    style="font-size:13px;font-weight:900;color:#0f172a;white-space:nowrap;transition:opacity .2s,width .28s">Portal</span>
-                <button onclick="toggleSidebar()" id="sidebar-toggle" title="Toggle sidebar"
-                    style="width:28px;height:28px;border-radius:8px;border:none;cursor:pointer;background:#f0faf4;color:#2e9e63;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .18s">
-                    <i id="sidebar-toggle-icon" class="fa-solid fa-chevron-left"
-                        style="font-size:11px;transition:transform .3s"></i>
-                </button>
-            </div>
+    <!-- ══════════════════ APP SHELL (Header + Main) ══════════════════ -->
+    <div id="app-shell" style="display:flex;flex:1;flex-direction:column;min-width:0;overflow:hidden;background:#f4f7f5;">
 
-            <!-- Nav items -->
-            <div style="padding:10px;flex:1;overflow:hidden">
-                <button class="psb-item psb-active" data-section="dashboard" onclick="switchSection('dashboard',this)">
-                    <div class="psb-icon"><i class="fa-solid fa-chart-pie"></i></div>
-                    <span class="psb-label">Dashboard</span>
-                </button>
-                <button class="psb-item" data-section="identity" onclick="switchSection('identity',this)">
-                    <div class="psb-icon"><i class="fa-solid fa-id-card-clip"></i></div>
-                    <span class="psb-label">Identity & Governance</span>
-                </button>
-                <button class="psb-item" data-section="activity_logs" onclick="switchSection('activity_logs',this)">
-                    <div class="psb-icon"><i class="fa-solid fa-file-lines"></i></div>
-                    <span class="psb-label">Activity Logs</span>
-                </button>
-                <button class="psb-item" data-section="error_logs" onclick="switchSection('error_logs',this)">
-                    <div class="psb-icon"><i class="fa-solid fa-bug"></i></div>
-                    <span class="psb-label">Error Logs</span>
-                </button>
-                <button class="psb-item" data-section="settings" onclick="switchSection('settings',this)">
-                    <div class="psb-icon"><i class="fa-solid fa-gear"></i></div>
-                    <span class="psb-label">Settings</span>
-                </button>
-            </div>
-
-            <!-- Bottom: user identity + logout -->
-            <div id="psb-user-footer" style="border-top:1px solid #f0faf4;padding:10px">
-                <!-- Expanded state: avatar + name + logout -->
-                <div id="psb-user-expanded"
-                    style="display:flex;align-items:center;gap:10px;padding:8px 6px;border-radius:12px;background:#f8fafc;overflow:hidden;transition:opacity .2s">
-                    <div
-                        style="width:32px;height:32px;border-radius:9px;background:#e8f8f0;color:#2e9e63;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                        <i class="fa-solid fa-user-shield" style="font-size:13px"></i>
+        <!-- ══════════════════ HEADER ══════════════════ -->
+        <header class="portal-header au">
+            <div class="w-full px-5 sm:px-8 py-3 flex items-center justify-between gap-4" style="min-height:60px">
+                
+                <!-- Left: Global Search -->
+                <div class="flex-1 max-w-[400px]">
+                    <div class="relative group">
+                        <i class="fa-solid fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#2e9e63] transition-colors text-sm"></i>
+                        <input type="text" placeholder="ค้นหาเมนู หรือแคมเปญ... (Ctrl + K)" 
+                            class="w-full pl-10 pr-14 py-2 bg-gray-50/50 border border-gray-200 rounded-xl text-[13px] font-semibold text-gray-700 outline-none focus:bg-white focus:border-[#2e9e63] focus:ring-4 focus:ring-[#2e9e63]/10 transition-all font-prompt">
+                        <div class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-400 border border-gray-200 px-1.5 py-0.5 rounded-md bg-white">Ctrl+K</div>
                     </div>
-                    <div class="psb-label" style="flex:1;min-width:0">
-                        <div
-                            style="font-size:9px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;line-height:1;margin-bottom:2px">
-                            Admin</div>
-                        <div
-                            style="font-size:12px;font-weight:900;color:#0f172a;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-                            <?= htmlspecialchars($_SESSION['admin_username'] ?? 'Administrator') ?>
+                </div>
+
+                <!-- Right: user + logout -->
+                <div class="flex items-center gap-3 sm:gap-4">
+
+                    <?php if (isset($adminRole) && $adminRole === 'superadmin'): ?>
+                        <!-- Git Pull Button -->
+                        <button id="btnGitPull" onclick="triggerGitPull()" title="Pull โค้ดล่าสุดจาก Git"
+                            class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-100 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 font-bold text-[11px] transition-colors cursor-pointer">
+                            <i class="fa-solid fa-code-branch"></i>
+                            <span>Git Pull</span>
+                        </button>
+                    <?php endif; ?>
+
+                    <!-- Live connection badge -->
+                    <div id="ws-badge" title="Real-time connection status"
+                        style="display:flex;align-items:center;gap:5px;padding:4px 8px;border-radius:8px;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;border:1px solid #c7e8d5;background:#f0fdf4;color:#16a34a;transition:all .3s">
+                        <span id="ws-dot" style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;animation:livePulse 1.6s infinite"></span>
+                        <span id="ws-label" class="hidden sm:inline">Live</span>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="w-px h-6 bg-gray-200 hidden sm:block"></div>
+
+                    <!-- User Identity & Logout -->
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <div class="text-right hidden sm:block">
+                            <div class="text-[9px] font-extrabold uppercase tracking-widest text-gray-400 leading-none mb-1">Admin</div>
+                            <div class="text-[13px] font-black text-gray-800 leading-none"><?= htmlspecialchars($_SESSION['admin_username'] ?? 'Administrator') ?></div>
                         </div>
+                        <div class="w-9 h-9 rounded-xl flex flex-shrink-0 items-center justify-center shadow-md shadow-emerald-500/20 text-sm" style="background: linear-gradient(135deg, #2e9e63, #10b981); color:#fff;">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <a href="../admin/logout.php" title="ออกจากระบบ"
+                            class="w-9 h-9 rounded-xl bg-red-50 text-red-500 flex flex-shrink-0 items-center justify-center hover:bg-red-500 hover:text-white transition-colors border border-red-100 ml-1">
+                            <i class="fa-solid fa-power-off text-xs"></i>
+                        </a>
                     </div>
-                    <a href="../admin/logout.php" class="psb-label" title="ออกจากระบบ"
-                        style="width:28px;height:28px;border-radius:8px;background:#fff1f2;color:#ef4444;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .18s;text-decoration:none"
-                        onmouseover="this.style.background='#ef4444';this.style.color='#fff'"
-                        onmouseout="this.style.background='#fff1f2';this.style.color='#ef4444'">
-                        <i class="fa-solid fa-power-off" style="font-size:11px"></i>
-                    </a>
-                </div>
-                <!-- Collapsed state: avatar only (centered) -->
-                <div id="psb-user-collapsed" style="display:none;flex-direction:column;align-items:center;gap:6px">
-                    <div
-                        style="width:32px;height:32px;border-radius:9px;background:#e8f8f0;color:#2e9e63;display:flex;align-items:center;justify-content:center">
-                        <i class="fa-solid fa-user-shield" style="font-size:13px"></i>
-                    </div>
-                    <a href="../admin/logout.php" title="ออกจากระบบ"
-                        style="width:28px;height:28px;border-radius:8px;background:#fff1f2;color:#ef4444;display:flex;align-items:center;justify-content:center;transition:background .18s;text-decoration:none"
-                        onmouseover="this.style.background='#ef4444';this.style.color='#fff'"
-                        onmouseout="this.style.background='#fff1f2';this.style.color='#ef4444'">
-                        <i class="fa-solid fa-power-off" style="font-size:11px"></i>
-                    </a>
                 </div>
             </div>
-        </nav>
+        </header>
 
         <!-- ── Main Content ── -->
-        <main id="portal-main" style="flex:1;overflow-y:auto;min-width:0">
+        <main id="portal-main" style="flex:1;overflow-y:auto;min-width:0;">
 
             <!-- ════════════ SECTION: DASHBOARD ════════════ -->
             <div id="section-dashboard" class="portal-section">
