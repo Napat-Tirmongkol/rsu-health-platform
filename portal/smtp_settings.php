@@ -15,8 +15,8 @@ $fileExists  = file_exists($secretsPath);
 $fileWritable= $fileExists ? is_writable($secretsPath) : is_writable(dirname($secretsPath));
 $embed       = isset($_GET['embed']);
 
-// ใช้ Header/Footer จาก Admin เพื่อความสม่ำเสมอ
-if (!$embed) require_once __DIR__ . '/../admin/includes/header.php';
+// ใช้ Header/Footer จาก Admin เพื่อความสม่ำเสมอในเรื่อง Styles/Scripts
+require_once __DIR__ . '/../admin/includes/header.php';
 ?>
 
 <style>
@@ -40,6 +40,11 @@ if (!$embed) require_once __DIR__ . '/../admin/includes/header.php';
     </a>';
     renderPageHeader('SMTP Settings', 'ตั้งค่าและทดสอบระบบส่งอีเมลแจ้งเตือน', $header_actions);
     ?>
+    <?php else: ?>
+        <div class="mb-6">
+            <h1 class="text-2xl font-black text-gray-900">SMTP Settings</h1>
+            <p class="text-xs text-gray-500">ตั้งค่าและทดสอบระบบส่งอีเมลแจ้งเตือน</p>
+        </div>
     <?php endif; ?>
 
     <!-- Status Banner -->
@@ -279,4 +284,4 @@ function togglePass() {
 }
 </script>
 
-<?php if (!$embed) require_once __DIR__ . '/../admin/includes/footer.php'; ?>
+<?php require_once __DIR__ . '/../admin/includes/footer.php'; ?>

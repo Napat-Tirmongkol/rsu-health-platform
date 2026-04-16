@@ -43,9 +43,6 @@ try {
     $tableExists = $pdo->query("SHOW TABLES LIKE 'sys_email_logs'")->rowCount() > 0;
 
     if ($tableExists) {
-        $total = (int)$pdo->prepare("SELECT COUNT(*) FROM sys_email_logs {$whereSQL}")
-                          ->execute($params)
-                          ?: 0;
         // re-fetch COUNT properly
         $stmtCount = $pdo->prepare("SELECT COUNT(*) FROM sys_email_logs {$whereSQL}");
         $stmtCount->execute($params);
@@ -96,10 +93,10 @@ $typeLabels = [
     ''                  => ['label' => 'อื่นๆ',        'color' => '#64748b', 'bg' => '#f1f5f9', 'icon' => 'fa-envelope'],
 ];
 
-if (!$embed) require_once __DIR__ . '/includes/header.php';
+// โหลด Header เสมอเพื่อให้ได้ CSS/JS แต่ซ่อน Layout ถ้าเป็น embed
+require_once __DIR__ . '/includes/header.php';
 ?>
 
-<?php if (!$embed): ?>
 <style>
 .el-card { background:#fff; border:1.5px solid #e5e7eb; border-radius:1.25rem; overflow:hidden; }
 .stat-box { text-align:center; padding:1rem; }
@@ -122,9 +119,8 @@ if (!$embed) require_once __DIR__ . '/includes/header.php';
     .col-id,.col-err { display:none; }
 }
 </style>
-<?php endif; ?>
 
-<div class="<?= $embed ? 'p-6' : 'max-w-7xl mx-auto px-4 py-8' ?>">
+<div class="<?= $embed ? 'p-0' : 'max-w-7xl mx-auto px-4 py-8' ?>">
 
 <?php if (!$embed): ?>
 <?php
@@ -133,6 +129,11 @@ $header_actions = '<a href="index.php" class="bg-white border border-gray-100 ho
 </a>';
 renderPageHeader('Email Logs', 'ประวัติการส่งอีเมลทั้งหมดของระบบ', $header_actions);
 ?>
+<?php else: ?>
+    <div class="mb-6">
+        <h1 class="text-2xl font-black text-gray-900">Email Logs</h1>
+        <p class="text-xs text-gray-500">ประวัติการส่งอีเมลทั้งหมดของระบบ</p>
+    </div>
 <?php endif; ?>
 
 <?php if (!$tableExists): ?>
@@ -321,4 +322,4 @@ renderPageHeader('Email Logs', 'ประวัติการส่งอีเ
 <?php endif; // tableExists ?>
 </div>
 
-<?php if (!$embed) require_once __DIR__ . '/includes/footer.php'; ?>
+<?php require_once __DIR__ . '/includes/footer.php'; ?>

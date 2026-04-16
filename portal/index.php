@@ -1747,14 +1747,14 @@ try {
             <!-- ════════════ SECTION: EMAIL LOGS ════════════ -->
             <div id="section-email_logs" class="portal-section"
                 style="display:none; height:100%; border-radius:inherit; background:#f8fafc;">
-                <iframe src="email_logs.php?embed=1"
+                <iframe src="email_logs.php?embed=1&layout=none"
                     style="width:100%; height:100%; border:none; border-radius:inherit;"></iframe>
             </div>
 
             <!-- ════════════ SECTION: SMTP SETTINGS ════════════ -->
             <div id="section-smtp_settings" class="portal-section"
                 style="display:none; height:100%; border-radius:inherit; background:#f8fafc;">
-                <iframe src="smtp_settings.php?embed=1"
+                <iframe src="smtp_settings.php?embed=1&layout=none"
                     style="width:100%; height:100%; border:none; border-radius:inherit;"></iframe>
             </div>
 

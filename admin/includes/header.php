@@ -1,6 +1,6 @@
 <?php
 // admin/includes/header.php
-$layout_none = isset($_GET['layout']) && $_GET['layout'] === 'none';
+$layout_none = (isset($_GET['layout']) && $_GET['layout'] === 'none') || isset($_GET['embed']);
 
 if (!function_exists('renderPageHeader')) {
     function renderPageHeader($title, $subtitle, $actions_html = '') {
