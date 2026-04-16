@@ -1625,20 +1625,20 @@ try {
                                             style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;border:1.5px solid #d1fae5;background:#f0fdf4;color:#16a34a;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;text-align:left">
                                             <i class="fa-solid fa-code-branch"></i> <span>Git Pull — Update System</span>
                                         </button>
-                                        <a href="smtp_settings.php"
+                                        <a href="javascript:switchSection('smtp_settings')"
                                             style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;border:1.5px solid #dbeafe;background:#eff6ff;color:#1d4ed8;font-size:13px;font-weight:700;text-decoration:none;transition:all .2s">
                                             <i class="fa-solid fa-envelope-circle-check"></i> SMTP Settings (Email)
                                         </a>
                                     <?php endif; ?>
-                                    <a href="../admin/error_logs.php"
+                                    <a href="javascript:switchSection('error_logs')"
                                         style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#374151;font-size:13px;font-weight:700;text-decoration:none;transition:all .2s">
                                         <i class="fa-solid fa-bug" style="color:#94a3b8"></i> Error Logs
                                     </a>
-                                    <a href="../admin/email_logs.php"
+                                    <a href="javascript:switchSection('email_logs')"
                                         style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#374151;font-size:13px;font-weight:700;text-decoration:none;transition:all .2s">
                                         <i class="fa-solid fa-envelope-open-text" style="color:#94a3b8"></i> Email Logs
                                     </a>
-                                    <a href="../admin/sentry_test.php"
+                                    <a href="javascript:switchSection('sentry_test')"
                                         style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#374151;font-size:13px;font-weight:700;text-decoration:none;transition:all .2s">
                                         <i class="fa-brands fa-sentry" style="color:#94a3b8"></i> Sentry Monitoring
                                     </a>
@@ -1755,6 +1755,13 @@ try {
             <div id="section-smtp_settings" class="portal-section"
                 style="display:none; height:100%; border-radius:inherit; background:#f8fafc;">
                 <iframe src="smtp_settings.php?embed=1&layout=none"
+                    style="width:100%; height:100%; border:none; border-radius:inherit;"></iframe>
+            </div>
+
+            <!-- ════════════ SECTION: SENTRY TEST ════════════ -->
+            <div id="section-sentry_test" class="portal-section"
+                style="display:none; height:100%; border-radius:inherit; background:#f8fafc;">
+                <iframe src="../admin/sentry_test.php?embed=1&layout=none"
                     style="width:100%; height:100%; border:none; border-radius:inherit;"></iframe>
             </div>
 
