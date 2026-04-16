@@ -219,7 +219,7 @@
     <div class="help-row">
       <i class="fa-solid fa-circle-info" style="font-size:10px"></i>
       หากพบปัญหา กรุณาติดต่อ
-      <a href="mailto:it@rsu.ac.th">it@rsu.ac.th</a>
+      <a href="mailto:healthy@rsu.ac.th">healthy@rsu.ac.th</a>
     </div>
   </div>
 </body>
