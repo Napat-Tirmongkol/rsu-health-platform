@@ -135,28 +135,56 @@ function smtp_send(string $to, string $subject, string $htmlBody, array $cfg): b
     }
 }
 
-// ─── ฟังก์ชันหลักสำหรับส่งอีเมล ──────────────────────────────────────────────
-function send_campaign_email(string $to, string $subject, string $body): bool {
+// ─── บันทึก log การส่งอีเมล ───────────────────────────────────────────────────
+function log_email(string $to, string $subject, string $type, bool $ok, string $err = ''): void {
+    try {
+        $pdo  = db();
+        $stmt = $pdo->prepare("
+            INSERT INTO sys_email_logs (recipient, subject, type, status, error_msg)
+            VALUES (:r, :s, :t, :st, :e)
+        ");
+        $stmt->execute([
+            ':r'  => $to,
+            ':s'  => mb_substr($subject, 0, 500),
+            ':t'  => $type,
+            ':st' => $ok ? 'sent' : 'failed',
+            ':e'  => $ok ? null : mb_substr($err, 0, 500),
+        ]);
+    } catch (Throwable) {
+        // log ล้มเหลว — ignore เพื่อไม่กระทบ flow หลัก
+    }
+}
+
+// ─── ฟังก์ชันหลักสำหรับส่งอีเมล (พร้อม logging) ──────────────────────────────
+function send_campaign_email(string $to, string $subject, string $body, string $type = ''): bool {
     if (empty($to)) return false;
 
     $secrets = get_secrets();
     $host    = $secrets['SMTP_HOST'] ?? '';
+    $ok      = false;
+    $errMsg  = '';
 
     // ถ้ามี SMTP config → ส่งผ่าน SMTP
     if (!empty($host) && !empty($secrets['SMTP_USER']) && !empty($secrets['SMTP_PASS'])) {
-        return smtp_send($to, $subject, $body, $secrets);
+        // จับ error_log ชั่วคราวเพื่อดักข้อความ error
+        $ok = smtp_send($to, $subject, $body, $secrets);
+        if (!$ok) $errMsg = 'SMTP send failed — check PHP error_log for details';
+    } else {
+        // Fallback: php mail()
+        $fromEmail = $secrets['SMTP_FROM_EMAIL'] ?? 'no-reply@rsu.ac.th';
+        $fromName  = $secrets['SMTP_FROM_NAME']  ?? 'RSU Medical Clinic';
+        $headers   = implode("\r\n", [
+            'MIME-Version: 1.0',
+            'Content-Type: text/html; charset=UTF-8',
+            'From: =?UTF-8?B?' . base64_encode($fromName) . "?= <{$fromEmail}>",
+            'X-Mailer: PHP/' . PHP_VERSION,
+        ]);
+        $ok = mail($to, '=?UTF-8?B?' . base64_encode($subject) . '?=', $body, $headers);
+        if (!$ok) $errMsg = 'php mail() returned false — sendmail not configured';
     }
 
-    // Fallback: php mail() (ใช้ได้ถ้า server ตั้งค่า sendmail ไว้)
-    $fromEmail = $secrets['SMTP_FROM_EMAIL'] ?? 'no-reply@rsu.ac.th';
-    $fromName  = $secrets['SMTP_FROM_NAME']  ?? 'RSU Medical Clinic';
-    $headers   = implode("\r\n", [
-        'MIME-Version: 1.0',
-        'Content-Type: text/html; charset=UTF-8',
-        'From: =?UTF-8?B?' . base64_encode($fromName) . "?= <{$fromEmail}>",
-        'X-Mailer: PHP/' . PHP_VERSION,
-    ]);
-    return mail($to, '=?UTF-8?B?' . base64_encode($subject) . '?=', $body, $headers);
+    log_email($to, $subject, $type, $ok, $errMsg);
+    return $ok;
 }
 
 // ─── HTML Email Template ──────────────────────────────────────────────────────
@@ -275,5 +303,5 @@ function notify_booking_status(string $to, string $type, array $data): bool {
     }
 
     $body = get_email_template($emailTitle, $message, $details, $tplType);
-    return send_campaign_email($to, $subject, $body);
+    return send_campaign_email($to, $subject, $body, $type);
 }

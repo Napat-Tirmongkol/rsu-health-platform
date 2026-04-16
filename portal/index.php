@@ -1634,6 +1634,10 @@ try {
                                         style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#374151;font-size:13px;font-weight:700;text-decoration:none;transition:all .2s">
                                         <i class="fa-solid fa-bug" style="color:#94a3b8"></i> Error Logs
                                     </a>
+                                    <a href="../admin/email_logs.php"
+                                        style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#374151;font-size:13px;font-weight:700;text-decoration:none;transition:all .2s">
+                                        <i class="fa-solid fa-envelope-open-text" style="color:#94a3b8"></i> Email Logs
+                                    </a>
                                     <a href="../admin/sentry_test.php"
                                         style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#374151;font-size:13px;font-weight:700;text-decoration:none;transition:all .2s">
                                         <i class="fa-brands fa-sentry" style="color:#94a3b8"></i> Sentry Monitoring
@@ -1737,6 +1741,13 @@ try {
             <div id="section-error_logs" class="portal-section"
                 style="display:none; height:100%; border-radius:inherit; background:#f8fafc;">
                 <iframe src="error_logs.php?embed=1"
+                    style="width:100%; height:100%; border:none; border-radius:inherit;"></iframe>
+            </div>
+
+            <!-- ════════════ SECTION: EMAIL LOGS ════════════ -->
+            <div id="section-email_logs" class="portal-section"
+                style="display:none; height:100%; border-radius:inherit; background:#f8fafc;">
+                <iframe src="email_logs.php?embed=1"
                     style="width:100%; height:100%; border:none; border-radius:inherit;"></iframe>
             </div>
 
