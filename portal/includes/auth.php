@@ -16,9 +16,10 @@ if (session_status() === PHP_SESSION_NONE) {
 if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
     if (isset($_SESSION['_admin_last_activity'])) {
         if (time() - $_SESSION['_admin_last_activity'] > 7200) {
+            $isStaff = !empty($_SESSION['is_ecampaign_staff']);
             session_unset();
             session_destroy();
-            header('Location: ../admin/login.php?reason=timeout');
+            header('Location: ' . ($isStaff ? '../admin/staff_login.php' : '../admin/login.php') . '?reason=timeout');
             exit;
         }
     }
@@ -27,6 +28,7 @@ if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true
 
 // ── Auth Check ───────────────────────────────────────────────────────────────
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    // staff_login ใช้ session key เดียวกัน (admin_logged_in) — ไม่ต้องแยก
     header('Location: ../admin/login.php');
     exit;
 }

@@ -16,10 +16,11 @@ const ADMIN_SESSION_TIMEOUT = 7200;
 if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
     if (isset($_SESSION['_admin_last_activity'])) {
         if (time() - $_SESSION['_admin_last_activity'] > ADMIN_SESSION_TIMEOUT) {
-            // หมดเวลา — ล้าง session แล้ว redirect
+            // หมดเวลา — ล้าง session แล้ว redirect ไปหน้า login ที่เหมาะสม
+            $isStaff = !empty($_SESSION['is_ecampaign_staff']);
             session_unset();
             session_destroy();
-            header('Location: login.php?reason=timeout');
+            header('Location: ' . ($isStaff ? 'staff_login.php' : 'login.php') . '?reason=timeout');
             exit;
         }
     }

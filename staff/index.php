@@ -33,6 +33,9 @@ require_once __DIR__ . '/../config.php';
             <i class="fa-solid fa-user-tie mr-1 text-gray-400"></i><?= htmlspecialchars($_SESSION['staff_name']) ?>
         </span>
         <?php endif; ?>
+        <a href="../portal/index.php" class="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-xs font-bold hover:bg-blue-100 transition-colors">
+            <i class="fa-solid fa-grip mr-1"></i>Portal
+        </a>
         <a href="logout.php" class="bg-red-50 text-red-500 px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-100 transition-colors">
             ออกจากระบบ
         </a>

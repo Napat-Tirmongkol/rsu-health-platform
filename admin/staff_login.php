@@ -9,7 +9,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // ถ้า login แล้ว ข้ามไปหน้า index
 if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
-    header('Location: index.php');
+    header('Location: ../portal/index.php');
     exit;
 }
 
@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     log_activity('staff_login', "เจ้าหน้าที่ '{$staff['full_name']}' (Username: {$staff['username']}) เข้าสู่ระบบ e-Campaign", (int)$staff['id']);
 
-                    header('Location: index.php');
+                    header('Location: ../portal/index.php');
                     exit;
                 }
             } else {
