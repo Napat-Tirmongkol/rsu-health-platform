@@ -1733,21 +1733,21 @@ try {
             <!-- ════════════ SECTION: ACTIVITY LOGS ════════════ -->
             <div id="section-activity_logs" class="portal-section"
                 style="display:none; height:100%; border-radius:inherit; background:#f8fafc;">
-                <iframe src="activity_logs.php?embed=1"
+                <iframe src="../admin/activity_logs.php?embed=1"
                     style="width:100%; height:100%; border:none; border-radius:inherit;"></iframe>
             </div>
 
             <!-- ════════════ SECTION: ERROR LOGS ════════════ -->
             <div id="section-error_logs" class="portal-section"
                 style="display:none; height:100%; border-radius:inherit; background:#f8fafc;">
-                <iframe src="error_logs.php?embed=1"
+                <iframe src="../admin/error_logs.php?embed=1"
                     style="width:100%; height:100%; border:none; border-radius:inherit;"></iframe>
             </div>
 
             <!-- ════════════ SECTION: EMAIL LOGS ════════════ -->
             <div id="section-email_logs" class="portal-section"
                 style="display:none; height:100%; border-radius:inherit; background:#f8fafc;">
-                <iframe src="email_logs.php?embed=1&layout=none"
+                <iframe src="../admin/email_logs.php?embed=1&layout=none"
                     style="width:100%; height:100%; border:none; border-radius:inherit;"></iframe>
             </div>
 
@@ -2295,13 +2295,13 @@ try {
             if (collapsed) collapsed.style.display = isCollapsed ? 'flex' : 'none';
         }
 
-        function switchSection(sectionId, btn) {
+        window.switchSection = function (sectionId, btn) {
             document.querySelectorAll('.portal-section').forEach(function (s) { s.style.display = 'none'; });
             var target = document.getElementById('section-' + sectionId);
             if (target) target.style.display = '';
             document.querySelectorAll('.psb-item').forEach(function (b) { b.classList.remove('psb-active'); });
             if (btn) btn.classList.add('psb-active');
-        }
+        };
 
         // Pause when tab hidden, resume when visible
         document.addEventListener('visibilitychange', () => {
