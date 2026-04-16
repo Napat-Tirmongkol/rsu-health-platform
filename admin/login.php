@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 1.5rem;
+            padding: 5rem 1.5rem 3rem;
         }
 
         /* ── Top brand bar ────────────────────────────── */
@@ -112,7 +112,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 1.5rem;
             overflow: hidden;
             box-shadow: 0 20px 60px rgba(0,0,0,.13);
-            min-height: 460px;
         }
 
         /* ── Left panel ────────────────────────────────── */
@@ -391,12 +390,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: 0 2px 8px rgba(0,0,0,.2);
         }
 
-        /* responsive */
+        /* ── Responsive ────────────────────────────────────── */
+
+        /* tablet / small desktop — hide left panel early */
         @media (max-width: 640px) {
+            body { padding: 4.5rem 1rem 2.5rem; }
             .left-panel { display: none; }
-            .login-card { max-width: 420px; }
+            .login-card { max-width: 420px; border-radius: 1.25rem; }
             .right-panel { padding: 2rem 1.5rem; }
             .main-title { font-size: 1.35rem; }
+        }
+
+        /* small phones (iPhone SE, Galaxy A-series) */
+        @media (max-width: 380px) {
+            body { padding: 4rem 0.75rem 2rem; }
+            .right-panel { padding: 1.75rem 1.125rem; }
+            .main-title { font-size: 1.2rem; }
+            .sign-in-sub { font-size: .78rem; margin-bottom: 1.2rem; }
+            .btn-login { font-size: .82rem; padding: .75rem; }
+            .btn-google { padding: .65rem; font-size: .8rem; }
+        }
+
+        /* landscape mobile — card must not overflow viewport height */
+        @media (max-height: 620px) {
+            body { justify-content: flex-start; padding-top: 4.5rem; }
+            .left-panel { display: none; }
+            .login-card { max-width: 480px; border-radius: 1.25rem; }
+            .right-panel { padding: 1.5rem 2rem; }
+            .welcome-label { margin-bottom: .6rem; }
+            .main-title { font-size: 1.35rem; margin-bottom: .25rem; }
+            .sign-in-sub { margin-bottom: 1rem; }
+            .input-wrap { margin-bottom: .7rem; }
+            .btn-login { margin-bottom: .7rem; padding: .7rem; }
+            .divider { margin-bottom: .6rem; }
+            .btn-google { margin-bottom: .8rem; }
         }
     </style>
 </head>
