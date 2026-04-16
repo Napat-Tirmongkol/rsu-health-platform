@@ -182,6 +182,7 @@ function fetchToolData(PDO $pdo, string $name, array $args): array {
             };
             return $pdo->query("
                 SELECT
+                    c.id                                                    AS campaign_id,
                     c.title                                                 AS ชื่อแคมเปญ,
                     c.status                                                AS สถานะ,
                     c.total_capacity                                        AS โควต้า,
@@ -249,6 +250,24 @@ function fetchToolData(PDO $pdo, string $name, array $args): array {
                 ORDER BY อัตราเติมโควต้า_pct DESC
             ")->fetchAll(PDO::FETCH_ASSOC);
 
+        case 'get_appointment_distribution':
+            // วันนัดหมายไหนมีผู้เข้าร่วมมากที่สุด (appointment_date) ในแคมเปญที่ระบุ
+            $campId = (int)($args['campaign_id'] ?? 0);
+            if ($campId <= 0) return ['error' => 'กรุณาระบุ campaign_id ที่ถูกต้อง (ดึงได้จาก get_all_campaigns)'];
+            $stmt = $pdo->prepare("
+                SELECT
+                    appointment_date                AS วันนัดหมาย,
+                    COUNT(id)                       AS จำนวนผู้เข้าร่วม
+                FROM camp_bookings
+                WHERE campaign_id = ?
+                GROUP BY appointment_date
+                ORDER BY จำนวนผู้เข้าร่วม DESC
+            ");
+            $stmt->execute([$campId]);
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            if (empty($rows)) return ['info' => "ไม่พบข้อมูล appointment_date สำหรับ campaign_id {$campId}"];
+            return $rows;
+
         default:
             return ['error' => "ไม่รู้จักฟังก์ชัน: {$name}"];
     }
@@ -299,6 +318,20 @@ $toolDeclarations = [[
             'name'        => 'get_capacity_report',
             'description' => 'ดึงรายงานอัตราการเติมโควต้าของทุกแคมเปญ บอกว่าแคมเปญไหนเต็มหรือยังว่างอยู่',
             'parameters'  => ['type' => 'object', 'properties' => new stdClass()],
+        ],
+        [
+            'name'        => 'get_appointment_distribution',
+            'description' => 'ดูการกระจายตัวของผู้เข้าร่วมแยกตามวันนัดหมาย (appointment_date) ของแคมเปญที่ระบุ — ใช้ตอบคำถาม "วันไหนคนมากที่สุด/น้อยที่สุด", "วันที่ผู้เข้าร่วมกระจุกตัว" หรือ "ภาพรวม schedule ของแคมเปญ" ต้องระบุ campaign_id (ดึงได้จาก get_all_campaigns)',
+            'parameters'  => [
+                'type'       => 'object',
+                'properties' => [
+                    'campaign_id' => [
+                        'type'        => 'integer',
+                        'description' => 'ID ของแคมเปญที่ต้องการดู (ได้จาก campaign_id ใน get_all_campaigns)',
+                    ],
+                ],
+                'required' => ['campaign_id'],
+            ],
         ],
     ],
 ]];
