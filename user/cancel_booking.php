@@ -47,13 +47,17 @@ try {
 
   // ส่งอีเมลถ้ามีข้อมูล
   if ($bInfo && !empty($bInfo['email'])) {
-    require_once __DIR__ . '/../includes/mail_helper.php';
-    notify_booking_status($bInfo['email'], 'cancelled_by_user', [
-        'campaign_title' => $bInfo['title'],
-        'date'           => date('d/m/Y', strtotime($bInfo['slot_date'])),
-        'time'           => substr($bInfo['start_time'], 0, 5) . ' - ' . substr($bInfo['end_time'], 0, 5),
-        'full_name'      => $bInfo['full_name'] ?? '',
-    ]);
+    try {
+      require_once __DIR__ . '/../includes/mail_helper.php';
+      notify_booking_status($bInfo['email'], 'cancelled_by_user', [
+          'campaign_title' => $bInfo['title'],
+          'date'           => date('d/m/Y', strtotime($bInfo['slot_date'])),
+          'time'           => substr($bInfo['start_time'], 0, 5) . ' - ' . substr($bInfo['end_time'], 0, 5),
+          'full_name'      => $bInfo['full_name'] ?? '',
+      ]);
+    } catch (Exception $e) {
+      error_log("Cancel Booking Email Error: " . $e->getMessage());
+    }
   }
 
 } catch (PDOException $e) {
