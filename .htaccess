@@ -42,6 +42,16 @@ RewriteRule ^favicon\.ico$ - [R=204,L]
     php_value session.cookie_samesite Lax
 </IfModule>
 
+# ─── Upload Limits (Insurance Sync Hub) ───────────────────────
+<IfModule mod_php.c>
+    php_value upload_max_filesize 30M
+    php_value post_max_size       64M
+</IfModule>
+<IfModule mod_php8.c>
+    php_value upload_max_filesize 30M
+    php_value post_max_size       64M
+</IfModule>
+
 # DirectoryIndex
 DirectoryIndex index.php index.html
 
