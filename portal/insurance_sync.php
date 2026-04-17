@@ -231,11 +231,13 @@ $csrfToken = get_csrf_token();
 
                 <div class="flex gap-3 mt-5">
                     <button id="btnExecute" onclick="doExecute(false)"
-                        class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2">
+                        style="flex:1;background:#16a34a;color:#fff;font-weight:700;padding:.75rem 1rem;border-radius:.75rem;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem;font-family:inherit;font-size:15px;transition:opacity .2s"
+                        onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
                         <i class="fa-solid fa-check"></i> ยืนยันซิงค์
                     </button>
                     <button onclick="resetSync()"
-                        class="px-6 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 rounded-xl transition-all">
+                        style="padding:.75rem 1.5rem;background:#f1f5f9;color:#374151;font-weight:700;border-radius:.75rem;border:none;cursor:pointer;font-family:inherit;font-size:15px;transition:opacity .2s"
+                        onmouseover="this.style.opacity='.75'" onmouseout="this.style.opacity='1'">
                         ยกเลิก
                     </button>
                 </div>
@@ -522,10 +524,12 @@ function renderDryRunResult(data) {
         document.getElementById('btnExecute').textContent = '';
         document.getElementById('btnExecute').innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-2"></i>บังคับยืนยัน (Override Guard)';
         document.getElementById('btnExecute').onclick = () => doExecute(true);
-        document.getElementById('btnExecute').classList.replace('bg-green-600','bg-red-600');
-        document.getElementById('btnExecute').classList.replace('hover:bg-green-700','hover:bg-red-700');
+        document.getElementById('btnExecute').style.background = '#dc2626';
     } else {
         guardDiv.classList.add('hidden');
+        document.getElementById('btnExecute').innerHTML = '<i class="fa-solid fa-check mr-2"></i>ยืนยันซิงค์';
+        document.getElementById('btnExecute').onclick = () => doExecute(false);
+        document.getElementById('btnExecute').style.background = '#16a34a';
     }
 
     // Summary counts
