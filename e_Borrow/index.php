@@ -78,7 +78,7 @@ include('includes/student_header.php');
 
 /* ===== HERO ===== */
 .hero {
-    background: linear-gradient(145deg, #0B6623 0%, #1a8c35 60%, #084C1A 100%);
+    background: linear-gradient(135deg, #0052CC 0%, #0070f3 100%);
     padding: 28px 20px 64px;
     position: relative; overflow: hidden;
 }
@@ -127,25 +127,25 @@ include('includes/student_header.php');
     box-shadow: 0 8px 24px rgba(0,0,0,.10);
     cursor: pointer;
     transition: transform .2s, box-shadow .2s;
-    border: 1px solid rgba(11,102,35,.08);
+    border: 1px solid rgba(0,82,204,.08);
 }
 .qr-card:active { transform: scale(.97); box-shadow: 0 4px 12px rgba(0,0,0,.08); }
 .qr-icon-box {
     width: 52px; height: 52px; border-radius: 14px;
-    background: linear-gradient(135deg, #0B6623, #1a8c35);
+    background: linear-gradient(135deg, #0052CC, #0070f3);
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
 }
 .qr-icon-box i { font-size: 1.6rem; color: #fff; }
 .qr-info h4 { font-size: .95rem; font-weight: 700; color: #1a1a1a; margin: 0 0 2px; }
 .qr-info p  { font-size: .75rem; color: #888; margin: 0; }
-.qr-arrow   { margin-left: auto; color: #0B6623; font-size: 1rem; }
+.qr-arrow   { margin-left: auto; color: #0052CC; font-size: 1rem; }
 
 /* ===== SECTION ===== */
 .section { padding: 20px 16px 0; }
 .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
 .section-head h3 { font-size: .95rem; font-weight: 700; color: #1a1a1a; margin: 0; }
-.section-head a  { font-size: .78rem; color: #0B6623; font-weight: 600; text-decoration: none; }
+.section-head a  { font-size: .78rem; color: #0052CC; font-weight: 600; text-decoration: none; }
 
 /* ===== FINE BANNER ===== */
 .fine-banner {
@@ -160,38 +160,38 @@ include('includes/student_header.php');
 
 /* ===== DARK MODE OVERRIDES ===== */
 body.dark-mode .qr-card {
-    background: #1e2d25;
+    background: #162040;
     border-color: rgba(255,255,255,.08);
     box-shadow: 0 8px 24px rgba(0,0,0,.3);
 }
 body.dark-mode .qr-info h4 { color: #e2e8f0; }
 body.dark-mode .qr-info p  { color: #94a3b8; }
-body.dark-mode .qr-arrow   { color: #4ade80; }
+body.dark-mode .qr-arrow   { color: #60a5fa; }
 
 body.dark-mode .item-card {
-    background: #1e2d25;
+    background: #162040;
     border-color: rgba(255,255,255,.05);
     box-shadow: 0 2px 10px rgba(0,0,0,.25);
 }
 body.dark-mode .item-info h4   { color: #e2e8f0; }
 body.dark-mode .item-info .type-tag { color: #64748b; }
 body.dark-mode .due-text       { color: #94a3b8; }
-body.dark-mode .item-thumb     { background: #162112; }
+body.dark-mode .item-thumb     { background: #0f1a35; }
 
-body.dark-mode .pill-ok      { background: rgba(22,163,74,.2);  color: #4ade80; }
+body.dark-mode .pill-ok      { background: rgba(22,163,74,.2);  color: #60a5fa; }
 body.dark-mode .pill-pending { background: rgba(245,158,11,.15); color: #fbbf24; }
 body.dark-mode .pill-overdue { background: rgba(220,38,38,.2);  color: #f87171; }
 
 body.dark-mode .section-head h3 { color: #e2e8f0; }
-body.dark-mode .section-head a  { color: #4ade80; }
+body.dark-mode .section-head a  { color: #60a5fa; }
 
 body.dark-mode .empty-state {
-    background: #1e2d25;
+    background: #162040;
     box-shadow: 0 2px 10px rgba(0,0,0,.25);
 }
 body.dark-mode .empty-state h4 { color: #e2e8f0; }
 body.dark-mode .empty-state p  { color: #64748b; }
-body.dark-mode .empty-icon     { background: linear-gradient(135deg, #162112, #1e2d25); }
+body.dark-mode .empty-icon     { background: linear-gradient(135deg, #0f1a35, #162040); }
 
 body.dark-mode .error-banner {
     background: rgba(220,38,38,.15);
@@ -228,7 +228,7 @@ body.dark-mode .btn-cancel-sm:active { background: rgba(220,38,38,.3); }
 .item-thumb {
     width: 52px; height: 52px; border-radius: 12px;
     object-fit: cover; flex-shrink: 0;
-    background: #f0f4f0;
+    background: #eff6ff;
     display: flex; align-items: center; justify-content: center;
 }
 .item-thumb img { width: 100%; height: 100%; border-radius: 12px; object-fit: cover; }
@@ -273,7 +273,7 @@ body.dark-mode .btn-cancel-sm:active { background: rgba(220,38,38,.3); }
 }
 .empty-icon {
     width: 72px; height: 72px; border-radius: 20px;
-    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
     display: flex; align-items: center; justify-content: center;
     font-size: 2rem; margin: 0 auto 14px;
 }
@@ -282,9 +282,9 @@ body.dark-mode .btn-cancel-sm:active { background: rgba(220,38,38,.3); }
 .btn-borrow {
     display: inline-flex; align-items: center; gap: 8px;
     padding: 12px 24px; border-radius: 14px;
-    background: linear-gradient(135deg, #0B6623, #1a8c35);
+    background: linear-gradient(135deg, #0052CC, #0070f3);
     color: #fff; font-weight: 700; font-size: .88rem;
-    text-decoration: none; box-shadow: 0 4px 14px rgba(11,102,35,.25);
+    text-decoration: none; box-shadow: 0 4px 14px rgba(0,82,204,.25);
     transition: opacity .2s, transform .15s;
 }
 .btn-borrow:hover  { opacity: .9; }
@@ -365,7 +365,7 @@ body.dark-mode .btn-cancel-sm:active { background: rgba(220,38,38,.3); }
         <?php endif; ?>
 
         <div class="section-head">
-            <h3><i class="fas fa-hand-holding-medical" style="color:#0B6623; margin-right:6px;"></i>อุปกรณ์ที่ยืมอยู่</h3>
+            <h3><i class="fas fa-hand-holding-medical" style="color:#0052CC; margin-right:6px;"></i>อุปกรณ์ที่ยืมอยู่</h3>
             <a href="history.php">ดูประวัติ →</a>
         </div>
 
@@ -397,7 +397,7 @@ body.dark-mode .btn-cancel-sm:active { background: rgba(220,38,38,.3); }
                          alt="รูปอุปกรณ์"
                          onerror="this.parentElement.innerHTML='<i class=\'fas fa-image\'></i>'">
                 <?php else: ?>
-                    <i class="fas fa-stethoscope" style="color:#0B6623;"></i>
+                    <i class="fas fa-stethoscope" style="color:#0052CC;"></i>
                 <?php endif; ?>
             </div>
 
@@ -458,7 +458,7 @@ function showHomeQRCode() {
                     <h3 style="margin:0 0 4px;font-size:1.1rem;">${studentCode}</h3>
                     <p style="margin:0;color:#666;font-size:.85rem;">${studentName}</p>
                 </div>
-                <p style="margin:0;font-size:.75rem;color:#0B6623;background:#f0fdf4;padding:8px 14px;border-radius:8px;">
+                <p style="margin:0;font-size:.75rem;color:#0052CC;background:#eff6ff;padding:8px 14px;border-radius:8px;">
                     <i class="fas fa-info-circle"></i> ยื่นให้เจ้าหน้าที่สแกนเพื่อยืมอุปกรณ์
                 </p>
             </div>`,
@@ -469,7 +469,7 @@ function showHomeQRCode() {
             });
         },
         confirmButtonText: 'ปิด',
-        confirmButtonColor: '#0B6623',
+        confirmButtonColor: '#0052CC',
         showClass: { popup: 'animate__animated animate__fadeInUp animate__faster' }
     });
 }
