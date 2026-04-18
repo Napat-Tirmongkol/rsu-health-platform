@@ -2508,26 +2508,8 @@ try {
                 });
             }
         });
-        // Auto-switch section from URL ?section=identity
-        (function () {
-            var params = new URLSearchParams(window.location.search);
-            var sec = params.get('section');
-            var tab = params.get('tab');
-            if (sec) {
-                var btn = document.querySelector('.psb-item[data-section="' + sec + '"]');
-                switchSection(sec, btn);
-            }
-            if (sec === 'identity' && tab) {
-                var tabBtn = document.querySelector('.id-tab[data-tab="' + tab + '"]');
-                if (tabBtn) switchIdTab(tab, tabBtn);
-            }
-            // Auto-dismiss toast
-            var toast = document.getElementById('id-toast');
-            if (toast) setTimeout(function () { toast.style.transition = 'opacity .5s'; toast.style.opacity = '0'; setTimeout(function () { toast.remove(); }, 500); }, 3000);
-        })();
-
         /* ── Sidebar Controls ────────────────────────────────────────────────────── */
-        function toggleSidebar() {
+        window.toggleSidebar = function () {
             var sidebar = document.getElementById('portal-sidebar');
             var icon = document.getElementById('sidebar-toggle-icon');
             var expanded = document.getElementById('psb-user-expanded');
@@ -2537,7 +2519,7 @@ try {
             icon.style.transform = isCollapsed ? 'rotate(180deg)' : '';
             if (expanded) expanded.style.display = isCollapsed ? 'none' : 'flex';
             if (collapsed) collapsed.style.display = isCollapsed ? 'flex' : 'none';
-        }
+        };
 
         window.switchSection = function (sectionId, btn) {
             document.querySelectorAll('.portal-section').forEach(function (s) { s.style.display = 'none'; });
@@ -2547,10 +2529,27 @@ try {
             if (btn) btn.classList.add('psb-active');
             var url = new URL(window.location.href);
             url.searchParams.set('section', sectionId);
-            // remove pagination/filter params when switching sections
             ['page','el_search','el_level','el_date','el_source','al_q','eml_q','eml_type','eml_status'].forEach(function(k){ url.searchParams.delete(k); });
             history.pushState({section: sectionId}, '', url.toString());
         };
+
+        // Auto-switch section from URL ?section=...
+        (function () {
+            var params = new URLSearchParams(window.location.search);
+            var sec = params.get('section');
+            var tab = params.get('tab');
+            if (sec) {
+                var btn = document.querySelector('.psb-item[data-section="' + sec + '"]');
+                if (btn) window.switchSection(sec, btn);
+            }
+            if (sec === 'identity' && tab) {
+                var tabBtn = document.querySelector('.id-tab[data-tab="' + tab + '"]');
+                if (tabBtn) switchIdTab(tab, tabBtn);
+            }
+            // Auto-dismiss toast
+            var toast = document.getElementById('id-toast');
+            if (toast) setTimeout(function () { toast.style.transition = 'opacity .5s'; toast.style.opacity = '0'; setTimeout(function () { toast.remove(); }, 500); }, 3000);
+        })();
 
         // Pause when tab hidden, resume when visible
         document.addEventListener('visibilitychange', () => {
