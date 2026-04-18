@@ -150,41 +150,12 @@ function render_header(string $title = 'E-Vax'): void {
       <main class="w-full max-w-md h-full bg-white shadow-xl relative overflow-y-auto overflow-x-hidden custom-scrollbar">
         <?php if ($isUserFolder && $user && !in_array($currentPage, ['index.php', 'logout.php'])): ?>
           <?php
-            // ── Role-based Theming Configuration ────────────────────────────
-            $roleGroups = [
-              'student' => [
-                'label'      => 'นักศึกษา',
-                'gradient'   => 'from-[#0052CC] to-[#0070f3]',
-                'icon'       => 'fa-user-graduate',
-                'tagClass'   => 'bg-blue-400/20 text-blue-50 border-blue-400/30'
-              ],
-              'faculty' => [
-                'label'      => 'อาจารย์',
-                'gradient'   => 'from-[#7c3aed] to-[#9333ea]',
-                'icon'       => 'fa-user-tie',
-                'tagClass'   => 'bg-purple-400/20 text-purple-50 border-purple-400/30'
-              ],
-              'staff' => [
-                'label'      => 'เจ้าหน้าที่',
-                'gradient'   => 'from-[#059669] to-[#10b981]',
-                'icon'       => 'fa-user-gear',
-                'tagClass'   => 'bg-emerald-400/20 text-emerald-50 border-emerald-400/30'
-              ],
-              'other' => [
-                'label'      => 'บุคคลทั่วไป',
-                'gradient'   => 'from-[#4b5563] to-[#6b7280]',
-                'icon'       => 'fa-user-astronaut',
-                'tagClass'   => 'bg-slate-400/20 text-slate-50 border-slate-400/30'
-              ]
-            ];
-
-            $currRole    = $user['status'] ?? 'other';
-            $theme       = $roleGroups[$currRole] ?? $roleGroups['other'];
-            $statusLabel = $theme['label'];
+            $statusMap   = ['student' => 'นักศึกษา', 'faculty' => 'อาจารย์', 'staff' => 'เจ้าหน้าที่', 'other' => 'บุคคลทั่วไป'];
+            $statusLabel = $statusMap[$user['status'] ?? ''] ?? ($user['status'] ?? '');
             $displayName = ($user['prefix'] ?? '') . ($user['full_name'] ?? 'ผู้ใช้');
           ?>
           <!-- ── Global User Header ────────────────────────────────────────── -->
-          <div class="bg-gradient-to-br <?= $theme['gradient'] ?> p-6 pb-11 flex-shrink-0 relative overflow-hidden transition-colors duration-500">
+          <div class="bg-gradient-to-br from-[#0052CC] to-[#0070f3] p-6 pb-11 flex-shrink-0 relative overflow-hidden">
             <!-- Ambient Light Effect -->
             <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
             
@@ -216,18 +187,15 @@ function render_header(string $title = 'E-Vax'): void {
                 ?>
                   <img src="<?= htmlspecialchars($profilePic) ?>" alt="Profile" class="w-full h-full object-cover">
                 <?php else: ?>
-                  <i class="fa-solid <?= $theme['icon'] ?> text-2xl text-white"></i>
+                  <i class="fa-solid fa-user-astronaut text-2xl text-white"></i>
                 <?php endif; ?>
               </div>
               <div class="flex-1">
                 <h2 class="text-[17px] font-extrabold text-white leading-tight">สวัสดี, <?= htmlspecialchars($displayName) ?> 👋</h2>
                 <div class="flex items-center gap-1.5 mt-1.5">
-                  <span class="px-2.5 py-1 <?= $theme['tagClass'] ?> rounded-lg text-[9px] font-black uppercase tracking-wider border backdrop-blur-md shadow-sm">
-                    <i class="fa-solid <?= $theme['icon'] ?> mr-1.5 opacity-70"></i>
-                    <?= htmlspecialchars($statusLabel) ?>
-                  </span>
+                  <span class="px-2 py-0.5 bg-white/15 rounded-md text-[9px] font-bold text-white/90 uppercase letter-spacing-wider"><?= htmlspecialchars($statusLabel) ?></span>
                   <?php if (!empty($user['student_personnel_id'])): ?>
-                    <span class="text-[10px] font-bold text-white/50 ml-1">• รหัส <?= htmlspecialchars($user['student_personnel_id']) ?></span>
+                    <span class="text-[10px] font-bold text-white/60">• รหัส <?= htmlspecialchars($user['student_personnel_id']) ?></span>
                   <?php endif; ?>
                 </div>
               </div>
