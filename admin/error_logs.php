@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
     } else {
         $pdo->prepare("INSERT INTO sys_settings (`key`, `value`) VALUES ('admin_alert_email', ?)
                        ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)")->execute([$emailVal]);
-        header('Location: error_logs.php?saved=1');
+        header('Location: error_logs.php?saved=1' . (isset($_GET['embed']) ? '&embed=1' : ''));
         exit;
     }
 }
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'clear
             $stmt = $pdo->prepare("DELETE FROM sys_error_logs WHERE level = ?");
             $stmt->execute([$clearLevel]);
         }
-        header('Location: error_logs.php?cleared=1');
+        header('Location: error_logs.php?cleared=1' . (isset($_GET['embed']) ? '&embed=1' : ''));
         exit;
     } catch (PDOException $e) {
         $clear_error = $e->getMessage();
@@ -532,7 +532,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
             $pdo->prepare("DELETE FROM sys_error_logs WHERE id = ?")->execute([$logId]);
         } catch (PDOException) {}
     }
-    header('Location: error_logs.php?' . $filterQs);
+    header('Location: error_logs.php?' . $filterQs . (isset($_GET['embed']) ? '&embed=1' : ''));
     exit;
 }
 
