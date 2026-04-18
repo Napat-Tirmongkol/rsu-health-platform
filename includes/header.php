@@ -170,7 +170,7 @@ function render_header(string $title = 'E-Vax'): void {
         <p class="mt-4 text-[<?= $tLoader ?>] font-semibold text-sm animate-pulse font-prompt"><?= htmlspecialchars(__('loading')) ?></p>
       </div>
 
-      <main class="w-full max-w-md h-full bg-white shadow-xl relative overflow-y-auto overflow-x-hidden custom-scrollbar">
+      <main class="w-full md:max-w-2xl lg:max-w-4xl h-full bg-white shadow-xl relative overflow-y-auto overflow-x-hidden custom-scrollbar transition-all duration-300">
         <?php if ($isUserFolder && $user && !in_array($currentPage, ['index.php', 'logout.php'])): ?>
           <?php
             $statusMap   = ['student' => 'นักศึกษา', 'faculty' => 'อาจารย์', 'staff' => 'เจ้าหน้าที่', 'other' => 'บุคคลทั่วไป'];

@@ -50,7 +50,7 @@ render_header(__('campaign.page_title'));
             <p class="text-gray-500 font-medium"><?= __('campaign.empty') ?></p>
         </div>
     <?php else: ?>
-        <div class="grid gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <?php foreach ($camp_list as $c):
                 $badge     = getBadge($c['type']);
                 $remaining = $c['total_capacity'] - $c['used_seats'];
