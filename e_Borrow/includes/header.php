@@ -3,7 +3,7 @@
 @session_start();
 
 // ดึง Base Path ของ e_Borrow มาใช้เพื่อความแม่นยำของ Assets
-$base_url = explode('/archive/e_Borrow', $_SERVER['SCRIPT_NAME'])[0] . '/archive/e_Borrow/';
+$base_url = explode('/e_Borrow', $_SERVER['SCRIPT_NAME'])[0] . '/e_Borrow/';
 ?>
 <!DOCTYPE html>
 <html lang="th">
