@@ -77,43 +77,43 @@ require_once __DIR__ . '/../includes/header.php';
 render_header('RSU Medical Hub');
 ?>
 
-<div class="flex flex-col min-h-full">
+<div class="flex flex-col min-h-full pb-20">
 
   <!-- ── Cards (pulls up over header gradient) ─────────────────────────── -->
-  <div class="flex-1 px-3.5 -mt-5">
+  <div class="flex-1 px-4 -mt-6 relative z-10">
 
     <!-- นัดหมายที่กำลังมา -->
-    <div class="bg-white rounded-2xl p-[18px] mb-3.5 shadow-[0_4px_24px_rgba(0,0,0,.07)]">
-      <div class="flex items-center justify-between mb-3.5">
-        <div class="flex items-center gap-2.5">
-          <div class="w-[30px] h-[30px] bg-blue-50 rounded-[9px] flex items-center justify-center shrink-0">
-            <i class="fa-solid fa-calendar-check text-xs text-[#0052CC]"></i>
+    <div class="bg-white rounded-3xl p-5 mb-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-calendar-check text-sm text-[#0052CC]"></i>
           </div>
-          <span class="text-sm font-extrabold text-slate-900">นัดหมายที่กำลังมา</span>
+          <span class="text-[15px] font-bold text-gray-900">นัดหมายที่กำลังมา</span>
         </div>
-        <a href="my_bookings.php" class="text-[11px] font-bold text-[#0052CC] no-underline">ดูทั้งหมด →</a>
+        <a href="my_bookings.php" class="text-xs font-bold text-[#0052CC] hover:underline">ดูทั้งหมด <i class="fa-solid fa-arrow-right ml-1"></i></a>
       </div>
 
       <?php if (empty($upcomingBookings)): ?>
-        <div class="text-center pt-4 pb-2">
-          <i class="fa-regular fa-calendar text-4xl text-slate-200 block mb-2"></i>
-          <p class="text-[13px] text-slate-400 mb-3.5">ยังไม่มีนัดหมายที่กำลังมา</p>
-          <a href="booking_campaign.php" class="inline-block bg-[#0052CC] text-white text-xs font-bold py-2.5 px-[22px] rounded-xl no-underline">
+        <div class="text-center pt-6 pb-4 bg-gray-50/50 rounded-2xl border-2 border-dashed border-gray-100">
+          <i class="fa-regular fa-calendar-xmark text-4xl text-gray-300 block mb-3"></i>
+          <p class="text-sm text-gray-400 mb-4 font-medium">ยังไม่มีนัดหมายที่กำลังมา</p>
+          <a href="booking_campaign.php" class="inline-block bg-[#0052CC] hover:bg-blue-700 text-white text-xs font-bold py-3 px-6 rounded-xl shadow-sm hover:shadow active:scale-[0.98] transition-all">
             + จองนัดหมายใหม่
           </a>
         </div>
       <?php else: ?>
         <?php foreach ($upcomingBookings as $appt): ?>
-          <a href="my_bookings.php" class="block p-3 bg-[#f8faff] rounded-[13px] mb-2 no-underline border border-[#e8f0ff]">
-            <div class="text-[13px] font-bold text-slate-800 mb-1"><?= htmlspecialchars($appt['title']) ?></div>
-            <div class="text-[11px] text-slate-500 flex items-center gap-1.5 flex-wrap">
-              <i class="fa-regular fa-clock"></i>
-              <?= hub_fmt_date($appt['slot_date'], $thaiMonths) ?>
-              &nbsp;·&nbsp;<?= substr($appt['start_time'],0,5) ?>–<?= substr($appt['end_time'],0,5) ?> น.
+          <a href="my_bookings.php" class="block p-4 bg-blue-50/30 rounded-2xl mb-3 no-underline border border-blue-100/50 hover:border-[#0052CC] hover:shadow-sm transition-all active:scale-[0.98]">
+            <div class="text-sm font-bold text-gray-800 mb-1.5"><?= htmlspecialchars($appt['title']) ?></div>
+            <div class="text-[11px] text-gray-500 flex items-center gap-2 flex-wrap font-medium">
+              <span class="flex items-center gap-1"><i class="fa-regular fa-clock text-[#0052CC]"></i> <?= hub_fmt_date($appt['slot_date'], $thaiMonths) ?></span>
+              <span class="text-gray-300">•</span>
+              <span><?= substr($appt['start_time'],0,5) ?>–<?= substr($appt['end_time'],0,5) ?> น.</span>
               <?php if ($appt['status'] === 'confirmed'): ?>
-                <span class="ml-auto bg-green-100 text-green-700 text-[10px] font-extrabold py-0.5 px-2 rounded">ยืนยันแล้ว</span>
+                <span class="ml-auto bg-emerald-100 text-emerald-700 text-[10px] font-bold py-1 px-2.5 rounded-lg border border-emerald-200">ยืนยันแล้ว</span>
               <?php else: ?>
-                <span class="ml-auto bg-yellow-100 text-yellow-700 text-[10px] font-extrabold py-0.5 px-2 rounded">รอยืนยัน</span>
+                <span class="ml-auto bg-amber-100 text-amber-700 text-[10px] font-bold py-1 px-2.5 rounded-lg border border-amber-200">รอยืนยัน</span>
               <?php endif; ?>
             </div>
           </a>
@@ -122,36 +122,39 @@ render_header('RSU Medical Hub');
     </div>
 
     <!-- อุปกรณ์ที่ยืมอยู่ -->
-    <div class="bg-white rounded-2xl p-[18px] mb-3.5 shadow-[0_4px_24px_rgba(0,0,0,.07)]">
-      <div class="flex items-center justify-between mb-3.5">
-        <div class="flex items-center gap-2.5">
-          <div class="w-[30px] h-[30px] bg-orange-50 rounded-[9px] flex items-center justify-center shrink-0">
-            <i class="fa-solid fa-box-open text-xs text-orange-500"></i>
+    <div class="bg-white rounded-3xl p-5 mb-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-box-open text-sm text-orange-500"></i>
           </div>
-          <span class="text-sm font-extrabold text-slate-900">อุปกรณ์ที่ยืมอยู่</span>
+          <span class="text-[15px] font-bold text-gray-900">อุปกรณ์ที่ยืมอยู่</span>
         </div>
-        <a href="../e_Borrow/auth_bridge.php?to=history.php" class="text-[11px] font-bold text-orange-500 no-underline">ดูทั้งหมด →</a>
+        <a href="../e_Borrow/auth_bridge.php?to=history.php" class="text-xs font-bold text-orange-500 hover:underline">ดูทั้งหมด <i class="fa-solid fa-arrow-right ml-1"></i></a>
       </div>
 
       <?php if (empty($activeBorrows)): ?>
-        <div class="text-center pt-4 pb-2">
-          <i class="fa-solid fa-box-open text-4xl text-slate-200 block mb-2"></i>
-          <p class="text-[13px] text-slate-400 mb-3.5">ไม่มีรายการยืมอุปกรณ์</p>
-          <a href="../e_Borrow/auth_bridge.php" class="inline-block bg-orange-500 text-white text-xs font-bold py-2.5 px-[22px] rounded-xl no-underline">
-            ยืมอุปกรณ์
+        <div class="text-center pt-6 pb-4 bg-gray-50/50 rounded-2xl border-2 border-dashed border-gray-100">
+          <i class="fa-solid fa-box-open text-4xl text-gray-300 block mb-3"></i>
+          <p class="text-sm text-gray-400 mb-4 font-medium">ไม่มีรายการยืมอุปกรณ์</p>
+          <a href="../e_Borrow/auth_bridge.php" class="inline-block bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold py-3 px-6 rounded-xl shadow-sm hover:shadow active:scale-[0.98] transition-all">
+            ทำรายการยืมอุปกรณ์
           </a>
         </div>
       <?php else: ?>
         <?php foreach ($activeBorrows as $borrow): ?>
           <?php
             $daysLeft = (int)ceil((strtotime($borrow['due_date']) - time()) / 86400);
-            $urgColor = $daysLeft <= 2 ? '#ef4444' : ($daysLeft <= 5 ? '#f97316' : '#16a34a');
+            $urgColor = $daysLeft <= 2 ? 'text-red-600' : ($daysLeft <= 5 ? 'text-orange-500' : 'text-emerald-600');
+            $urgBg = $daysLeft <= 2 ? 'bg-red-50 border-red-100' : ($daysLeft <= 5 ? 'bg-orange-50 border-orange-100' : 'bg-emerald-50 border-emerald-100');
           ?>
-          <div class="p-3 bg-[#fff8f5] rounded-[13px] mb-2 border border-[#ffe4cc]">
-            <div class="text-[13px] font-bold text-slate-800 mb-1"><?= htmlspecialchars($borrow['item_name']) ?></div>
-            <div class="text-[11px] text-slate-500 flex items-center justify-between">
+          <div class="p-4 rounded-2xl mb-3 border <?= $urgBg ?> hover:shadow-sm transition-all">
+            <div class="text-sm font-bold text-gray-800 mb-1"><?= htmlspecialchars($borrow['item_name']) ?></div>
+            <div class="text-[11px] text-gray-500 flex items-center justify-between font-medium">
               <span><?= htmlspecialchars($borrow['category_name']) ?></span>
-              <span style="color:<?= $urgColor ?>" class="font-extrabold">คืนภายใน <?= $daysLeft ?> วัน</span>
+              <span class="<?= $urgColor ?> font-bold bg-white px-2 py-0.5 rounded-md shadow-sm border border-white/50">
+                <i class="fa-solid fa-clock-rotate-left mr-1"></i> คืนภายใน <?= $daysLeft ?> วัน
+              </span>
             </div>
           </div>
         <?php endforeach; ?>
@@ -159,23 +162,23 @@ render_header('RSU Medical Hub');
     </div>
 
     <!-- Quick Access -->
-    <div class="grid grid-cols-2 gap-3 mb-3.5">
-      <a href="booking_campaign.php" class="bg-white rounded-2xl p-[18px_14px] no-underline shadow-[0_4px_20px_rgba(0,0,0,.06)] flex flex-col gap-2.5">
-        <div class="w-11 h-11 bg-gradient-to-br from-[#0052CC] to-[#0070f3] rounded-[14px] flex items-center justify-center">
-          <i class="fa-solid fa-syringe text-[17px] text-white"></i>
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      <a href="booking_campaign.php" class="bg-white rounded-3xl p-5 no-underline shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center gap-3 active:scale-95 transition-all hover:border-[#0052CC]">
+        <div class="w-12 h-12 bg-gradient-to-br from-[#0052CC] to-[#0070f3] rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200">
+          <i class="fa-solid fa-notes-medical text-2xl text-white"></i>
         </div>
         <div>
-          <div class="text-[13px] font-extrabold text-slate-800">นัดหมายสุขภาพ</div>
-          <div class="text-[11px] text-slate-400 mt-0.5">จอง / ดูประวัติ</div>
+          <div class="text-sm font-bold text-gray-900">นัดหมายสุขภาพ</div>
+          <div class="text-[10px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">จอง / ดูประวัติ</div>
         </div>
       </a>
-      <a href="../e_Borrow/auth_bridge.php" class="bg-white rounded-2xl p-[18px_14px] no-underline shadow-[0_4px_20px_rgba(0,0,0,.06)] flex flex-col gap-2.5">
-        <div class="w-11 h-11 bg-gradient-to-br from-[#f97316] to-[#fb923c] rounded-[14px] flex items-center justify-center">
-          <i class="fa-solid fa-box-open text-[17px] text-white"></i>
+      <a href="../e_Borrow/auth_bridge.php" class="bg-white rounded-3xl p-5 no-underline shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center gap-3 active:scale-95 transition-all hover:border-orange-500">
+        <div class="w-12 h-12 bg-gradient-to-br from-[#f97316] to-[#fb923c] rounded-2xl flex items-center justify-center shadow-lg shadow-orange-200">
+          <i class="fa-solid fa-wheelchair text-2xl text-white"></i>
         </div>
         <div>
-          <div class="text-[13px] font-extrabold text-slate-800">ยืมอุปกรณ์</div>
-          <div class="text-[11px] text-slate-400 mt-0.5">e-Borrow</div>
+          <div class="text-sm font-bold text-gray-900">ยืมอุปกรณ์</div>
+          <div class="text-[10px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">ระบบ e-Borrow</div>
         </div>
       </a>
     </div>
