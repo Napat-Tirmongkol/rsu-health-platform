@@ -41,6 +41,9 @@ $GLOBALS['_tr'] = file_exists($_langFile)
 function __(string $key, mixed ...$args): string
 {
     $str = $GLOBALS['_tr'][$key] ?? $key;
+    if (!is_string($str)) {
+        return $key; // array/bool values (e.g. bookings.months_short) must be accessed via $GLOBALS['_tr'] directly
+    }
     return $args ? vsprintf($str, $args) : $str;
 }
 

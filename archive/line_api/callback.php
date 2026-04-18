@@ -70,8 +70,9 @@ curl_close($ch);
 
 $profile = json_decode($profileRes, true);
 
-$line_user_id = $profile['userId']      ?? null;
-$displayName  = $profile['displayName'] ?? null;
+$line_user_id  = $profile['userId']      ?? null;
+$displayName   = $profile['displayName'] ?? null;
+$linePicture   = $profile['pictureUrl']  ?? '';
 
 if (!$line_user_id) {
     die("Authentication failed. (ไม่สามารถรับ Profile ได้)");
@@ -128,6 +129,7 @@ try {
     } else {
         // ❌ ไม่พบ User — ผู้ใช้ใหม่ ให้กรอกข้อมูลส่วนตัวครั้งแรก
         $_SESSION['line_user_id']      = $line_user_id;
+        $_SESSION['line_picture_url']  = $linePicture;
         $_SESSION['pending_redirect']  = $redirectTarget;
 
         header("Location: ../../user/profile.php");

@@ -337,15 +337,17 @@ function render_header(string $title = 'E-Vax'): void
           </div>
 
           <div class="flex items-center gap-4 relative z-10">
-            <div
-              class="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center border-2 border-white/20 shadow-lg overflow-hidden">
-              <?php
+            <?php
               $profilePic = $user['picture_url'] ?? $_SESSION['line_picture'] ?? '';
-              if (!empty($profilePic)):
-                ?>
-                <img src="<?= htmlspecialchars($profilePic) ?>" alt="Profile" class="w-full h-full object-cover">
+            ?>
+            <div class="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center border-2 border-white/20 shadow-lg overflow-hidden">
+              <?php if (!empty($profilePic)): ?>
+                <img src="<?= htmlspecialchars($profilePic, ENT_QUOTES) ?>"
+                     alt="Profile"
+                     class="w-full h-full object-cover"
+                     onerror="this.parentElement.innerHTML='<div class=\'w-full h-full bg-white/15 backdrop-blur-md flex items-center justify-center\'><i class=\'fa-solid fa-user text-2xl text-white\'></i></div>'">
               <?php else: ?>
-                <i class="fa-solid fa-user-astronaut text-2xl text-white"></i>
+                <i class="fa-solid fa-user text-2xl text-white"></i>
               <?php endif; ?>
             </div>
             <div class="flex-1">

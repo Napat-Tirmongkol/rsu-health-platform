@@ -59,19 +59,10 @@ usort($historyBookings,  fn($a, $b) => strtotime($b['slot_date'].' '.$b['start_t
 
 render_header(__('bookings.page_title'));
 
-function formatDate(string $dateStr): string {
-    $months     = __('bookings.months_short');
-    $isBuddhist = __('bookings.date_buddhist');
-    [$y, $m, $d] = explode('-', $dateStr);
-    $year = $isBuddhist ? (int)$y + 543 : (int)$y;
-    return (int)$d . ' ' . $months[(int)$m] . ' ' . $year;
-}
-
 function renderBookingCard($b): void {
-    $dateLabel  = formatDate($b['slot_date']);
+    $dateLabel  = ecampaign_format_date($b['slot_date']);
     $timeLabel  = substr($b['start_time'], 0, 5) . ' – ' . substr($b['end_time'], 0, 5);
-    $dows       = __('bookings.dow');
-    $dow        = $dows[date('w', strtotime($b['slot_date']))];
+    $dow        = ecampaign_format_dow($b['slot_date']);
     $isAttended      = !empty($b['attended_at']);
     $isConfirmed        = ($b['status'] === 'confirmed');
     $isPending          = ($b['status'] === 'booked');      // รอ Admin อนุมัติ
