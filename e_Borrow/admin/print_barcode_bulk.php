@@ -63,7 +63,7 @@ if (!empty($all_ids)) {
         .item-name { font-size: 14px; font-weight: bold; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; line-height: 1.2; }
         .item-serial { font-size: 12px; color: #555; margin-bottom: 2px; }
         .no-print { text-align: center; margin-bottom: 20px; }
-        .btn { padding: 10px 20px; background: #0B6623; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; text-decoration: none; display: inline-block; }
+        .btn { padding: 10px 20px; background: #0052CC; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; text-decoration: none; display: inline-block; }
         @media print {
             body { background: none; padding: 0; }
             .page { width: 100%; box-shadow: none; margin: 0; padding: 5mm; height: auto; }

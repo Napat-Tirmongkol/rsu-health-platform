@@ -55,7 +55,7 @@ $authUrl = "https://access.line.me/oauth2/v2.1/authorize?" . http_build_query([
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Prompt', sans-serif;
-            background: linear-gradient(135deg, #0B6623 0%, #1a8c35 50%, #084C1A 100%);
+            background: linear-gradient(135deg, #0052CC 0%, #0070f3 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -78,7 +78,7 @@ $authUrl = "https://access.line.me/oauth2/v2.1/authorize?" . http_build_query([
             box-shadow: 0 30px 60px rgba(0,0,0,0.25);
         }
         .card-header {
-            background: #0B6623;
+            background: #0052CC;
             padding: 48px 28px 36px;
             text-align: center;
         }
@@ -89,7 +89,7 @@ $authUrl = "https://access.line.me/oauth2/v2.1/authorize?" . http_build_query([
             display: flex; align-items: center; justify-content: center;
             margin: 0 auto 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            font-size: 2.8rem; color: #0B6623;
+            font-size: 2.8rem; color: #0052CC;
             transition: transform .3s;
         }
         .logo-box:hover { transform: translateY(-5px) scale(1.05); }

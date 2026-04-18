@@ -20,8 +20,8 @@ $default_name = isset($_SESSION['line_name_to_register']) ? htmlspecialchars($_S
     <style>
         :root {
             /* (����������ͧ) */
-            --color-primary: #0B6623;
-            --color-primary-dark: #084C1A;
+            --color-primary: #0052CC;
+            --color-primary-dark: #003d99;
             --color-page-bg: #B7E5CD;
             --color-content-bg: #FFFFFF;
             --border-radius-main: 12px;

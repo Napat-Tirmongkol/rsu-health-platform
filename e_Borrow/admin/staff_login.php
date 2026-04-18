@@ -37,7 +37,7 @@ $error = isset($_GET['error']) ? ($errors[$_GET['error']] ?? 'เกิดข้
             align-items: center;
             justify-content: center;
             padding: 24px;
-            background: linear-gradient(135deg, #0B6623 0%, #1a8c35 50%, #084C1A 100%);
+            background: linear-gradient(135deg, #0052CC 0%, #0070f3 100%);
         }
 
         .login-wrapper {
@@ -59,7 +59,7 @@ $error = isset($_GET['error']) ? ($errors[$_GET['error']] ?? 'เกิดข้
 
         /* ── Header ── */
         .card-header {
-            background: #0B6623;
+            background: #0052CC;
             padding: 40px 28px 32px;
             text-align: center;
         }
@@ -69,7 +69,7 @@ $error = isset($_GET['error']) ? ($errors[$_GET['error']] ?? 'เกิดข้
             border-radius: 22px;
             display: flex; align-items: center; justify-content: center;
             margin: 0 auto 18px;
-            font-size: 2.5rem; color: #0B6623;
+            font-size: 2.5rem; color: #0052CC;
             box-shadow: 0 8px 20px rgba(0,0,0,.15);
             transition: transform .3s;
         }
@@ -82,7 +82,7 @@ $error = isset($_GET['error']) ? ($errors[$_GET['error']] ?? 'เกิดข้
 
         .role-badge {
             display: inline-flex; align-items: center; gap: 6px;
-            background: #f0fdf4; color: #16a34a;
+            background: #eff6ff; color: #16a34a;
             border: 1px solid #bbf7d0;
             border-radius: 20px;
             padding: 5px 14px;
@@ -147,7 +147,7 @@ $error = isset($_GET['error']) ? ($errors[$_GET['error']] ?? 'เกิดข้
         .btn-login {
             width: 100%;
             padding: 14px;
-            background: #0B6623;
+            background: #0052CC;
             color: #fff;
             font-size: 1rem; font-weight: 700;
             font-family: 'Prompt', sans-serif;
@@ -222,7 +222,7 @@ $error = isset($_GET['error']) ? ($errors[$_GET['error']] ?? 'เกิดข้
             <form method="POST" action="../process/login_process.php" autocomplete="off">
 
                 <div class="form-group">
-                    <label for="username"><i class="fa-solid fa-user" style="margin-right:5px;color:#0B6623;"></i>ชื่อผู้ใช้</label>
+                    <label for="username"><i class="fa-solid fa-user" style="margin-right:5px;color:#0052CC;"></i>ชื่อผู้ใช้</label>
                     <div class="input-wrap">
                         <i class="icon-left fa-solid fa-at"></i>
                         <input type="text" id="username" name="username"
@@ -233,7 +233,7 @@ $error = isset($_GET['error']) ? ($errors[$_GET['error']] ?? 'เกิดข้
                 </div>
 
                 <div class="form-group">
-                    <label for="password"><i class="fa-solid fa-lock" style="margin-right:5px;color:#0B6623;"></i>รหัสผ่าน</label>
+                    <label for="password"><i class="fa-solid fa-lock" style="margin-right:5px;color:#0052CC;"></i>รหัสผ่าน</label>
                     <div class="input-wrap">
                         <i class="icon-left fa-solid fa-key"></i>
                         <input type="password" id="password" name="password"

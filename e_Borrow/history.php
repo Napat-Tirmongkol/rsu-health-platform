@@ -42,7 +42,7 @@ include('includes/student_header.php');
 
 /* ===== TOP HEADER ===== */
 .history-header {
-    background: linear-gradient(145deg, #0B6623 0%, #1a8c35 60%, #084C1A 100%);
+    background: linear-gradient(135deg, #0052CC 0%, #0070f3 100%);
     padding: 30px 20px 45px;
     text-align: center;
     position: relative;
@@ -137,27 +137,27 @@ include('includes/student_header.php');
 .empty-state p { color: #64748b; font-size: .9rem; margin: 0 0 16px; }
 .btn-primary-sm {
     display: inline-block; padding: 8px 16px;
-    background: #0B6623; color: #fff; border-radius: 10px;
+    background: #0052CC; color: #fff; border-radius: 10px;
     text-decoration: none; font-size: .85rem; font-weight: 600;
 }
 
 /* ===== DARK MODE OVERRIDES ===== */
-body.dark-mode .hist-card { background: #1e2d25; border-color: rgba(255,255,255,.05); box-shadow: 0 4px 12px rgba(0,0,0,.2); }
-body.dark-mode .hist-thumb { background: #162112; color: #334155; }
+body.dark-mode .hist-card { background: #162040; border-color: rgba(255,255,255,.05); box-shadow: 0 4px 12px rgba(0,0,0,.2); }
+body.dark-mode .hist-thumb { background: #0f1a35; color: #334155; }
 body.dark-mode .hist-title { color: #e2e8f0; }
 body.dark-mode .hist-item { color: #94a3b8; }
 body.dark-mode .hist-dates { background: rgba(255,255,255,.03); }
 body.dark-mode .date-row span { color: #94a3b8; }
 body.dark-mode .date-row strong { color: #cbd5e1; }
 
-body.dark-mode .status-returned { background: rgba(22,163,74,.2); color: #4ade80; }
+body.dark-mode .status-returned { background: rgba(22,163,74,.2); color: #60a5fa; }
 body.dark-mode .status-pending  { background: rgba(202,138,4,.2); color: #facc15; }
 body.dark-mode .status-rejected { background: rgba(100,116,139,.2); color: #94a3b8; }
 body.dark-mode .status-cancelled{ background: rgba(220,38,38,.2); color: #f87171; }
 
 body.dark-mode .btn-cancel { border-color: rgba(220,38,38,.4); color: #f87171; }
 body.dark-mode .btn-cancel:hover { background: rgba(220,38,38,.15); }
-body.dark-mode .empty-state { background: #1e2d25; }
+body.dark-mode .empty-state { background: #162040; }
 </style>
 
 <div class="page-wrap">

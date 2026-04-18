@@ -33,7 +33,7 @@ include('includes/student_header.php');
 
 /* ===== TOP HEADER ===== */
 .borrow-header {
-    background: linear-gradient(145deg, #0B6623 0%, #1a8c35 60%, #084C1A 100%);
+    background: linear-gradient(135deg, #0052CC 0%, #0070f3 100%);
     padding: 30px 20px 45px; /* เผื่อที่ให้ search bar ลอย */
     text-align: center;
     position: relative;
@@ -57,7 +57,7 @@ include('includes/student_header.php');
     padding: 12px 18px;
     display: flex; align-items: center; gap: 12px;
     box-shadow: 0 8px 24px rgba(0,0,0,.08);
-    border: 1px solid rgba(11,102,35,.08);
+    border: 1px solid rgba(0,82,204,.08);
     transition: box-shadow .2s;
 }
 .search-box:focus-within {
@@ -122,7 +122,7 @@ include('includes/student_header.php');
     position: absolute; top: 10px; right: 10px;
     background: rgba(255,255,255,.9); backdrop-filter: blur(4px);
     padding: 4px 8px; border-radius: 8px;
-    font-size: .7rem; font-weight: 700; color: #0B6623;
+    font-size: .7rem; font-weight: 700; color: #0052CC;
     box-shadow: 0 2px 8px rgba(0,0,0,.1);
     display: flex; align-items: center; gap: 4px;
 }
@@ -162,17 +162,17 @@ include('includes/student_header.php');
 .empty-state p { color: #64748b; font-size: .9rem; margin: 0; }
 
 /* ===== DARK MODE OVERRIDES ===== */
-body.dark-mode .search-box { background: #1e2d25; border-color: rgba(255,255,255,.08); }
+body.dark-mode .search-box { background: #162040; border-color: rgba(255,255,255,.08); }
 body.dark-mode .search-box input { color: #e2e8f0; }
 body.dark-mode .btn-clear { background: rgba(255,255,255,.1); color: #94a3b8; }
-body.dark-mode .equip-card { background: #1e2d25; border-color: rgba(255,255,255,.05); }
+body.dark-mode .equip-card { background: #162040; border-color: rgba(255,255,255,.05); }
 body.dark-mode .card-body h3 { color: #e2e8f0; }
 body.dark-mode .card-body p { color: #94a3b8; }
-body.dark-mode .card-img-wrap { background: #162112; }
+body.dark-mode .card-img-wrap { background: #0f1a35; }
 body.dark-mode .card-img-placeholder { color: #334155; }
-body.dark-mode .stock-badge { background: rgba(30,45,37,.9); color: #4ade80; border: 1px solid rgba(255,255,255,.1); }
+body.dark-mode .stock-badge { background: rgba(30,50,80,.9); color: #60a5fa; border: 1px solid rgba(255,255,255,.1); }
 body.dark-mode .btn-request { background: rgba(14,165,233,.15); color: #38bdf8; }
-body.dark-mode .empty-state { background: #1e2d25; }
+body.dark-mode .empty-state { background: #162040; }
 </style>
 
 <div class="page-wrap">

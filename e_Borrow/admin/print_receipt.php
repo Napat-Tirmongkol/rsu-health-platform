@@ -82,7 +82,7 @@ try {
         }
         .receipt-header h1 {
             margin: 0;
-            color: var(--color-primary, #0B6623);
+            color: var(--color-primary, #0052CC);
         }
         .receipt-details {
             display: grid;
@@ -108,7 +108,7 @@ try {
             text-align: right;
             font-size: 1.5em;
             font-weight: bold;
-            color: var(--color-primary, #0B6623);
+            color: var(--color-primary, #0052CC);
         }
         .receipt-footer {
             margin-top: 40px;
