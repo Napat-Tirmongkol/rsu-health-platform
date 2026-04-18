@@ -9,8 +9,72 @@ require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/includes/auth.php'; // ตรวจสอบความปลอดภัย
 
 $pdo = db();
-$adminRole = $_SESSION['admin_role'] ?? 'admin'; // ตัวแปรบทบาทสำหรับเช็คสิทธิ์ (Mock role)
-$isStaff   = !empty($_SESSION['is_ecampaign_staff']); // flag: เจ้าหน้าที่ e-Campaign (ไม่ใช่ Portal Admin)
+$adminRole = $_SESSION['admin_role'] ?? 'admin';
+$isStaff   = !empty($_SESSION['is_ecampaign_staff']);
+
+$activeSection = $_GET['section'] ?? 'dashboard';
+
+// ── POST handlers for embedded section partials (must be before any HTML) ────
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $sectionAction = $_POST['action'] ?? '';
+
+    // Error Logs actions
+    if (in_array($sectionAction, ['save_alert_email', 'clear', 'delete_one'], true)) {
+        try {
+            $pdo->exec("CREATE TABLE IF NOT EXISTS sys_settings (`key` VARCHAR(100) NOT NULL PRIMARY KEY, `value` TEXT NOT NULL DEFAULT '', updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+            if ($sectionAction === 'save_alert_email') {
+                $emailVal = trim($_POST['alert_email'] ?? '');
+                if ($emailVal !== '' && !filter_var($emailVal, FILTER_VALIDATE_EMAIL)) {
+                    header('Location: index.php?section=error_logs&email_error=1');
+                } else {
+                    $pdo->prepare("INSERT INTO sys_settings (`key`,`value`) VALUES ('admin_alert_email',?) ON DUPLICATE KEY UPDATE `value`=VALUES(`value`)")->execute([$emailVal]);
+                    header('Location: index.php?section=error_logs&saved=1');
+                }
+                exit;
+            } elseif ($sectionAction === 'clear') {
+                $cl = $_POST['clear_level'] ?? 'all';
+                if ($cl === 'all') { $pdo->exec("TRUNCATE TABLE sys_error_logs"); }
+                else { $pdo->prepare("DELETE FROM sys_error_logs WHERE level=?")->execute([$cl]); }
+                header('Location: index.php?section=error_logs&cleared=1'); exit;
+            } elseif ($sectionAction === 'delete_one') {
+                $lid = (int)($_POST['log_id'] ?? 0);
+                if ($lid > 0) $pdo->prepare("DELETE FROM sys_error_logs WHERE id=?")->execute([$lid]);
+                header('Location: index.php?section=error_logs'); exit;
+            }
+        } catch (PDOException) {}
+    }
+}
+
+// ── Export handlers for error_logs (must be before any HTML) ─────────────────
+if ($activeSection === 'error_logs' && isset($_GET['export'])) {
+    $expFmt    = $_GET['export'];
+    $expSearch = trim($_GET['el_search'] ?? '');
+    $expLevel  = $_GET['el_level']  ?? '';
+    $expDate   = $_GET['el_date']   ?? '';
+    $expWhere  = 'WHERE 1=1'; $expParams = [];
+    if ($expSearch !== '') { $expWhere .= ' AND (message LIKE ? OR source LIKE ?)'; $expParams[] = "%$expSearch%"; $expParams[] = "%$expSearch%"; }
+    if (in_array($expLevel, ['error','warning','info'], true)) { $expWhere .= ' AND level=?'; $expParams[] = $expLevel; }
+    if ($expDate !== '') { $expWhere .= ' AND DATE(created_at)=?'; $expParams[] = $expDate; }
+    $expStmt = $pdo->prepare("SELECT id,level,source,message,context,ip_address,user_id,created_at FROM sys_error_logs $expWhere ORDER BY created_at DESC LIMIT 10000");
+    $expStmt->execute($expParams);
+    $expRows = $expStmt->fetchAll(PDO::FETCH_ASSOC);
+    $expFile = 'error_logs_' . date('Ymd_His');
+    if ($expFmt === 'csv') {
+        header('Content-Type: text/csv; charset=utf-8');
+        header("Content-Disposition: attachment; filename={$expFile}.csv");
+        $out = fopen('php://output', 'w');
+        fprintf($out, chr(0xEF).chr(0xBB).chr(0xBF));
+        fputcsv($out, ['ID','Level','Source','Message','Context','IP','UserID','Created']);
+        foreach ($expRows as $r) fputcsv($out, [$r['id'],$r['level'],$r['source'],$r['message'],$r['context'],$r['ip_address'],$r['user_id'],$r['created_at']]);
+        fclose($out); exit;
+    }
+    if ($expFmt === 'json') {
+        header('Content-Type: application/json; charset=utf-8');
+        header("Content-Disposition: attachment; filename={$expFile}.json");
+        echo json_encode(['exported_at'=>date('Y-m-d H:i:s'),'total'=>count($expRows),'logs'=>$expRows], JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+}
 
 $idSearch = $_GET['id_search'] ?? '';
 
@@ -1834,37 +1898,32 @@ try {
 
             <!-- ════════════ SECTION: ACTIVITY LOGS ════════════ -->
             <div id="section-activity_logs" class="portal-section"
-                style="display:none; height:100%; border-radius:inherit; background:#f8fafc;">
-                <iframe src="../admin/activity_logs.php?embed=1"
-                    style="width:100%; height:100%; border:none; border-radius:inherit;"></iframe>
+                style="<?= $activeSection==='activity_logs'?'':'display:none;' ?> background:#f8fafc; overflow-y:auto;">
+                <?php include __DIR__ . '/_partials/activity_logs.php'; ?>
             </div>
 
             <!-- ════════════ SECTION: ERROR LOGS ════════════ -->
             <div id="section-error_logs" class="portal-section"
-                style="display:none; height:100%; border-radius:inherit; background:#f8fafc;">
-                <iframe src="../admin/error_logs.php?embed=1"
-                    style="width:100%; height:100%; border:none; border-radius:inherit;"></iframe>
+                style="<?= $activeSection==='error_logs'?'':'display:none;' ?> background:#f8fafc; overflow-y:auto;">
+                <?php include __DIR__ . '/_partials/error_logs.php'; ?>
             </div>
 
             <!-- ════════════ SECTION: EMAIL LOGS ════════════ -->
             <div id="section-email_logs" class="portal-section"
-                style="display:none; height:100%; border-radius:inherit; background:#f8fafc;">
-                <iframe src="../admin/email_logs.php?embed=1&layout=none"
-                    style="width:100%; height:100%; border:none; border-radius:inherit;"></iframe>
+                style="<?= $activeSection==='email_logs'?'':'display:none;' ?> background:#f8fafc; overflow-y:auto;">
+                <?php include __DIR__ . '/_partials/email_logs.php'; ?>
             </div>
 
             <!-- ════════════ SECTION: SMTP SETTINGS ════════════ -->
             <div id="section-smtp_settings" class="portal-section"
-                style="display:none; height:100%; border-radius:inherit; background:#f8fafc;">
-                <iframe src="smtp_settings.php?embed=1&layout=none"
-                    style="width:100%; height:100%; border:none; border-radius:inherit;"></iframe>
+                style="<?= $activeSection==='smtp_settings'?'':'display:none;' ?> background:#f8fafc; overflow-y:auto;">
+                <?php include __DIR__ . '/_partials/smtp_settings.php'; ?>
             </div>
 
             <!-- ════════════ SECTION: SENTRY TEST ════════════ -->
             <div id="section-sentry_test" class="portal-section"
-                style="display:none; height:100%; border-radius:inherit; background:#f8fafc;">
-                <iframe src="../admin/sentry_test.php?embed=1&layout=none"
-                    style="width:100%; height:100%; border:none; border-radius:inherit;"></iframe>
+                style="<?= $activeSection==='sentry_test'?'':'display:none;' ?> background:#f8fafc; overflow-y:auto;">
+                <?php include __DIR__ . '/_partials/sentry_test.php'; ?>
             </div>
 
         </main><!-- /portal-main -->
@@ -2486,6 +2545,11 @@ try {
             if (target) target.style.display = '';
             document.querySelectorAll('.psb-item').forEach(function (b) { b.classList.remove('psb-active'); });
             if (btn) btn.classList.add('psb-active');
+            var url = new URL(window.location.href);
+            url.searchParams.set('section', sectionId);
+            // remove pagination/filter params when switching sections
+            ['page','el_search','el_level','el_date','el_source','al_q','eml_q','eml_type','eml_status'].forEach(function(k){ url.searchParams.delete(k); });
+            history.pushState({section: sectionId}, '', url.toString());
         };
 
         // Pause when tab hidden, resume when visible

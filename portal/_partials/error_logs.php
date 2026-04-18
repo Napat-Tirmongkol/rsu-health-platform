@@ -1,0 +1,366 @@
+<?php
+// portal/_partials/error_logs.php — included by portal/index.php
+// POST handlers (save_alert_email, clear, delete_one) and export are handled at portal/index.php top
+// $pdo is available from parent scope
+
+// Auto-create tables
+try {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS sys_error_logs (
+        id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        level ENUM('error','warning','info') NOT NULL DEFAULT 'error',
+        source VARCHAR(300) NOT NULL DEFAULT '',
+        message TEXT NOT NULL,
+        context TEXT NOT NULL DEFAULT '',
+        ip_address VARCHAR(45) NOT NULL DEFAULT '',
+        user_id INT UNSIGNED NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        notified_at DATETIME NULL DEFAULT NULL,
+        INDEX idx_level (level),
+        INDEX idx_created_at (created_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    $pdo->exec("CREATE TABLE IF NOT EXISTS sys_settings (
+        `key` VARCHAR(100) NOT NULL PRIMARY KEY,
+        `value` TEXT NOT NULL DEFAULT '',
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+} catch (PDOException) {}
+
+// Load current alert email
+$_el_alertEmail = (string)($pdo->query(
+    "SELECT `value` FROM sys_settings WHERE `key` = 'admin_alert_email' LIMIT 1"
+)->fetchColumn() ?: '');
+
+// Validation error from redirect
+$_el_emailError = isset($_GET['email_error']) ? 'รูปแบบอีเมลไม่ถูกต้อง' : null;
+
+// Filters
+$_el_page   = max(1, (int)($_GET['page'] ?? 1));
+$_el_limit  = 50;
+$_el_offset = ($_el_page - 1) * $_el_limit;
+$_el_search  = trim($_GET['el_search'] ?? '');
+$_el_level   = $_GET['el_level']  ?? '';
+$_el_date    = $_GET['el_date']   ?? '';
+$_el_source  = $_GET['el_source'] ?? '';
+
+$_el_where  = 'WHERE 1=1';
+$_el_params = [];
+if ($_el_search !== '') {
+    $_el_where   .= ' AND (message LIKE ? OR source LIKE ?)';
+    $_el_params[] = "%$_el_search%";
+    $_el_params[] = "%$_el_search%";
+}
+if (in_array($_el_level, ['error', 'warning', 'info'], true)) {
+    $_el_where   .= ' AND level = ?';
+    $_el_params[] = $_el_level;
+}
+if ($_el_date !== '') {
+    $_el_where   .= ' AND DATE(created_at) = ?';
+    $_el_params[] = $_el_date;
+}
+if ($_el_source === 'js') {
+    $_el_where .= " AND source LIKE '[JS]%'";
+} elseif ($_el_source === 'php') {
+    $_el_where .= " AND source NOT LIKE '[JS]%'";
+}
+
+$_el_logs = [];
+$_el_summary = [];
+$_el_total = 0;
+$_el_totalPages = 0;
+$_el_todayErrors = 0;
+try {
+    $_el_summary     = $pdo->query("SELECT level, COUNT(*) FROM sys_error_logs GROUP BY level")->fetchAll(PDO::FETCH_KEY_PAIR);
+    $_el_todayErrors = (int)$pdo->query("SELECT COUNT(*) FROM sys_error_logs WHERE level='error' AND DATE(created_at)=CURDATE()")->fetchColumn();
+
+    $sc = $pdo->prepare("SELECT COUNT(*) FROM sys_error_logs $_el_where");
+    $sc->execute($_el_params);
+    $_el_total      = (int)$sc->fetchColumn();
+    $_el_totalPages = (int)ceil($_el_total / $_el_limit);
+
+    $sr = $pdo->prepare("SELECT * FROM sys_error_logs $_el_where ORDER BY created_at DESC LIMIT $_el_limit OFFSET $_el_offset");
+    $sr->execute($_el_params);
+    $_el_logs = $sr->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $_el_dbError = $e->getMessage();
+}
+
+function _el_badge(string $l): string {
+    return match($l) {
+        'error'   => 'background:#fff1f2;border:1px solid #fecaca;color:#be123c',
+        'warning' => 'background:#fffbeb;border:1px solid #fde68a;color:#92400e',
+        default   => 'background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af',
+    };
+}
+function _el_icon(string $l): string {
+    return match($l) { 'error' => 'fa-circle-xmark', 'warning' => 'fa-triangle-exclamation', default => 'fa-circle-info' };
+}
+function _el_iconColor(string $l): string {
+    return match($l) { 'error' => '#e11d48', 'warning' => '#d97706', default => '#3b82f6' };
+}
+
+// Build filter querystring for export links
+$_el_filterQs = http_build_query(array_filter([
+    'el_search' => $_el_search,
+    'el_level'  => $_el_level,
+    'el_date'   => $_el_date,
+    'el_source' => $_el_source,
+]));
+?>
+
+<div class="p-6">
+
+    <!-- Flash alerts -->
+    <?php if (isset($_GET['saved'])): ?>
+    <div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-2xl text-green-700 text-sm flex items-center gap-2">
+        <i class="fa-solid fa-check-circle"></i> บันทึกการตั้งค่าเรียบร้อยแล้ว
+    </div>
+    <?php endif; ?>
+    <?php if (isset($_GET['cleared'])): ?>
+    <div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-2xl text-green-700 text-sm flex items-center gap-2">
+        <i class="fa-solid fa-check-circle"></i> ลบ Log เรียบร้อยแล้ว
+    </div>
+    <?php endif; ?>
+
+    <!-- Section Header -->
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <h2 class="text-2xl font-black text-gray-900 flex items-center gap-2">
+                <i class="fa-solid fa-bug text-red-500"></i> Error Logs
+            </h2>
+            <p class="text-xs text-gray-400 mt-1">บันทึกข้อผิดพลาดและ PHP errors ทั้งหมดในระบบ</p>
+        </div>
+        <div class="flex gap-2">
+            <a href="?section=error_logs&export=csv<?= $_el_filterQs ? '&'.$_el_filterQs : '' ?>"
+               class="px-3 py-2 bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold rounded-xl hover:bg-emerald-100 flex items-center gap-1.5">
+                <i class="fa-solid fa-file-csv"></i> CSV
+            </a>
+            <a href="?section=error_logs&export=json<?= $_el_filterQs ? '&'.$_el_filterQs : '' ?>"
+               class="px-3 py-2 bg-violet-50 text-violet-700 border border-violet-200 text-xs font-bold rounded-xl hover:bg-violet-100 flex items-center gap-1.5">
+                <i class="fa-solid fa-file-code"></i> JSON
+            </a>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <?php
+        $cards = [
+            ['label'=>'Error วันนี้', 'val'=>$_el_todayErrors,               'icon'=>'fa-circle-xmark',        'bg'=>'#fff1f2','ic'=>'#e11d48'],
+            ['label'=>'Total Errors', 'val'=>$_el_summary['error']??0,        'icon'=>'fa-triangle-exclamation', 'bg'=>'#fff1f2','ic'=>'#e11d48'],
+            ['label'=>'Warnings',     'val'=>$_el_summary['warning']??0,      'icon'=>'fa-circle-exclamation',   'bg'=>'#fffbeb','ic'=>'#d97706'],
+            ['label'=>'Info',         'val'=>$_el_summary['info']??0,         'icon'=>'fa-circle-info',          'bg'=>'#eff6ff','ic'=>'#3b82f6'],
+        ];
+        foreach ($cards as $c): ?>
+        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center gap-4">
+            <div class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style="background:<?= $c['bg'] ?>">
+                <i class="fa-solid <?= $c['icon'] ?> text-lg" style="color:<?= $c['ic'] ?>"></i>
+            </div>
+            <div>
+                <p class="text-2xl font-black text-gray-900"><?= number_format((int)$c['val']) ?></p>
+                <p class="text-xs text-gray-400 font-semibold mt-0.5"><?= $c['label'] ?></p>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    </div>
+
+    <!-- Alert Email Settings -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-bell text-blue-500 text-sm"></i>
+            </div>
+            <div>
+                <p class="text-sm font-bold text-gray-800">แจ้งเตือน Error ทางอีเมล</p>
+                <p class="text-xs text-gray-400">ส่ง Error Digest ทุก 30 นาทีเมื่อมี error ใหม่ในระบบ</p>
+            </div>
+        </div>
+        <form method="POST" action="index.php?section=error_logs" class="flex flex-wrap gap-3 items-end">
+            <input type="hidden" name="action" value="save_alert_email">
+            <div class="flex-1 min-w-[220px]">
+                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">อีเมล Admin (ว่างเปล่า = ปิดการแจ้งเตือน)</label>
+                <div class="relative">
+                    <i class="fa-solid fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-xs"></i>
+                    <input type="email" name="alert_email" value="<?= htmlspecialchars($_el_alertEmail) ?>"
+                        placeholder="admin@example.com"
+                        class="w-full pl-8 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all">
+                </div>
+                <?php if ($_el_emailError): ?>
+                <p class="text-xs text-red-500 font-semibold mt-1"><?= htmlspecialchars($_el_emailError) ?></p>
+                <?php endif; ?>
+            </div>
+            <button type="submit" class="px-5 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 flex items-center gap-2 shadow-sm">
+                <i class="fa-solid fa-floppy-disk"></i> บันทึก
+            </button>
+            <?php if ($_el_alertEmail): ?>
+            <div class="flex items-center gap-2 text-xs text-emerald-700 font-semibold px-4 py-2.5 bg-emerald-50 border border-emerald-200 rounded-xl">
+                <i class="fa-solid fa-circle-check text-emerald-500"></i> กำลังส่งไปยัง <?= htmlspecialchars($_el_alertEmail) ?>
+            </div>
+            <?php else: ?>
+            <div class="flex items-center gap-2 text-xs text-gray-400 font-semibold px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl">
+                <i class="fa-solid fa-bell-slash"></i> ปิดการแจ้งเตือน
+            </div>
+            <?php endif; ?>
+        </form>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6">
+        <form method="GET" class="flex flex-wrap gap-3 items-end">
+            <input type="hidden" name="section" value="error_logs">
+            <div class="flex-1 min-w-[180px]">
+                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">ค้นหา</label>
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-xs"></i>
+                    <input type="text" name="el_search" value="<?= htmlspecialchars($_el_search) ?>"
+                        placeholder="message หรือ source..."
+                        class="w-full pl-8 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-100 transition-all bg-gray-50">
+                </div>
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">Level</label>
+                <select name="el_level" class="py-2.5 px-3 border border-gray-200 rounded-xl text-sm outline-none bg-gray-50">
+                    <option value="">ทั้งหมด</option>
+                    <option value="error"   <?= $_el_level==='error'   ? 'selected':'' ?>>Error</option>
+                    <option value="warning" <?= $_el_level==='warning' ? 'selected':'' ?>>Warning</option>
+                    <option value="info"    <?= $_el_level==='info'    ? 'selected':'' ?>>Info</option>
+                </select>
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">วันที่</label>
+                <input type="date" name="el_date" value="<?= htmlspecialchars($_el_date) ?>"
+                    class="py-2.5 px-3 border border-gray-200 rounded-xl text-sm outline-none bg-gray-50">
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">แหล่งที่มา</label>
+                <select name="el_source" class="py-2.5 px-3 border border-gray-200 rounded-xl text-sm outline-none bg-gray-50">
+                    <option value="">ทั้งหมด</option>
+                    <option value="js"  <?= $_el_source==='js'  ? 'selected':'' ?>>JavaScript</option>
+                    <option value="php" <?= $_el_source==='php' ? 'selected':'' ?>>PHP</option>
+                </select>
+            </div>
+            <button type="submit" class="px-5 py-2.5 bg-[#0052CC] text-white text-sm font-bold rounded-xl hover:bg-blue-700 transition-colors shadow-sm">
+                <i class="fa-solid fa-filter mr-1"></i> กรอง
+            </button>
+            <?php if ($_el_search || $_el_level || $_el_date || $_el_source): ?>
+            <a href="?section=error_logs" class="px-4 py-2.5 bg-gray-100 text-gray-600 text-sm font-medium rounded-xl hover:bg-gray-200 flex items-center gap-1">
+                <i class="fa-solid fa-xmark text-xs"></i> ล้าง
+            </a>
+            <?php endif; ?>
+        </form>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-4">
+        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+            <p class="text-sm font-bold text-gray-700">
+                พบ <span class="text-[#0052CC]"><?= number_format($_el_total) ?></span> รายการ
+                <?php if ($_el_level || $_el_search || $_el_date): ?><span class="text-gray-400 font-normal">(กรองแล้ว)</span><?php endif; ?>
+            </p>
+            <form method="POST" action="index.php?section=error_logs" onsubmit="return confirm('ยืนยันการลบ log?')">
+                <input type="hidden" name="action" value="clear">
+                <div class="flex gap-2">
+                    <select name="clear_level" class="py-1.5 px-2 border border-gray-200 rounded-lg text-xs outline-none bg-white">
+                        <option value="all">ทั้งหมด</option>
+                        <option value="error">เฉพาะ Error</option>
+                        <option value="warning">เฉพาะ Warning</option>
+                        <option value="info">เฉพาะ Info</option>
+                    </select>
+                    <button type="submit" class="px-4 py-1.5 bg-red-500 text-white text-xs font-bold rounded-lg hover:bg-red-600 flex items-center gap-1.5">
+                        <i class="fa-solid fa-trash-can"></i> ล้าง Log
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <?php if (isset($_el_dbError)): ?>
+        <div class="p-6 text-red-600 text-sm"><i class="fa-solid fa-triangle-exclamation mr-2"></i> <?= htmlspecialchars($_el_dbError) ?></div>
+        <?php elseif (empty($_el_logs)): ?>
+        <div class="py-16 text-center text-gray-400">
+            <i class="fa-solid fa-check-circle text-4xl text-green-300 mb-3 block"></i>
+            <p class="font-semibold">ไม่พบ error log</p>
+            <p class="text-sm mt-1">ระบบทำงานปกติ</p>
+        </div>
+        <?php else: ?>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-100">
+                        <th class="px-5 py-3 text-[10px] font-extrabold text-gray-400 uppercase tracking-widest w-32">Level</th>
+                        <th class="px-5 py-3 text-[10px] font-extrabold text-gray-400 uppercase tracking-widest w-44">เวลา</th>
+                        <th class="px-5 py-3 text-[10px] font-extrabold text-gray-400 uppercase tracking-widest w-40">Source</th>
+                        <th class="px-5 py-3 text-[10px] font-extrabold text-gray-400 uppercase tracking-widest">Message</th>
+                        <th class="px-5 py-3 text-[10px] font-extrabold text-gray-400 uppercase tracking-widest w-28">IP</th>
+                        <th class="px-5 py-3 w-8"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    <?php foreach ($_el_logs as $log): ?>
+                    <tr class="hover:bg-gray-50/60 transition-colors group">
+                        <td class="px-5 py-3.5">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase" style="<?= _el_badge($log['level']) ?>">
+                                <i class="fa-solid <?= _el_icon($log['level']) ?> text-[9px]" style="color:<?= _el_iconColor($log['level']) ?>"></i>
+                                <?= $log['level'] ?>
+                            </span>
+                        </td>
+                        <td class="px-5 py-3.5 text-xs text-gray-500 whitespace-nowrap">
+                            <?= date('d/m/y H:i:s', strtotime($log['created_at'])) ?>
+                        </td>
+                        <td class="px-5 py-3.5">
+                            <code class="text-[10px] bg-gray-100 px-1.5 py-0.5 rounded text-gray-600 break-all"><?= htmlspecialchars($log['source']) ?></code>
+                        </td>
+                        <td class="px-5 py-3.5">
+                            <p class="text-sm text-gray-700 line-clamp-2 max-w-xl"><?= htmlspecialchars($log['message']) ?></p>
+                            <?php if (!empty($log['context'])): ?>
+                            <button onclick="this.nextElementSibling.classList.toggle('hidden')" class="mt-1 text-[10px] text-blue-500 hover:underline font-semibold">
+                                <i class="fa-solid fa-code text-[9px]"></i> ดู context
+                            </button>
+                            <pre class="hidden mt-2 text-[10px] bg-gray-50 border border-gray-200 rounded-lg p-3 overflow-x-auto text-gray-600 whitespace-pre-wrap max-w-xl"><?= htmlspecialchars($log['context']) ?></pre>
+                            <?php endif; ?>
+                        </td>
+                        <td class="px-5 py-3.5">
+                            <code class="text-[10px] text-gray-400"><?= htmlspecialchars($log['ip_address'] ?: '-') ?></code>
+                        </td>
+                        <td class="px-3 py-3.5">
+                            <form method="POST" action="index.php?section=error_logs">
+                                <input type="hidden" name="action" value="delete_one">
+                                <input type="hidden" name="log_id" value="<?= $log['id'] ?>">
+                                <button type="submit" onclick="return confirm('ลบรายการนี้?')"
+                                    class="opacity-0 group-hover:opacity-100 w-7 h-7 flex items-center justify-center rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all">
+                                    <i class="fa-solid fa-xmark text-xs"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <?php endif; ?>
+
+        <!-- Pagination -->
+        <?php if ($_el_totalPages > 1): ?>
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+            <p class="text-xs text-gray-500">
+                <?= number_format($_el_offset + 1) ?>–<?= number_format(min($_el_offset + $_el_limit, $_el_total)) ?> / <?= number_format($_el_total) ?>
+            </p>
+            <div class="flex gap-1">
+                <?php
+                $_el_pgQs = $_el_filterQs ? '&'.$_el_filterQs : '';
+                if ($_el_page > 1): ?>
+                <a href="?section=error_logs&page=<?= $_el_page - 1 ?><?= $_el_pgQs ?>" class="p-2 border border-gray-200 rounded-lg hover:bg-white text-gray-400"><i class="fa-solid fa-chevron-left text-xs"></i></a>
+                <?php endif; ?>
+                <?php for ($i = max(1, $_el_page - 2); $i <= min($_el_totalPages, $_el_page + 2); $i++): ?>
+                <a href="?section=error_logs&page=<?= $i ?><?= $_el_pgQs ?>"
+                   class="w-9 h-9 flex items-center justify-center rounded-lg text-sm <?= $i === $_el_page ? 'bg-[#0052CC] text-white font-bold shadow-md' : 'border border-gray-200 hover:bg-white text-gray-500' ?>">
+                    <?= $i ?>
+                </a>
+                <?php endfor; ?>
+                <?php if ($_el_page < $_el_totalPages): ?>
+                <a href="?section=error_logs&page=<?= $_el_page + 1 ?><?= $_el_pgQs ?>" class="p-2 border border-gray-200 rounded-lg hover:bg-white text-gray-400"><i class="fa-solid fa-chevron-right text-xs"></i></a>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+    </div>
+
+</div>
