@@ -279,7 +279,7 @@ include('../includes/header.php');
         </div>
         
         <div class="flex items-center gap-3 w-full sm:w-auto">
-            <a href="../../portal/index.php"
+            <a href="../portal/index.php"
                 class="flex-1 sm:flex-none justify-center bg-white border border-gray-200 text-gray-800 px-5 py-2.5 rounded-xl font-bold text-sm hover:shadow-lg hover:border-gray-300 hover:text-blue-600 hover:-translate-y-0.5 transition-all flex items-center gap-2">
                 <i class="fas fa-arrow-left"></i> กลับหน้าหลัก
             </a>
