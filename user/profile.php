@@ -102,7 +102,7 @@ $error_param = $_GET['error'] ?? '';
 render_header('ข้อมูลส่วนตัว');
 ?>
 
-<div class="p-5 pb-28 flex flex-col min-h-screen animate-in fade-in slide-in-from-right-4 duration-500">
+<div class="p-5 pb-36 flex flex-col min-h-screen animate-in fade-in slide-in-from-right-4 duration-500">
 
   <?php if ($isEditing && $_nameNeedsReview): ?>
   <div class="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800 font-prompt flex items-start gap-3">
@@ -405,7 +405,7 @@ render_header('ข้อมูลส่วนตัว');
     </div>
 
     <div
-      class="fixed bottom-0 left-0 right-0 max-w-md mx-auto p-4 bg-white border-t border-gray-100 z-20 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]">
+      class="fixed left-0 right-0 max-w-md mx-auto p-4 bg-white border-t border-gray-100 z-20 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]" style="bottom: 64px;">
       <?php if ($isEditing): ?>
       <div class="flex gap-3">
         <a href="<?= $redirectBack !== '' ? htmlspecialchars($redirectBack) : 'my_bookings.php' ?>"

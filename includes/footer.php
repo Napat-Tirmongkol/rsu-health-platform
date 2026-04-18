@@ -29,7 +29,7 @@ function render_footer(): void {
 
   <?php if ($showNav): ?>
   <!-- ── Bottom Navigation ────────────────────────────────────────────────── -->
-  <nav style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:448px;background:#fff;border-top:1px solid #e8edf5;display:flex;z-index:999;padding-bottom:env(safe-area-inset-bottom,0);">
+  <nav style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:448px;background:#fff;border-top:1px solid #eef2f6;display:flex;z-index:999;padding-bottom:env(safe-area-inset-bottom,0);box-shadow:0 -5px 20px rgba(0,0,0,0.04);border-radius:20px 20px 0 0;">
     <?php foreach ($navItems as $item):
       $active = ($currentPage === $item['file']);
       $color  = $active ? '#0052CC' : '#94a3b8';

@@ -73,7 +73,7 @@ $jsT = [
 ];
 ?>
 
-<div class="p-5 pb-32 flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-500">
+<div class="p-5 pb-36 flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-500">
     <div class="flex-1">
         <div class="flex items-center gap-3 mb-6">
             <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-xl shrink-0">
@@ -136,7 +136,7 @@ $jsT = [
                 <?php endif; ?>
             </div>
 
-            <div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto p-4 bg-white border-t border-gray-100 z-20 flex gap-3 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]">
+            <div class="fixed left-0 right-0 max-w-md mx-auto p-4 bg-white border-t border-gray-100 z-20 flex gap-3 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]" style="bottom: 64px;">
                 <a href="booking_date.php?year=<?= $year ?>&month=<?= $month ?>&campaign_id=<?= $campaignId ?>"
                    class="px-6 py-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-colors text-center shadow-sm active:scale-95">
                     <?= htmlspecialchars(__('time.back')) ?>

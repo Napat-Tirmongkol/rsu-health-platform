@@ -95,7 +95,7 @@ function density_for_day($y, $m, $d, $stats, $dbErr): string {
 render_header(__('date.page_title'));
 ?>
 
-<div class="p-5 pb-32 flex flex-col h-full bg-[#f4f7fa]">
+<div class="p-5 pb-36 flex flex-col h-full bg-[#f4f7fa]">
     <div class="mb-6">
         <h2 class="text-2xl font-bold text-gray-900"><?= htmlspecialchars(__('date.heading')) ?></h2>
         <p class="text-sm text-gray-500 mt-1"><?= htmlspecialchars(__('date.desc')) ?></p>
@@ -173,7 +173,7 @@ render_header(__('date.page_title'));
     </div>
 </div>
 
-<div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto p-4 bg-white border-t border-gray-100 z-20 flex gap-3 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]">
+<div class="fixed left-0 right-0 max-w-md mx-auto p-4 bg-white border-t border-gray-100 z-20 flex gap-3 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]" style="bottom: 64px;">
     <a href="booking_campaign.php"
        class="px-6 py-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-colors text-center shadow-sm">
         <?= htmlspecialchars(__('date.back')) ?>
