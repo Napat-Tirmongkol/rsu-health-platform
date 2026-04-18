@@ -29,20 +29,21 @@ function render_footer(): void {
 
   <?php if ($showNav): ?>
   <!-- ── Bottom Navigation ────────────────────────────────────────────────── -->
-  <nav style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:448px;background:#fff;border-top:1px solid #eef2f6;display:flex;z-index:999;padding-bottom:env(safe-area-inset-bottom,0);box-shadow:0 -5px 20px rgba(0,0,0,0.04);border-radius:20px 20px 0 0;">
+  <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[448px] bg-white border-t border-[#eef2f6] flex z-[999] rounded-t-[20px] shadow-[0_-5px_20px_rgba(0,0,0,0.04)]"
+       style="padding-bottom:env(safe-area-inset-bottom,0)">
     <?php foreach ($navItems as $item):
       $active = ($currentPage === $item['file']);
-      $color  = $active ? '#0052CC' : '#94a3b8';
     ?>
-    <a href="<?= $item['file'] ?>" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 8px;text-decoration:none;color:<?= $color ?>;">
-      <i class="<?= $item['icon'] ?>" style="font-size:18px;<?= $active ? 'filter:drop-shadow(0 0 4px rgba(0,82,204,.35));' : '' ?>"></i>
-      <span style="font-size:10px;font-weight:<?= $active ? '800' : '600' ?>;"><?= $item['label'] ?></span>
-      <?php if ($active): ?><span style="width:18px;height:3px;background:#0052CC;border-radius:2px;margin-top:1px;"></span><?php endif; ?>
+    <a href="<?= $item['file'] ?>"
+       class="flex-1 flex flex-col items-center gap-[3px] pt-2.5 pb-2 no-underline <?= $active ? 'text-[#0052CC]' : 'text-slate-400' ?>">
+      <i class="<?= $item['icon'] ?> text-[18px] <?= $active ? '[filter:drop-shadow(0_0_4px_rgba(0,82,204,.35))]' : '' ?>"></i>
+      <span class="text-[10px] <?= $active ? 'font-extrabold' : 'font-semibold' ?>"><?= $item['label'] ?></span>
+      <?php if ($active): ?><span class="w-[18px] h-[3px] bg-[#0052CC] rounded-sm mt-px"></span><?php endif; ?>
     </a>
     <?php endforeach; ?>
   </nav>
   <!-- bottom spacer so content isn't hidden behind nav -->
-  <div style="height:64px;"></div>
+  <div class="h-16"></div>
   <?php endif; ?>
 
       <script>
