@@ -19,7 +19,10 @@ if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true
             $isStaff = !empty($_SESSION['is_ecampaign_staff']);
             session_unset();
             session_destroy();
-            header('Location: ' . ($isStaff ? '../admin/auth/staff_login.php' : '../admin/auth/login.php') . '?reason=timeout');
+            // ajax_git_pull.php อยู่ที่ admin/ajax/ (depth ลึกกว่า portal/)
+            $_inAjax = basename(dirname($_SERVER['SCRIPT_NAME'] ?? '')) === 'ajax';
+            $_pfx = $_inAjax ? '../../admin/auth/' : '../admin/auth/';
+            header('Location: ' . $_pfx . ($isStaff ? 'staff_login.php' : 'login.php') . '?reason=timeout');
             exit;
         }
     }
@@ -28,7 +31,7 @@ if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true
 
 // ── Auth Check ───────────────────────────────────────────────────────────────
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    // staff_login ใช้ session key เดียวกัน (admin_logged_in) — ไม่ต้องแยก
-    header('Location: ../admin/auth/login.php');
+    $_inAjax = basename(dirname($_SERVER['SCRIPT_NAME'] ?? '')) === 'ajax';
+    header('Location: ' . ($_inAjax ? '../../admin/auth/login.php' : '../admin/auth/login.php'));
     exit;
 }
