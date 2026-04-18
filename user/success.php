@@ -120,12 +120,13 @@ render_header(__('success.page_title'));
     </div>
   </div>
 
-  <div class="fixed left-0 right-0 max-w-md mx-auto p-4 bg-white border-t border-gray-100 z-20 flex flex-col gap-3 shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.1)]" style="bottom: 64px;">
-    <a href="my_bookings.php"
-       class="w-full flex items-center justify-center bg-[#0052CC] hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all shadow-sm font-prompt active:scale-[0.98]">
-      <i class="fa-solid fa-list-check mr-2"></i> <?= htmlspecialchars(__('success.view_all_btn')) ?>
-    </a>
-  </div>
+    <!-- Action Bar -->
+    <div class="mt-8 w-full flex flex-col gap-3">
+      <a href="my_bookings.php"
+         class="w-full flex items-center justify-center bg-[#0052CC] hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all shadow-sm font-prompt active:scale-[0.98]">
+        <i class="fa-solid fa-list-check mr-2"></i> <?= htmlspecialchars(__('success.view_all_btn')) ?>
+      </a>
+    </div>
 </div>
 
 <?php render_footer(); ?>

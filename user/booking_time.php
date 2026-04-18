@@ -136,13 +136,14 @@ $jsT = [
                 <?php endif; ?>
             </div>
 
-            <div class="fixed left-0 right-0 max-w-md mx-auto p-4 bg-white border-t border-gray-100 z-20 flex gap-3 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]" style="bottom: 64px;">
+            <!-- Action Bar -->
+            <div class="mt-8 pt-4 border-t border-gray-100 flex gap-3 w-full">
                 <a href="booking_date.php?year=<?= $year ?>&month=<?= $month ?>&campaign_id=<?= $campaignId ?>"
-                   class="px-6 py-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-colors text-center shadow-sm active:scale-95">
+                   class="px-6 py-4 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-bold rounded-xl transition-colors text-center shadow-sm active:scale-[0.98]">
                     <?= htmlspecialchars(__('time.back')) ?>
                 </a>
                 <button type="submit"
-                        class="flex-1 bg-[#0052CC] hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-colors text-center shadow-sm active:scale-95">
+                        class="flex-1 bg-[#0052CC] hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all shadow-sm active:scale-[0.98] font-prompt">
                     <?= htmlspecialchars(__('time.confirm_btn')) ?>
                 </button>
             </div>

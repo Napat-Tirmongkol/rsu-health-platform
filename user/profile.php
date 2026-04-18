@@ -404,10 +404,8 @@ render_header('ข้อมูลส่วนตัว');
       </div>
     </div>
 
-    <div
-      class="fixed left-0 right-0 max-w-md mx-auto p-4 bg-white border-t border-gray-100 z-20 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]" style="bottom: 64px;">
+    <div class="mt-8 pt-4 border-t border-gray-100 flex gap-3 w-full">
       <?php if ($isEditing): ?>
-      <div class="flex gap-3">
         <a href="<?= $redirectBack !== '' ? htmlspecialchars($redirectBack) : 'my_bookings.php' ?>"
            class="flex-none flex items-center justify-center px-5 py-4 border border-gray-200 rounded-xl text-gray-600 font-bold font-prompt transition-all hover:bg-gray-50 active:scale-[0.98]">
           ยกเลิก
@@ -416,7 +414,6 @@ render_header('ข้อมูลส่วนตัว');
           class="flex-1 bg-[#0052CC] hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all shadow-sm active:scale-[0.98] font-prompt">
           บันทึกการเปลี่ยนแปลง
         </button>
-      </div>
       <?php else: ?>
       <button type="submit"
         class="w-full bg-[#0052CC] hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all shadow-sm active:scale-[0.98] font-prompt">

@@ -171,22 +171,23 @@ render_header(__('date.page_title'));
             <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-500"></span> <?= htmlspecialchars(__('date.legend_full')) ?></div>
         </div>
     </div>
-</div>
 
-<div class="fixed left-0 right-0 max-w-md mx-auto p-4 bg-white border-t border-gray-100 z-20 flex gap-3 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]" style="bottom: 64px;">
-    <a href="booking_campaign.php"
-       class="px-6 py-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-colors text-center shadow-sm">
-        <?= htmlspecialchars(__('date.back')) ?>
-    </a>
-    <button id="btn-next-disabled" type="button" disabled
-        class="flex-1 bg-gray-200 text-gray-400 font-bold py-4 rounded-xl cursor-not-allowed <?= ($selectedDate !== null && density_for_day($year, $month, (int)$selectedDate, $dailyStats, $dbError) !== 'high' && strtotime(sprintf("%04d-%02d-%02d", $year, $month, $selectedDate)) >= strtotime(date('Y-m-d'))) ? 'hidden' : '' ?>">
-        <?= htmlspecialchars(__('date.next')) ?>
-    </button>
-    <a id="btn-next"
-        href="booking_time.php?year=<?= $year ?>&month=<?= $month ?>&day=<?= $selectedDate ?>&campaign_id=<?= $campaignId ?>"
-        class="flex-1 bg-[#0052CC] hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all shadow-sm text-center <?= ($selectedDate === null || density_for_day($year, $month, (int)$selectedDate, $dailyStats, $dbError) === 'high' || strtotime(sprintf("%04d-%02d-%02d", $year, $month, $selectedDate)) < strtotime(date('Y-m-d'))) ? 'hidden' : '' ?>">
-        <?= htmlspecialchars(__('date.next')) ?>
-    </a>
+    <!-- Action Bar -->
+    <div class="mt-8 flex gap-3 w-full">
+        <a href="booking_campaign.php"
+           class="px-6 py-4 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-bold rounded-xl transition-colors text-center shadow-sm active:scale-[0.98]">
+            <?= htmlspecialchars(__('date.back')) ?>
+        </a>
+        <button id="btn-next-disabled" type="button" disabled
+            class="flex-1 bg-gray-200 text-gray-400 font-bold py-4 rounded-xl cursor-not-allowed <?= ($selectedDate !== null && density_for_day($year, $month, (int)$selectedDate, $dailyStats, $dbError) !== 'high' && strtotime(sprintf("%04d-%02d-%02d", $year, $month, $selectedDate)) >= strtotime(date('Y-m-d'))) ? 'hidden' : '' ?>">
+            <?= htmlspecialchars(__('date.next')) ?>
+        </button>
+        <a id="btn-next"
+            href="booking_time.php?year=<?= $year ?>&month=<?= $month ?>&day=<?= $selectedDate ?>&campaign_id=<?= $campaignId ?>"
+            class="flex-1 bg-[#0052CC] hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all shadow-sm text-center active:scale-[0.98] <?= ($selectedDate === null || density_for_day($year, $month, (int)$selectedDate, $dailyStats, $dbError) === 'high' || strtotime(sprintf("%04d-%02d-%02d", $year, $month, $selectedDate)) < strtotime(date('Y-m-d'))) ? 'hidden' : '' ?>">
+            <?= htmlspecialchars(__('date.next')) ?>
+        </a>
+    </div>
 </div>
 
 <script>
