@@ -372,16 +372,6 @@ render_header($isEditing ? __('profile.heading_edit') : __('profile.heading'));
         </div>
         <div class="space-y-1.5">
           <label class="text-sm font-semibold text-gray-700 font-prompt" for="department">
-            <?= __('profile.lbl_department') ?>
-            <span class="text-gray-400 font-normal text-xs ml-1"><?= __('profile.optional') ?></span>
-          </label>
-          <input id="department" name="department" type="text"
-            value="<?= htmlspecialchars((string) ($userData['department'] ?? '')) ?>"
-            placeholder="Ex. College of Medicine"
-            class="w-full p-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0052CC] focus:border-transparent outline-none transition-all placeholder:text-gray-400 font-prompt" />
-        </div>
-        <div class="space-y-1.5">
-          <label class="text-sm font-semibold text-gray-700 font-prompt" for="department">
             คณะ / หน่วยงาน
             <span class="text-gray-400 font-normal text-xs ml-1">(ไม่บังคับ)</span>
           </label>
