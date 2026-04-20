@@ -151,10 +151,11 @@ if ($action === 'import') {
         exit;
     }
 
-    $file     = $_FILES['import_file'];
-    $ext      = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-    $tmpPath  = $file['tmp_name'];
-    $maxBytes = 5 * 1024 * 1024;
+    $file      = $_FILES['import_file'];
+    $ext       = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    $tmpPath   = $file['tmp_name'];
+    $maxBytes  = 5 * 1024 * 1024;
+    $impType   = in_array($_POST['import_type'] ?? 'faculty', ['faculty', 'department'], true) ? $_POST['import_type'] : 'faculty';
 
     if ($file['size'] > $maxBytes) {
         echo json_encode(['status' => 'error', 'message' => 'ไฟล์ใหญ่เกิน 5 MB']);
@@ -190,24 +191,22 @@ if ($action === 'import') {
         if ($cols === 0) { $skipped++; continue; }
 
         if ($cols === 1) {
-            $code = null; $nameTh = trim($row[0]); $nameEn = null; $type = 'faculty';
+            $code = null; $nameTh = trim($row[0]); $nameEn = null;
         } elseif ($cols === 2) {
             $isCode = strlen(trim($row[0])) <= 20 && !preg_match('/[\x{0E00}-\x{0E7F}]/u', $row[0]);
             $code   = $isCode ? (trim($row[0]) ?: null) : null;
             $nameTh = $isCode ? trim($row[1]) : trim($row[0]);
             $nameEn = $isCode ? null : trim($row[1]);
-            $type   = 'faculty';
         } else {
             $code = trim($row[0]) ?: null;
             $nameTh = trim($row[1]);
             $nameEn = trim($row[2]) ?: null;
-            $type   = 'faculty';
         }
 
         if ($nameTh === '') { $skipped++; continue; }
 
         try {
-            $stmt->execute([':code' => $code, ':name_th' => $nameTh, ':name_en' => $nameEn, ':type' => $type]);
+            $stmt->execute([':code' => $code, ':name_th' => $nameTh, ':name_en' => $nameEn, ':type' => $impType]);
             $inserted++;
         } catch (PDOException $e) {
             $skipped++;

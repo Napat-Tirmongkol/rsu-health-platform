@@ -252,7 +252,24 @@ foreach ($_cd_rows as $r) {
             </div>
             <div>
                 <p class="text-sm font-bold text-gray-800">นำเข้าจากไฟล์ Excel / CSV</p>
-                <p class="text-xs text-gray-400">รูปแบบ: <code class="bg-gray-100 px-1.5 py-0.5 rounded text-[11px]">รหัส | ชื่อ TH | ชื่อ EN</code> — Header row จะถูกข้ามอัตโนมัติ (ขนาดไม่เกิน 5 MB)</p>
+                <p class="text-xs text-gray-400">เลือกประเภท แล้วอัพโหลด — ไฟล์ต้องมี: ชื่อ TH | ชื่อ EN (รหัสถ้ามี) — Header row ข้ามอัตโนมัติ</p>
+            </div>
+        </div>
+
+        <!-- Type Selection -->
+        <div class="mb-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
+            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block">เลือกประเภท <span class="text-red-400">*</span></label>
+            <div class="flex gap-3">
+                <label class="flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-gray-200 rounded-xl cursor-pointer transition-all hover:border-blue-300"
+                       style="flex: 1;">
+                    <input type="radio" name="cd-import-type" value="faculty" checked class="w-4 h-4">
+                    <span class="font-semibold text-gray-700 text-sm">คณะ</span>
+                </label>
+                <label class="flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-gray-200 rounded-xl cursor-pointer transition-all hover:border-amber-300"
+                       style="flex: 1;">
+                    <input type="radio" name="cd-import-type" value="department" class="w-4 h-4">
+                    <span class="font-semibold text-gray-700 text-sm">หน่วยงาน</span>
+                </label>
             </div>
         </div>
 
@@ -477,18 +494,20 @@ foreach ($_cd_rows as $r) {
     };
     window.cdImport = async function () {
         if (!fileIn.files[0]) return;
+        const importType = document.querySelector('input[name="cd-import-type"]:checked')?.value || 'faculty';
         impBtn.style.opacity = '0.5';
         impBtn.style.pointerEvents = 'none';
         impBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังประมวลผล...';
         const fd = new FormData();
         fd.append('action', 'import');
+        fd.append('import_type', importType);
         fd.append('import_file', fileIn.files[0]);
         fd.append('csrf_token', CSRF);
         try {
             const res  = await fetch(ENDPOINT, { method: 'POST', body: fd });
             const data = await res.json();
             if (data.status === 'ok') {
-                cdShowImportResult('ok', data.message);
+                cdShowImportResult('ok', data.message + ' (' + (importType === 'faculty' ? 'คณะ' : 'หน่วยงาน') + ')');
                 setTimeout(() => location.reload(), 1000);
             } else {
                 cdShowImportResult('error', data.message);
