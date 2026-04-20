@@ -295,7 +295,8 @@ foreach ($_cd_rows as $r) {
 
         <div id="cd-import-btn-wrap" class="mt-4 hidden">
             <button id="cd-import-btn" onclick="cdImport()" type="button"
-                class="w-full bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-5 rounded-xl transition-all text-sm flex items-center justify-center gap-2">
+                style="width:100%;background:#7c3aed;color:#fff;font-weight:700;padding:12px 20px;border-radius:12px;border:none;font-size:13px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:background .2s"
+                onmouseover="this.style.background='#6d28d9'" onmouseout="this.style.background='#7c3aed'">
                 <i class="fa-solid fa-file-import"></i> นำเข้าข้อมูลจากไฟล์
             </button>
         </div>
