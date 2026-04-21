@@ -166,8 +166,8 @@ $_cd_qs = http_build_query(array_filter(['section' => 'clinic_data', 'cd_search'
                         </div>
                     </div>
                     <div class="md:col-span-2 pt-2 flex justify-end">
-                        <button type="submit" class="px-8 py-3 bg-teal-600 text-white text-sm font-black rounded-xl hover:bg-teal-700 flex items-center justify-center gap-2 shadow-lg shadow-teal-100 transition-all">
-                            <i class="fa-solid fa-save"></i> บันทึกข้อมูล
+                        <button type="submit" class="px-8 py-3 bg-slate-900 text-white text-sm font-black rounded-xl hover:bg-black flex items-center justify-center gap-2 shadow-lg shadow-slate-200 transition-all">
+                            <i class="fa-solid fa-save text-teal-400"></i> บันทึกข้อมูล
                         </button>
                     </div>
                 </form>
