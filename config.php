@@ -15,6 +15,7 @@ $__siteSettingsFile = __DIR__ . '/config/site_settings.json';
 $__siteSettings = file_exists($__siteSettingsFile) ? json_decode(file_get_contents($__siteSettingsFile), true) : [];
 defined('SITE_NAME') || define('SITE_NAME', $__siteSettings['site_name'] ?? 'e-Campaign V2');
 defined('SITE_LOGO') || define('SITE_LOGO', $__siteSettings['site_logo'] ?? ''); // Empty means use default icon
+defined('GEMINI_API_KEY') || define('GEMINI_API_KEY', $__siteSettings['gemini_api_key'] ?? '');
 
 
 /**

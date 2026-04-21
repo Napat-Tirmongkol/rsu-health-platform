@@ -421,7 +421,7 @@ async function uploadErrorLog(input) {
             }
         }, 100);
 
-        const res = await fetch('ajax/ajax_upload_error_logs.php', {
+        const res = await fetch('../admin/ajax/ajax_upload_error_logs.php', {
             method: 'POST',
             body: fd
         });

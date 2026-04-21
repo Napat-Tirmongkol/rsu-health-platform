@@ -24,6 +24,9 @@ if ($siteName !== '') {
     $settings['site_name'] = $siteName;
 }
 
+$geminiKey = trim($_POST['gemini_api_key'] ?? '');
+$settings['gemini_api_key'] = $geminiKey;
+
 // Handle Logo Upload
 if (isset($_FILES['site_logo']) && $_FILES['site_logo']['error'] === UPLOAD_ERR_OK) {
     $allowedTypes = ['image/jpeg', 'image/png', 'image/svg+xml'];

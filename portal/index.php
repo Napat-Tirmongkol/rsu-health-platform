@@ -321,6 +321,7 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars(SITE_NAME) ?> - Central Intelligence HUB</title>
+    <link rel="icon" href="../favicon.ico">
 
     <!-- UI Framework & Fonts -->
     <link
@@ -1779,6 +1780,10 @@ try {
                                         style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#374151;font-size:13px;font-weight:700;text-decoration:none;transition:all .2s">
                                         <i class="fa-brands fa-sentry" style="color:#94a3b8"></i> Sentry Monitoring
                                     </a>
+                                     <a href="javascript:void(0)" onclick="document.getElementById('gemini_api_key').focus(); document.getElementById('gemini_api_key').scrollIntoView({behavior:'smooth', block:'center'});"
+                                        style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;border:1.5px solid #fdf2f8;background:#fdf2f8;color:#be185d;font-size:13px;font-weight:700;text-decoration:none;transition:all .2s">
+                                        <i class="fa-solid fa-wand-magic-sparkles"></i> Gemini AI Settings
+                                     </a>
                                     <a href="javascript:switchSection('clinic_data')"
                                         style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;border:1.5px solid #ccfbf1;background:#f0fdfa;color:#0f766e;font-size:13px;font-weight:700;text-decoration:none;transition:all .2s">
                                         <i class="fa-solid fa-hospital" style="color:#14b8a6"></i> ข้อมูลคลีนิค
@@ -1801,6 +1806,16 @@ try {
                                 <div>
                                     <label style="display:block;font-size:12px;font-weight:800;color:#475569;margin-bottom:6px">ชื่อเว็บไซต์ (Site Name)</label>
                                     <input type="text" name="site_name" value="<?= htmlspecialchars(SITE_NAME) ?>" class="premium-input" style="width:100%;max-width:400px;">
+                                </div>
+                                <div>
+                                    <label style="display:block;font-size:12px;font-weight:800;color:#475569;margin-bottom:6px">Gemini API Key</label>
+                                    <div style="position:relative; max-width:400px;">
+                                        <input type="password" id="gemini_api_key" name="gemini_api_key" value="<?= htmlspecialchars(GEMINI_API_KEY) ?>" class="premium-input" style="width:100%; padding-right:40px;">
+                                        <button type="button" onclick="const p = document.getElementById('gemini_api_key'); p.type = p.type==='password'?'text':'password'; this.querySelector('i').className = p.type==='password'?'fa-solid fa-eye':'fa-solid fa-eye-slash';" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; color:#94a3b8; cursor:pointer;">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <p style="font-size:11px; color:#94a3b8; margin-top:4px;">ใช้สำหรับฟีเจอร์ AI ภายในระบบ (เช่น การวิเคราะห์ข้อมูลหรือการช่วยเหลือผู้ใช้)</p>
                                 </div>
                                 <div>
                                     <label style="display:block;font-size:12px;font-weight:800;color:#475569;margin-bottom:6px">โลโก้เว็บไซต์ (Site Logo)</label>

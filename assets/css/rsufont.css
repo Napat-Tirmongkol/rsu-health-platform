@@ -3,18 +3,21 @@
     src: url('../fonts/RSU_Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
 }
 @font-face {
     font-family: 'rsufont';
     src: url('../fonts/RSU_BOLD.ttf') format('truetype');
     font-weight: bold;
     font-style: normal;
+    font-display: swap;
 }
 @font-face {
     font-family: 'rsufont';
     src: url('../fonts/RSU_light.ttf') format('truetype');
     font-weight: 300;
     font-style: normal;
+    font-display: swap;
 }
 
 :root {

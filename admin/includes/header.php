@@ -27,7 +27,7 @@ if (!function_exists('renderPageHeader')) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Campaign Management — Admin</title>
-    <link rel="icon" href="data:,">
+    <link rel="icon" href="../favicon.ico">
     <link rel="stylesheet" href="../assets/css/tailwind.min.css">
     <link rel="stylesheet" href="../assets/css/portal.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
