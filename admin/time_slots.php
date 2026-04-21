@@ -93,6 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($skippedCount > 0) {
                 $msg .= " (ข้าม {$skippedCount} รอบที่ซ้ำซ้อนกัน)";
             }
+            log_activity('add_slot', $msg . " (Campaign ID: {$campaign_id})");
             echo json_encode(['status' => 'success', 'message' => $msg]);
             exit;
         }
@@ -119,6 +120,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $pdo->prepare("UPDATE camp_slots SET campaign_id = ?, start_time = ?, end_time = ?, max_capacity = ? WHERE id = ?")
                 ->execute([$campaign_id, $start_time, $end_time, $max, $id]);
+
+            log_activity('edit_slot', "แก้ไขรอบเวลา ID: {$id} เป็น {$start_time}-{$end_time} จุ {$max}");
 
             echo json_encode(['status' => 'success', 'message' => 'แก้ไขรอบเวลาเรียบร้อยแล้ว']);
             exit;
@@ -191,6 +194,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // ลบ Slot (หลังจากเคลียร์คนออกหมดแล้ว หรือไม่มีคนจอง)
         $pdo->prepare("DELETE FROM camp_slots WHERE id = ?")->execute([$id]);
+        
+        log_activity('delete_slot', "ลบรอบเวลา ID: {$id} (มีการยกเลิกผู้จองและส่งอีเมลแจ้งเตือนเรียบร้อยแล้ว)");
+        
         echo json_encode(['status' => 'success', 'message' => 'ระบบได้ส่งอีเมลแจ้งเตือนผู้จองและลบรอบเวลาเรียบร้อยแล้ว']);
         exit;
     }
@@ -235,6 +241,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (!$slotEmailFail) {
                 $pdo->prepare("DELETE FROM camp_slots WHERE id = ?")->execute([$id]);
+                log_activity('delete_slot', "ลบรอบเวลา ID: {$id} (Bulk Delete)");
                 $deletedCount++;
             } else {
                 $failedSlots[] = $id;

@@ -162,6 +162,8 @@ try {
     
     $pdo->commit();
 
+    log_activity('cancel_booking', "แอดมินยกเลิกการจอง ID: {$appointmentId} ของ " . ($booking['full_name'] ?? 'N/A') . " กิจกรรม: " . ($booking['campaign_title'] ?? 'N/A'));
+
     echo json_encode(['status' => 'success']);
 
 } catch (PDOException $e) {

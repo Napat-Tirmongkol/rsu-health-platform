@@ -41,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
             $message = "สร้างแคมเปญเรียบร้อยแล้ว!";
             $messageType = "success";
+            log_activity('create_campaign', "สร้างแคมเปญใหม่: {$title} (จุ {$capacity} คน)");
         } catch (PDOException $e) {
             $message = "เกิดข้อผิดพลาด: " . $e->getMessage();
             $messageType = "error";
@@ -75,6 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ]);
                     $message = "อัปเดตข้อมูลแคมเปญสำเร็จ!";
                     $messageType = "success";
+                    log_activity('update_campaign', "แก้ไขแคมเปญ ID: {$id} ({$title})");
                 }
             } catch (PDOException $e) {
                 $message = "เกิดข้อผิดพลาด: " . $e->getMessage();
@@ -118,6 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt->execute([':id' => $id]);
                     $message = "ลบแคมเปญสำเร็จ!";
                     $messageType = "success";
+                    log_activity('delete_campaign', "ลบแคมเปญ ID: {$id} (พร้อมลบรอบเวลาทั้งหมดที่เกี่ยวข้อง)");
                 }
             } catch (PDOException $e) {
                 $message = "เกิดข้อผิดพลาด: " . $e->getMessage();

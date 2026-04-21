@@ -50,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 echo json_encode(['status' => 'success', 'message' => 'อนุมัติคิวสำเร็จ']);
+                log_activity('approve_booking', "อนุมัติการจอง ID: {$appointmentId} ของ " . ($bInfo['full_name'] ?? 'N/A') . " กิจกรรม: " . ($bInfo['title'] ?? 'N/A'));
             } else {
                 echo json_encode(['status' => 'error', 'message' => 'ไม่สามารถอัปเดตได้ คิวอาจถูกอนุมัติหรือถูกยกเลิกไปแล้ว']);
             }

@@ -22,20 +22,47 @@ defined('SITE_LOGO') || define('SITE_LOGO', $__siteSettings['site_logo'] ?? '');
  */
 if (!function_exists('log_activity')) {
     function log_activity(string $action, string $description = '', ?int $user_id = null): bool {
+        static $activityTableReady = false;
         try {
             if (session_status() === PHP_SESSION_NONE) session_start();
             
-            if ($user_id === null && isset($_SESSION['admin_id'])) {
-                $user_id = (int)$_SESSION['admin_id'];
-            }
-            if ($user_id === null) return false;
-
             $pdo = db();
-            $stmt = $pdo->prepare("INSERT INTO sys_activity_logs (user_id, action, description) VALUES (:uid, :act, :desc)");
+
+            // Auto-create table if not exists (runs once per request)
+            if (!$activityTableReady) {
+                $pdo->exec("CREATE TABLE IF NOT EXISTS sys_activity_logs (
+                    id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                    user_id     INT UNSIGNED NULL,
+                    action      VARCHAR(100) NOT NULL,
+                    description TEXT,
+                    ip_address  VARCHAR(45),
+                    user_agent  TEXT,
+                    timestamp   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    INDEX idx_user (user_id),
+                    INDEX idx_action (action),
+                    INDEX idx_timestamp (timestamp)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+                $activityTableReady = true;
+            }
+
+            if ($user_id === null) {
+                $user_id = $_SESSION['admin_id'] ?? $_SESSION['user_id'] ?? null;
+                if ($user_id !== null) $user_id = (int)$user_id;
+            }
+
+            $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+            $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+
+            $stmt = $pdo->prepare("
+                INSERT INTO sys_activity_logs (user_id, action, description, ip_address, user_agent) 
+                VALUES (:uid, :act, :desc, :ip, :ua)
+            ");
             return $stmt->execute([
                 ':uid'  => $user_id,
-                ':act'  => $action,
-                ':desc' => $description
+                ':act'  => mb_substr($action, 0, 100),
+                ':desc' => $description,
+                ':ip'   => $ip,
+                ':ua'   => mb_substr($ua, 0, 1000)
             ]);
         } catch (Exception $e) {
             error_log("Logging Error: " . $e->getMessage());
