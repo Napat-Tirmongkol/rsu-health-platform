@@ -495,11 +495,15 @@ require_once __DIR__ . '/includes/header.php';
         
         Swal.fire({
             title: `ยกเลิกทั้งหมด ${ids.length} รายการ?`,
-            text: "ระบบจะแจ้งเตือนการยกเลิกไปยังผู้ใช้งานทุกคน",
+            html: `<p class="font-prompt text-sm text-gray-600">การดำเนินการนี้ไม่สามารถย้อนกลับได้</p>
+                   <div class="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                     <p class="font-prompt text-sm font-semibold text-orange-700">📧 ระบบจะส่งอีเมลแจ้งเตือนให้กับผู้ใช้ทั้งหมดที่ถูกยกเลิก</p>
+                   </div>`,
             icon: 'error',
             showCancelButton: true,
             confirmButtonColor: '#EF4444',
-            confirmButtonText: 'ยืนยันยกเลิกทั้งหมด'
+            confirmButtonText: 'ยืนยันยกเลิกทั้งหมด',
+            customClass: { title:'font-prompt', htmlContainer:'font-prompt', confirmButton:'font-prompt', cancelButton:'font-prompt' }
         }).then((result) => {
             if (result.isConfirmed) {
                 Swal.fire({ title: 'กำลังดำเนินการ...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
@@ -520,12 +524,17 @@ require_once __DIR__ . '/includes/header.php';
 
     function rejectOne(id) {
         Swal.fire({
-            title: 'Reject Booking?',
-            text: "User will be notified to reschedule.",
+            title: 'ปฏิเสธการจอง?',
+            html: `<p class="font-prompt text-sm text-gray-600">การจองนี้จะถูกยกเลิกและไม่สามารถย้อนกลับได้</p>
+                   <div class="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                     <p class="font-prompt text-sm font-semibold text-orange-700">📧 ระบบจะส่งอีเมลแจ้งเตือนให้กับผู้ใช้ทั้งหมดที่ถูกยกเลิก</p>
+                   </div>`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#EF4444',
-            confirmButtonText: 'Reject'
+            confirmButtonText: 'ยืนยันปฏิเสธ',
+            cancelButtonText: 'ยกเลิก',
+            customClass: { title:'font-prompt', htmlContainer:'font-prompt', confirmButton:'font-prompt', cancelButton:'font-prompt' }
         }).then((result) => {
             if (result.isConfirmed) {
                 performApiCall('ajax/ajax_force_cancel.php', id, 'Rejected', 'error');
@@ -536,12 +545,16 @@ require_once __DIR__ . '/includes/header.php';
     function rescheduleOne(id) {
         Swal.fire({
             title: 'ยืนยันการเลื่อนคิว?',
-            html: "ระบบจะแจ้งให้ผู้ใช้ทราบว่าคิวที่ยืนยันแล้วถูกยกเลิกเพื่อให้ <b>เลื่อนวันจองใหม่</b> พร้อมส่ง LINE แจ้งเตือนทันที",
+            html: `<p class="font-prompt text-sm text-gray-700">ระบบจะแจ้งให้ผู้ใช้ทราบว่าคิวที่ยืนยันแล้วถูกยกเลิกเพื่อให้ <b>เลื่อนวันจองใหม่</b></p>
+                   <div class="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                     <p class="font-prompt text-sm font-semibold text-orange-700">📧 ระบบจะส่งอีเมลแจ้งเตือนให้กับผู้ใช้ทั้งหมดที่ถูกยกเลิก</p>
+                   </div>`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#f97316',
             confirmButtonText: '<i class="fa-solid fa-paper-plane mr-2"></i> ยืนยันแจ้งเลื่อน',
-            cancelButtonText: 'ยกเลิก'
+            cancelButtonText: 'ยกเลิก',
+            customClass: { title:'font-prompt', htmlContainer:'font-prompt', confirmButton:'font-prompt', cancelButton:'font-prompt' }
         }).then((result) => {
             if (result.isConfirmed) {
                 performApiCall('ajax/ajax_force_cancel.php', id, 'แจ้งเลื่อนคิวสำเร็จ!', 'success');
