@@ -29,9 +29,10 @@ $endDate = date('Y-m-t', strtotime($startDate));
 try {
     $total_pending = (int) $pdo->query("SELECT COUNT(*) FROM camp_bookings WHERE status = 'booked'")->fetchColumn();
     $total_confirmed = (int) $pdo->query("SELECT COUNT(*) FROM camp_bookings WHERE status = 'confirmed'")->fetchColumn();
+    $total_cancelled = (int) $pdo->query("SELECT COUNT(*) FROM camp_bookings WHERE status IN ('cancelled', 'cancelled_by_admin')")->fetchColumn();
     $total_today = (int) $pdo->query("SELECT COUNT(*) FROM camp_bookings b JOIN camp_slots s ON b.slot_id = s.id WHERE s.slot_date = CURDATE()")->fetchColumn();
 } catch (PDOException $e) { /* fallback */
-    $total_pending = $total_confirmed = $total_today = 0;
+    $total_pending = $total_confirmed = $total_cancelled = $total_today = 0;
 }
 
 /** (3) DATA FETCHING (Universal Pending + Current Month) */
@@ -155,7 +156,9 @@ require_once __DIR__ . '/includes/header.php';
                 <span
                     class="px-2 py-0.5 bg-emerald-100 text-emerald-600 rounded-lg text-[10px]"><?= $total_confirmed ?></span></button>
             <button onclick="filterByStatus('cancelled')"
-                class="status-tab px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 transition-all">Cancelled</button>
+                class="status-tab px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 transition-all flex items-center gap-2">Cancelled
+                <span
+                    class="px-2 py-0.5 bg-red-100 text-red-600 rounded-lg text-[10px]"><?= $total_cancelled ?></span></button>
         </div>
 
         <div class="flex-1 w-full lg:max-w-md relative">
