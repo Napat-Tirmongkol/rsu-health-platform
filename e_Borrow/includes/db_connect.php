@@ -30,4 +30,11 @@ try {
 
 define('FINE_RATE_PER_DAY', 10.00);
 
+if (!function_exists('db')) {
+    function db(): PDO {
+        global $pdo;
+        return $pdo;
+    }
+}
+
 require_once __DIR__ . '/../../includes/error_logger.php';
