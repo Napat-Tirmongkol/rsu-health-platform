@@ -557,28 +557,28 @@ try {
         <!-- Nav items -->
         <div style="padding:10px;flex:1;overflow:hidden">
             <button class="psb-item psb-active" data-section="dashboard" onclick="switchSection('dashboard',this)">
-                <div class="psb-icon"><i class="fa-solid fa-chart-pie"></i></div>
-                <span class="psb-label">Dashboard</span>
+                <div class="psb-icon"><i class="fa-solid fa-chart-pie" style="color:#059669"></i></div>
+                <span class="psb-label" style="color:#059669;font-weight:900">Dashboard</span>
             </button>
             <button class="psb-item" data-section="ai_assistant" onclick="switchSection('ai_assistant',this)">
                 <div class="psb-icon"><i class="fa-solid fa-wand-magic-sparkles" style="color:#8b5cf6"></i></div>
                 <span class="psb-label" style="color:#7c3aed;font-weight:900">AI Assistant</span>
             </button>
             <button class="psb-item" data-section="identity" onclick="switchSection('identity',this)">
-                <div class="psb-icon"><i class="fa-solid fa-id-card-clip"></i></div>
-                <span class="psb-label">Identity & Governance</span>
+                <div class="psb-icon"><i class="fa-solid fa-id-card-clip" style="color:#2563eb"></i></div>
+                <span class="psb-label" style="color:#1d4ed8;font-weight:900">Identity & Governance</span>
             </button>
             <button class="psb-item" data-section="activity_logs" onclick="switchSection('activity_logs',this)">
-                <div class="psb-icon"><i class="fa-solid fa-file-lines"></i></div>
-                <span class="psb-label">Activity Logs</span>
+                <div class="psb-icon"><i class="fa-solid fa-file-lines" style="color:#64748b"></i></div>
+                <span class="psb-label" style="color:#475569;font-weight:900">Activity Logs</span>
             </button>
             <button class="psb-item" data-section="error_logs" onclick="switchSection('error_logs',this)">
-                <div class="psb-icon"><i class="fa-solid fa-bug"></i></div>
-                <span class="psb-label">Error Logs</span>
+                <div class="psb-icon"><i class="fa-solid fa-bug" style="color:#ef4444"></i></div>
+                <span class="psb-label" style="color:#dc2626;font-weight:900">Error Logs</span>
             </button>
             <button class="psb-item" data-section="settings" onclick="switchSection('settings',this)">
-                <div class="psb-icon"><i class="fa-solid fa-gear"></i></div>
-                <span class="psb-label">Settings</span>
+                <div class="psb-icon"><i class="fa-solid fa-gear" style="color:#d97706"></i></div>
+                <span class="psb-label" style="color:#b45309;font-weight:900">Settings</span>
             </button>
         </div>
     </nav>
