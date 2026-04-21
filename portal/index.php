@@ -585,7 +585,7 @@ try {
 
     <!-- ══════════════════ APP SHELL (Header + Main) ══════════════════ -->
     <div id="app-shell"
-        style="display: grid !important; grid-template-rows: auto 1fr !important; flex: 1 !important; min-width: 0 !important; overflow: hidden !important; background: #f4f7f5;">
+        style="display: flex !important; flex-direction: column !important; flex: 1 !important; min-width: 0 !important; overflow: hidden !important; background: #f4f7f5;">
 
         <!-- ══════════════════ HEADER ══════════════════ -->
         <header class="portal-header au" style="background: #ffffff !important; border-bottom: 1.5px solid #e2e8f0 !important; box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important; width: 100% !important; display: block !important; position: relative !important; z-index: 50 !important;">
@@ -603,25 +603,8 @@ try {
                     </div>
                 </div>
 
-                <!-- Right: user + logout -->
+                <!-- Right Action Icons -->
                 <div class="flex items-center gap-3 sm:gap-4">
-
-                    <?php if (isset($adminRole) && $adminRole === 'superadmin'): ?>
-                        <!-- Git Pull Button -->
-                        <button id="btnGitPull" onclick="triggerGitPull()" title="Pull โค้ดล่าสุดจาก Git"
-                            class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-100 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 font-bold text-[11px] transition-colors cursor-pointer">
-                            <i class="fa-solid fa-code-branch"></i>
-                            <span>Git Pull</span>
-                        </button>
-                    <?php endif; ?>
-
-                    <!-- Live connection badge -->
-                    <div id="ws-badge" title="Real-time connection status"
-                        style="display:flex;align-items:center;gap:5px;padding:4px 8px;border-radius:8px;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;border:1px solid #c7e8d5;background:#f0fdf4;color:#16a34a;transition:all .3s">
-                        <span id="ws-dot"
-                            style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;animation:livePulse 1.6s infinite"></span>
-                        <span id="ws-label" class="hidden sm:inline">Live</span>
-                    </div>
 
                     <!-- Dark Mode Toggle Button -->
                     <button id="darkModeToggle" onclick="toggleDarkMode()" title="สลับโหมดมืด/สว่าง"
