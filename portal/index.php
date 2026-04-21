@@ -680,7 +680,7 @@ try {
         <main id="portal-main" style="flex:1;overflow-y:auto;min-width:0;">
 
             <!-- ════════════ SECTION: DASHBOARD ════════════ -->
-            <div id="section-dashboard" class="portal-section">
+            <div id="section-dashboard" class="portal-section" style="<?= $activeSection==='dashboard'?'':'display:none;' ?>">
                 <div class="max-w-[1280px] mx-auto px-5 md:px-8 py-8 space-y-8">
 
                     <!-- KPI COMPACT STRIP -->
