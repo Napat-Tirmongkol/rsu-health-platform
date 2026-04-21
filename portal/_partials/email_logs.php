@@ -138,8 +138,8 @@ $_eml_typeLabels = [
                     <option value="failed" <?= $_eml_statusFilter==='failed' ? 'selected':'' ?>>❌ ล้มเหลว</option>
                 </select>
             </div>
-            <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-sm flex items-center gap-2">
-                <i class="fa-solid fa-magnifying-glass text-xs"></i> ค้นหา
+            <button type="submit" style="background:#4f46e5;color:#fff;padding:.6rem 1.25rem;border-radius:.75rem;font-weight:700;font-size:.875rem;display:flex;align-items:center;gap:.5rem;border:none;cursor:pointer;transition:background .15s" onmouseover="this.style.background='#4338ca'" onmouseout="this.style.background='#4f46e5'">
+                <i class="fa-solid fa-magnifying-glass" style="font-size:.75rem"></i> ค้นหา
             </button>
             <?php if ($_eml_search || $_eml_typeFilter || $_eml_statusFilter): ?>
             <a href="?section=email_logs" class="px-5 py-2.5 border border-gray-200 bg-white text-gray-500 rounded-xl font-bold text-sm hover:bg-gray-50 flex items-center gap-2">

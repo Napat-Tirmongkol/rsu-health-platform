@@ -1899,6 +1899,7 @@ try {
         const label = document.getElementById('ws-label');
 
         function setBadge(state) {
+            if (!badge || !dot || !label) return;
             const styles = {
                 live: { bg: '#f0fdf4', color: '#16a34a', border: '#c7e8d5', dot: '#22c55e', anim: 'livePulse 1.6s infinite', text: 'Live' },
                 loading: { bg: '#fffbeb', color: '#d97706', border: '#fde68a', dot: '#f59e0b', anim: 'livePulse .8s infinite', text: 'Updating…' },
