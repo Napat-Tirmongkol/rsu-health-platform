@@ -3,12 +3,7 @@
 
 // 1. "จ้างยาม" และ "เชื่อมต่อ DB"
 include('../includes/check_session.php'); 
-require_once(__DIR__ . '/../../config/db_connect.php'); 
-
-// บังคับกำหนดค่าปรับรายวัน (ป้องกัน Undefined Constant)
-if (!defined('FINE_RATE_PER_DAY')) {
-    define('FINE_RATE_PER_DAY', 10); 
-}
+require_once(__DIR__ . '/../../config.php');
 
 $pdo = db();
 

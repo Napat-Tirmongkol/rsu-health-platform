@@ -10,6 +10,9 @@ require_once __DIR__ . '/config/sentry.php'; // โหลดหลัง error_l
 defined('ERROR_LOG_RETENTION_DAYS')    || define('ERROR_LOG_RETENTION_DAYS',    30);  // วัน
 defined('ACTIVITY_LOG_RETENTION_DAYS') || define('ACTIVITY_LOG_RETENTION_DAYS', 90);  // วัน
 
+// ── Finance Settings ──────────────────────────────────────────────────────────
+defined('FINE_RATE_PER_DAY') || define('FINE_RATE_PER_DAY', 10); // ค่าปรับวันละ 10 บาท
+
 // ── Site Settings ─────────────────────────────────────────────────────────────
 $__siteSettingsFile = __DIR__ . '/config/site_settings.json';
 $__siteSettings = file_exists($__siteSettingsFile) ? json_decode(file_get_contents($__siteSettingsFile), true) : [];

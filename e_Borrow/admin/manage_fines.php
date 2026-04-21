@@ -1,13 +1,8 @@
 <?php
 // admin/manage_fines.php (แก้ไข V3.3 - กู้ชีพหน้าจัดการค่าปรับ)
 include('../includes/check_session.php'); 
-require_once(__DIR__ . '/../../config/db_connect.php');
-
+require_once(__DIR__ . '/../../config.php');
 $pdo = db();
-
-if (!defined('FINE_RATE_PER_DAY')) {
-    define('FINE_RATE_PER_DAY', 10); 
-}
 
 $allowed_roles = ['admin', 'editor'];
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], $allowed_roles)) {

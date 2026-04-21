@@ -2,7 +2,7 @@
 // e_Borrow/admin/index.php
 declare(strict_types=1);
 include('../includes/check_session.php');
-require_once __DIR__ . '/../../config/db_connect.php'; // ใช้ DB กลาง
+require_once __DIR__ . '/../../config.php'; // ใช้ Config กลาง
 
 try {
     $pdo = db();
