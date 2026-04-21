@@ -376,7 +376,6 @@ $_cd_qs = http_build_query(array_filter(['section' => 'clinic_data', 'cd_search'
         </div>
     </div>
 </div>
-</div>
 
 <!-- Edit Modal -->
 <div id="cd-edit-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4">

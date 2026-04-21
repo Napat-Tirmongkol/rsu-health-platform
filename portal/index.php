@@ -592,8 +592,7 @@ try {
             <div class="w-full px-5 sm:px-8 py-3 flex items-center justify-between gap-4" style="min-height:60px">
 
                 <!-- Left/Center: Global Search -->
-                <div style="flex: 1; display: flex; align-items: center; justify-content: flex-start; gap: 15px;">
-                    <span style="font-size: 10px; font-weight: 900; color: #2e9e63; white-space: nowrap; background: #f0faf4; padding: 4px 8px; border-radius: 6px; border: 1px solid #c7e8d5;">UI RECOVERY ACTIVE</span>
+                <div style="flex: 1; display: flex; justify-content: flex-start;">
                     <div class="relative group w-full max-w-[400px]">
                         <input type="text" placeholder="ค้นหาเมนู หรือแคมเปญ"
                             class="w-full pl-5 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[13px] font-bold text-slate-800 outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all font-prompt">
@@ -636,8 +635,7 @@ try {
                         </a>
                     </div>
                 </div>
-            </div>
-        </header>
+            </header>
 
         <!-- ── Main Content ── -->
         <main id="portal-main" style="flex:1;overflow-y:auto;min-width:0;">
@@ -1624,6 +1622,8 @@ try {
                         </form>
                     </div>
                 </div>
+                </div>
+            </div>
             <?php endif; ?>
 
             <!-- 
