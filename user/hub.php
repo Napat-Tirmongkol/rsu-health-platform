@@ -149,7 +149,7 @@ render_header('RSU Medical Hub');
           </div>
           <span style="font-size:13px;font-weight:800;color:#0f172a">อุปกรณ์ที่ยืมอยู่</span>
         </div>
-        <a href="../archive/e_Borrow/" style="color:#F97316;font-size:11px;font-weight:700;text-decoration:none">ดูทั้งหมด →</a>
+        <a href="../e_Borrow/" style="color:#F97316;font-size:11px;font-weight:700;text-decoration:none">ดูทั้งหมด →</a>
       </div>
 
       <div style="padding:12px 16px">
@@ -157,7 +157,7 @@ render_header('RSU Medical Hub');
           <div style="display:flex;flex-direction:column;align-items:center;padding:20px 0;gap:8px">
             <i class="fa-solid fa-box-open" style="font-size:32px;color:#e2e8f0"></i>
             <p style="font-size:12px;color:#94a3b8;font-weight:600;margin:0">ไม่มีรายการยืมอุปกรณ์</p>
-            <a href="../archive/e_Borrow/" style="background:#F97316;color:#fff;font-size:11px;font-weight:700;padding:8px 20px;border-radius:10px;text-decoration:none;margin-top:4px">
+            <a href="../e_Borrow/" style="background:#F97316;color:#fff;font-size:11px;font-weight:700;padding:8px 20px;border-radius:10px;text-decoration:none;margin-top:4px">
               ยืมอุปกรณ์
             </a>
           </div>
@@ -205,7 +205,7 @@ render_header('RSU Medical Hub');
           </div>
         </a>
 
-        <a href="../archive/e_Borrow/" style="text-decoration:none;background:#fff;border-radius:18px;padding:16px 14px;box-shadow:0 2px 16px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:12px">
+        <a href="../e_Borrow/" style="text-decoration:none;background:#fff;border-radius:18px;padding:16px 14px;box-shadow:0 2px 16px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:12px">
           <div style="width:44px;height:44px;background:linear-gradient(135deg,#f97316,#fb923c);border-radius:14px;display:flex;align-items:center;justify-content:center">
             <i class="fa-solid fa-boxes-stacked" style="color:#fff;font-size:16px"></i>
           </div>
