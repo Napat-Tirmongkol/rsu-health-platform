@@ -14,6 +14,11 @@ if (!$isEmbed) {
         '<i class="fa-solid fa-robot" style="color:#8b5cf6"></i> AI Campaign Analyst',
         'วิเคราะห์ข้อมูลแคมเปญด้วย Gemini AI · ถามอะไรก็ได้เกี่ยวกับข้อมูลในระบบ'
     );
+} else {
+    // เมื่อ Embed ให้โหลด FontAwesome และ Font ที่จำเป็นด้วย
+    echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">';
+    echo '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&display=swap">';
+    echo '<style>body { font-family: "Prompt", sans-serif; }</style>';
 }
 ?>
 
