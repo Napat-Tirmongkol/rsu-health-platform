@@ -1,6 +1,8 @@
 # ซ่อนไฟล์ใดไฟล์หนึ่งแบบเจาะจง (พิมพ์ชื่อไฟล์เต็มๆ)
 secrets.php
 config/db_connect.php
+e_borrow.sql
+
 
 # ซ่อนทั้งโฟลเดอร์ (ใส่เครื่องหมาย / ต่อท้าย)
 e_Borrow/uploads/

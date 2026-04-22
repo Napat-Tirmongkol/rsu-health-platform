@@ -104,8 +104,8 @@ try {
     }
 
     // Activity logs count (optional module)
-    if ($pdo->query("SHOW TABLES LIKE 'activity_logs'")->rowCount() > 0) {
-        $kpis['logs'] = (int) $pdo->query("SELECT COUNT(*) FROM activity_logs")->fetchColumn();
+    if ($pdo->query("SHOW TABLES LIKE 'sys_activity_logs'")->rowCount() > 0) {
+        $kpis['logs'] = (int) $pdo->query("SELECT COUNT(*) FROM sys_activity_logs")->fetchColumn();
     }
 } catch (PDOException $e) {
     error_log("Portal Stats Fetch Error: " . $e->getMessage());
