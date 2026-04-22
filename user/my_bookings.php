@@ -84,7 +84,8 @@ function getCampIcon($type): string {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>ประวัติการจอง - RSU Medical</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+    <script src="https://cdn.tailwindcss.com/3.4.1"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @font-face {
@@ -257,6 +258,47 @@ function getCampIcon($type): string {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        // Check for URL parameters to show alerts
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            
+            if (params.has('error')) {
+                const error = params.get('error');
+                if (error === 'already_booked') {
+                    Swal.fire({
+                        title: 'คุณจองกิจกรรมนี้ไปแล้ว',
+                        text: 'ไม่สามารถจองกิจกรรมเดิมซ้ำได้ คุณสามารถดูรายละเอียดหรือยกเลิกนัดหมายเดิมได้ในหน้านี้',
+                        icon: 'info',
+                        confirmButtonText: 'รับทราบ',
+                        confirmButtonColor: '#0052CC',
+                        customClass: { popup: 'rounded-[2.5rem]', confirmButton: 'rounded-xl px-10' }
+                    });
+                }
+            }
+
+            if (params.has('msg')) {
+                const msg = params.get('msg');
+                if (msg === 'cancelled_success') {
+                    Swal.fire({
+                        title: 'ยกเลิกนัดหมายแล้ว',
+                        text: 'ระบบได้ทำการยกเลิกนัดหมายของคุณเรียบร้อยแล้ว',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false,
+                        customClass: { popup: 'rounded-[2.5rem]' }
+                    });
+                } else if (msg === 'error') {
+                    Swal.fire({
+                        title: 'เกิดข้อผิดพลาด',
+                        text: 'ไม่สามารถดำเนินการได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง',
+                        icon: 'error',
+                        confirmButtonColor: '#0052CC',
+                        customClass: { popup: 'rounded-[2.5rem]', confirmButton: 'rounded-xl' }
+                    });
+                }
+            }
+        });
+
         function switchTab(tab) {
             const upBtn = document.getElementById('tab-upcoming');
             const hisBtn = document.getElementById('tab-history');
