@@ -31,8 +31,12 @@ $secrets = file_exists($secretsPath) ? require $secretsPath : [];
 define('LINE_LOGIN_CHANNEL_ID', $secrets['LINE_LOGIN_CHANNEL_ID'] ?? '');
 define('LINE_LOGIN_CHANNEL_SECRET', $secrets['LINE_LOGIN_CHANNEL_SECRET'] ?? '');
 
-// ⚠️ ต้องตรงกับ Callback URL ที่ลงทะเบียนใน LINE Developers Console เป๊ะๆ (เพิ่ม /archive/)
-define('LINE_LOGIN_CALLBACK_URL', 'https://healthycampus.rsu.ac.th/e-campaignv2/archive/line_api/callback.php');
+// --- Dynamic Callback URL Detection ---
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
+$host = $_SERVER['HTTP_HOST'] ?? 'healthycampus.rsu.ac.th';
+$base_path = (strpos($host, 'dev.healthycampus') !== false) ? '' : '/e-campaignv2';
+
+define('LINE_LOGIN_CALLBACK_URL', $protocol . $host . $base_path . '/archive/line_api/callback.php');
 
 // 2. LINE Messaging API Channel
 define('LINE_MESSAGING_CHANNEL_ACCESS_TOKEN', $secrets['EBORROW_LINE_MESSAGE_TOKEN'] ?? $secrets['LINE_MESSAGING_CHANNEL_ACCESS_TOKEN'] ?? '');
