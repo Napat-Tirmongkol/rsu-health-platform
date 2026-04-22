@@ -28,7 +28,7 @@ if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) || !strtotime($date)) {
 try {
     $pdo = db();
     $sql = "
-        SELECT 
+        SELECT
             t.id, t.max_capacity,
             (SELECT COUNT(*) FROM camp_bookings a WHERE a.slot_id = t.id AND a.status IN ('booked', 'confirmed')) as booked_count
         FROM camp_slots t
@@ -43,7 +43,7 @@ try {
         $remaining = (int)$slot['max_capacity'] - (int)$slot['booked_count'];
         $result[$slot['id']] = max(0, $remaining); // ส่งกลับเป็น ID => จำนวนที่เหลือ
     }
-    
+
     echo json_encode(['status' => 'success', 'data' => $result]);
 } catch (PDOException $e) {
     error_log("api_get_slots error: " . $e->getMessage());

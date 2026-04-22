@@ -159,43 +159,32 @@ function log_email(string $to, string $subject, string $type, bool $ok, string $
 function send_campaign_email(string $to, string $subject, string $body, string $type = ''): bool {
     if (empty($to)) return false;
 
-    // รองรับการส่งหลายอีเมล (คั่นด้วย comma)
-    $recipients = array_map('trim', explode(',', $to));
-    $recipients = array_filter($recipients, fn($e) => filter_var($e, FILTER_VALIDATE_EMAIL));
-    
-    if (empty($recipients)) return false;
-
     $secrets = get_secrets();
     $host    = $secrets['SMTP_HOST'] ?? '';
-    $allOk   = true;
+    $ok      = false;
+    $errMsg  = '';
 
-    foreach ($recipients as $recipient) {
-        $ok     = false;
-        $errMsg = '';
-
-        // ถ้ามี SMTP config → ส่งผ่าน SMTP
-        if (!empty($host) && !empty($secrets['SMTP_USER']) && !empty($secrets['SMTP_PASS'])) {
-            $ok = smtp_send($recipient, $subject, $body, $secrets);
-            if (!$ok) $errMsg = 'SMTP send failed — check PHP error_log for details';
-        } else {
-            // Fallback: php mail()
-            $fromEmail = $secrets['SMTP_FROM_EMAIL'] ?? 'no-reply@rsu.ac.th';
-            $fromName  = $secrets['SMTP_FROM_NAME']  ?? 'RSU Medical Clinic';
-            $headers   = implode("\r\n", [
-                'MIME-Version: 1.0',
-                'Content-Type: text/html; charset=UTF-8',
-                'From: =?UTF-8?B?' . base64_encode($fromName) . "?= <{$fromEmail}>",
-                'X-Mailer: PHP/' . PHP_VERSION,
-            ]);
-            $ok = mail($recipient, '=?UTF-8?B?' . base64_encode($subject) . '?=', $body, $headers);
-            if (!$ok) $errMsg = 'php mail() returned false — sendmail not configured';
-        }
-
-        log_email($recipient, $subject, $type, $ok, $errMsg);
-        if (!$ok) $allOk = false;
+    // ถ้ามี SMTP config → ส่งผ่าน SMTP
+    if (!empty($host) && !empty($secrets['SMTP_USER']) && !empty($secrets['SMTP_PASS'])) {
+        // จับ error_log ชั่วคราวเพื่อดักข้อความ error
+        $ok = smtp_send($to, $subject, $body, $secrets);
+        if (!$ok) $errMsg = 'SMTP send failed — check PHP error_log for details';
+    } else {
+        // Fallback: php mail()
+        $fromEmail = $secrets['SMTP_FROM_EMAIL'] ?? 'no-reply@rsu.ac.th';
+        $fromName  = $secrets['SMTP_FROM_NAME']  ?? 'RSU Medical Clinic';
+        $headers   = implode("\r\n", [
+            'MIME-Version: 1.0',
+            'Content-Type: text/html; charset=UTF-8',
+            'From: =?UTF-8?B?' . base64_encode($fromName) . "?= <{$fromEmail}>",
+            'X-Mailer: PHP/' . PHP_VERSION,
+        ]);
+        $ok = mail($to, '=?UTF-8?B?' . base64_encode($subject) . '?=', $body, $headers);
+        if (!$ok) $errMsg = 'php mail() returned false — sendmail not configured';
     }
 
-    return $allOk;
+    log_email($to, $subject, $type, $ok, $errMsg);
+    return $ok;
 }
 
 // ─── HTML Email Template ──────────────────────────────────────────────────────
@@ -359,13 +348,19 @@ function send_line_notification_simple(string $lineUserId, array $data): bool {
         CURLOPT_TIMEOUT        => 10,
     ]);
     
-    $result   = curl_exec($ch);
+    $result = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlErr = curl_error($ch);
     curl_close($ch);
 
     if ($httpCode !== 200) {
-        $hint = $httpCode === 400 ? ' (ผู้รับยังไม่เพิ่ม LINE OA เป็นเพื่อน หรือบล็อกแล้ว)' : '';
-        error_log("LINE push failed ($httpCode)$hint to $lineUserId: " . ($result ?: 'no response'));
+        $hint = match($httpCode) {
+            400 => 'ผู้รับอาจยังไม่ได้เพิ่ม LINE OA เป็นเพื่อน หรือบล็อก OA แล้ว',
+            401 => 'Channel Access Token ไม่ถูกต้องหรือหมดอายุ',
+            403 => 'ไม่มีสิทธิ์ส่งข้อความ',
+            default => "HTTP {$httpCode}"
+        };
+        error_log("LINE push failed for {$lineUserId}: {$hint}");
     }
 
     return ($httpCode === 200);
