@@ -1623,13 +1623,13 @@ try {
                 </div>
             <?php endif; ?>
 
-            <!-- 
+            <?php /*
                 DEVELOPER NOTE: HOW TO ADD NEW SECTIONS
                 To add a new page/section, follow this template to ensure layout stability:
                 <div id="section-NAME" class="portal-section" style="<?= $activeSection==='NAME'?'':'display:none;' ?> background:#f8fafc; overflow-y:auto;">
                     <?php include __DIR__ . '/_partials/NAME.php'; ?>
                 </div>
-            -->
+            */ ?>
 
             <!-- ════════════ SECTION: SETTINGS ════════════ -->
             <div id="section-settings" class="portal-section"
