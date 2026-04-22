@@ -112,6 +112,9 @@ if (!function_exists('check_maintenance')) {
         $currentScript = basename($_SERVER['SCRIPT_NAME']);
         if ($currentScript === 'index.php' && strpos($_SERVER['REQUEST_URI'], '/user/') !== false) return;
         if ($currentScript === 'line_login.php' || $currentScript === 'google_callback.php') return;
+        
+        // ยกเว้นหน้า UX Staging สำหรับการพัฒนา
+        if (strpos($_SERVER['REQUEST_URI'], '/ux_staging/') !== false) return;
 
         $mFile = __DIR__ . '/config/maintenance.json';
         if (file_exists($mFile)) {

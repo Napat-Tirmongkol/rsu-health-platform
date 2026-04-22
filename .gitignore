@@ -19,3 +19,6 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Staging Sandbox
+ux_staging/

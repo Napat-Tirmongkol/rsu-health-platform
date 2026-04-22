@@ -11,6 +11,7 @@ $pdo = db();
 
 // ─── Auto-create tables ───────────────────────────────────────────────────────
 try {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS sys_error_logs (
         id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         level      ENUM('error','warning','info') NOT NULL DEFAULT 'error',
         source     VARCHAR(300)  NOT NULL DEFAULT '',
