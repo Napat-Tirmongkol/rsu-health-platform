@@ -56,8 +56,13 @@ $isPassport = ($citizenIdValue !== '' && (!ctype_digit($citizenIdValue) || strle
 $_facultyList = [];
 try {
     $_pdo2 = db();
-    $_facultyList = $_pdo2->query("SELECT name_th FROM sys_faculties ORDER BY name_th")->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {}
+    $stmt_fac = $_pdo2->query("SELECT name_th FROM sys_faculties ORDER BY name_th");
+    if ($stmt_fac) {
+        $_facultyList = $stmt_fac->fetchAll(PDO::FETCH_ASSOC);
+    }
+} catch (Exception $e) {
+    error_log("Faculty query failed: " . $e->getMessage());
+}
 ?>
 <!DOCTYPE html>
 <html lang="th">
