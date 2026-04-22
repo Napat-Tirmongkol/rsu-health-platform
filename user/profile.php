@@ -54,6 +54,7 @@ $citizenIdValue = $userData['citizen_id'];
 $isPassport = ($citizenIdValue !== '' && (!ctype_digit($citizenIdValue) || strlen($citizenIdValue) > 13));
 
 require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../includes/footer.php';
 render_header(__('profile.title_edit'));
 ?>
 
