@@ -188,16 +188,17 @@ $_cd_qs = http_build_query(array_filter(['section' => 'clinic_data', 'cd_search'
                     </div>
                 </div>
 
-                <!-- Simple Type Radio -->
-                <div class="mb-4 flex gap-2">
-                    <label class="flex-1 cursor-pointer">
-                        <input type="radio" name="cd-import-type" value="faculty" checked class="hidden peer">
-                        <div class="p-2.5 text-center rounded-xl border border-slate-200 text-xs font-black text-slate-400 peer-checked:bg-blue-50 peer-checked:border-blue-200 peer-checked:text-blue-600 transition-all italic">คณะ</div>
-                    </label>
-                    <label class="flex-1 cursor-pointer">
-                        <input type="radio" name="cd-import-type" value="department" class="hidden peer">
-                        <div class="p-2.5 text-center rounded-xl border border-slate-200 text-xs font-black text-slate-400 peer-checked:bg-amber-50 peer-checked:border-amber-200 peer-checked:text-amber-600 transition-all italic">หน่วยงาน</div>
-                    </label>
+                <!-- Improved Type Selection -->
+                <div class="mb-4 flex p-1 bg-slate-50 rounded-2xl border border-slate-100">
+                    <button type="button" onclick="cdSetImportType('faculty')" id="btn-import-faculty"
+                            class="cd-import-type-btn flex-1 py-3 rounded-xl text-xs font-black transition-all bg-white shadow-sm text-blue-600 border border-blue-100">
+                        คณะ
+                    </button>
+                    <button type="button" onclick="cdSetImportType('department')" id="btn-import-department"
+                            class="cd-import-type-btn flex-1 py-3 rounded-xl text-xs font-black transition-all text-slate-400 hover:text-slate-600">
+                        หน่วยงาน
+                    </button>
+                    <input type="hidden" name="cd-import-type" id="cd-import-type-val" value="faculty">
                 </div>
 
                 <div id="cd-drop-zone"
@@ -595,7 +596,7 @@ $_cd_qs = http_build_query(array_filter(['section' => 'clinic_data', 'cd_search'
     };
     window.cdImport = async function () {
         if (!fileIn.files[0]) return;
-        const importType = document.querySelector('input[name="cd-import-type"]:checked')?.value || 'faculty';
+        const importType = document.getElementById('cd-import-type-val').value || 'faculty';
         impBtn.disabled = true;
         impBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังประมวลผล...';
         const fd = new FormData();
@@ -631,5 +632,26 @@ $_cd_qs = http_build_query(array_filter(['section' => 'clinic_data', 'cd_search'
             impRes.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-2"></i>' + msg;
         }
     }
+
+    // ── Set Import Type Logic ──────────────────────────────────────────────
+    window.cdSetImportType = function(type) {
+        document.getElementById('cd-import-type-val').value = type;
+        const btnFac = document.getElementById('btn-import-faculty');
+        const btnDep = document.getElementById('btn-import-department');
+
+        // Reset both
+        [btnFac, btnDep].forEach(btn => {
+            btn.classList.remove('bg-white', 'shadow-sm', 'text-blue-600', 'border-blue-100', 'text-amber-600', 'border-amber-100');
+            btn.classList.add('text-slate-400', 'hover:text-slate-600');
+        });
+
+        // Set active
+        const activeBtn = type === 'faculty' ? btnFac : btnDep;
+        const activeColor = type === 'faculty' ? 'text-blue-600' : 'text-amber-600';
+        const activeBorder = type === 'faculty' ? 'border-blue-100' : 'border-amber-100';
+
+        activeBtn.classList.add('bg-white', 'shadow-sm', activeColor, 'border', activeBorder);
+        activeBtn.classList.remove('text-slate-400', 'hover:text-slate-600');
+    };
 })();
 </script>
