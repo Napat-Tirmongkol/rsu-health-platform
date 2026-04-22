@@ -106,7 +106,8 @@ $thaiDate = $days[date('w')] . ", " . date('j') . " " . $months[date('n')-1] . "
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
     </style>
     <script>
-        let qr = null;
+        if (typeof window.qr === 'undefined') window.qr = null;
+        var qr = window.qr;
         function toggleModal(id, show) {
             const el = document.getElementById(id);
             if (!el) return;
