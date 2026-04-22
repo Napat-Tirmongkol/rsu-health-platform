@@ -5,12 +5,11 @@ session_start();
 require_once __DIR__ . '/../config.php';
 check_maintenance('e_campaign');
 
-if (empty($_SESSION['evax_student_id'])) {
+$lineUserId = $_SESSION['line_user_id'] ?? '';
+if ($lineUserId === '') {
     header('Location: index.php');
     exit;
 }
-
-$userId = (int)$_SESSION['evax_student_id'];
 
 $user = null;
 $camp_list = [];
@@ -22,8 +21,8 @@ try {
     $pdo = db();
     $today = date('Y-m-d');
 
-    $stmt = $pdo->prepare("SELECT * FROM sys_users WHERE id = :id LIMIT 1");
-    $stmt->execute([':id' => $userId]);
+    $stmt = $pdo->prepare("SELECT * FROM sys_users WHERE line_user_id = :line_id LIMIT 1");
+    $stmt->execute([':line_id' => $lineUserId]);
     $user = $stmt->fetch();
 
     $stmt = $pdo->prepare("

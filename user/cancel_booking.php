@@ -1,69 +1,64 @@
 <?php
 // user/cancel_booking.php
 declare(strict_types=1);
-
-require_once __DIR__ . '/../config.php';
 session_start();
+require_once __DIR__ . '/../config.php';
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-  header('Location: my_bookings.php', true, 303);
-  exit;
+$lineUserId = $_SESSION['line_user_id'] ?? '';
+if ($lineUserId === '' || $_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: index.php');
+    exit;
 }
 
 validate_csrf_or_die();
 
-$studentId = isset($_SESSION['evax_student_id']) ? (int)$_SESSION['evax_student_id'] : 0;
 $appointmentId = isset($_POST['appointment_id']) ? (int)$_POST['appointment_id'] : 0;
 
-if ($studentId <= 0 || $appointmentId <= 0) {
-  header('Location: my_bookings.php', true, 303);
-  exit;
+if ($appointmentId <= 0) {
+    header('Location: my_bookings.php');
+    exit;
 }
 
 try {
-  $pdo = db();
-  
-  // ดึงข้อมูลก่อนลบเพื่อนำไปใส่ในอีเมล
-  $stmtInfo = $pdo->prepare("SELECT u.email, u.full_name, c.title, s.slot_date, s.start_time, s.end_time 
-                             FROM camp_bookings b 
-                             JOIN sys_users u ON b.student_id = u.id 
-                             JOIN camp_list c ON b.campaign_id = c.id 
-                             JOIN camp_slots s ON b.slot_id = s.id 
-                             WHERE b.id = :aid AND b.student_id = :sid");
-  $stmtInfo->execute([':aid' => $appointmentId, ':sid' => $studentId]);
-  $bInfo = $stmtInfo->fetch(PDO::FETCH_ASSOC);
+    $pdo = db();
+    
+    // ดึงข้อมูลผู้ใช้เพื่อตรวจสอบว่าเป็นเจ้าของนัดหมายจริงหรือไม่
+    $stmtU = $pdo->prepare("SELECT student_personnel_id, id FROM sys_users WHERE line_user_id = :line_id LIMIT 1");
+    $stmtU->execute([':line_id' => $lineUserId]);
+    $user = $stmtU->fetch(PDO::FETCH_ASSOC);
 
-  // อัปเดตสถานะเป็น cancelled ในตารางใหม่ (camp_bookings)
-  $sql = "
-    UPDATE camp_bookings 
-    SET status = 'cancelled' 
-    WHERE id = :appointment_id AND student_id = :student_id
-  ";
-  $stmt = $pdo->prepare($sql);
-  $stmt->execute([
-    ':appointment_id' => $appointmentId,
-    ':student_id' => $studentId
-  ]);
-
-  // ส่งอีเมลถ้ามีข้อมูล
-  if ($bInfo && !empty($bInfo['email'])) {
-    try {
-      require_once __DIR__ . '/../includes/mail_helper.php';
-      notify_booking_status($bInfo['email'], 'cancelled_by_user', [
-          'campaign_title' => $bInfo['title'],
-          'date'           => date('d/m/Y', strtotime($bInfo['slot_date'])),
-          'time'           => substr($bInfo['start_time'], 0, 5) . ' - ' . substr($bInfo['end_time'], 0, 5),
-          'full_name'      => $bInfo['full_name'] ?? '',
-      ]);
-    } catch (Exception $e) {
-      error_log("Cancel Booking Email Error: " . $e->getMessage());
+    if (!$user) {
+        die("User not found.");
     }
-  }
+
+    $sid = $user['student_personnel_id'];
+    $userId = $user['id'];
+
+    // ตรวจสอบสถานะก่อนยกเลิก
+    $stmtCheck = $pdo->prepare("SELECT status FROM camp_bookings WHERE id = :aid AND student_personnel_id = :sid");
+    $stmtCheck->execute([':aid' => $appointmentId, ':sid' => $sid]);
+    $currentStatus = $stmtCheck->fetchColumn();
+
+    if (!$currentStatus) {
+        die("Appointment not found or access denied.");
+    }
+
+    if (in_array($currentStatus, ['cancelled', 'cancelled_by_admin'])) {
+        header('Location: my_bookings.php?msg=already_cancelled');
+        exit;
+    }
+
+    // ทำการยกเลิก
+    $stmt = $pdo->prepare("UPDATE camp_bookings SET status = 'cancelled' WHERE id = :aid AND student_personnel_id = :sid");
+    $stmt->execute([':aid' => $appointmentId, ':sid' => $sid]);
+
+    log_activity('Cancel Booking', "User cancelled appointment #$appointmentId", $userId);
+
+    header('Location: my_bookings.php?msg=cancelled_success');
+    exit;
 
 } catch (PDOException $e) {
-  error_log("cancel_booking error: " . $e->getMessage()); echo json_encode(["status" => "error", "message" => "เกิดข้อผิดพลาด กรุณาลองใหม่"]);
+    error_log("Cancel Booking Error: " . $e->getMessage());
+    header('Location: my_bookings.php?msg=error');
+    exit;
 }
-
-// ยกเลิกเสร็จ เด้งกลับไปหน้าประวัติการจอง
-header('Location: my_bookings.php', true, 303);
-exit;

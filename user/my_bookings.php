@@ -5,12 +5,11 @@ session_start();
 require_once __DIR__ . '/../config.php';
 check_maintenance('e_campaign');
 
-if (empty($_SESSION['evax_student_id'])) {
+$lineUserId = $_SESSION['line_user_id'] ?? '';
+if ($lineUserId === '') {
     header('Location: index.php');
     exit;
 }
-
-$studentId = (int)$_SESSION['evax_student_id'];
 
 // Fetch Bookings
 $bookings = [];
@@ -28,11 +27,12 @@ try {
             c.description AS campaign_desc
         FROM camp_bookings a
         JOIN camp_list c ON a.campaign_id = c.id
-        WHERE a.student_id = :student_id
+        JOIN sys_users u ON a.student_id = u.student_personnel_id
+        WHERE u.line_user_id = :line_id
         ORDER BY a.booking_date DESC, a.booking_time DESC
     ";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([':student_id' => $studentId]);
+    $stmt->execute([':line_id' => $lineUserId]);
     $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     error_log("my_bookings error: " . $e->getMessage());

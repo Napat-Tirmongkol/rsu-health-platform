@@ -1,122 +1,39 @@
 <?php
-// user/index.php
-declare(strict_types=1)
-;
+// user/index.php — User Portal Entry
+declare(strict_types=1);
 session_start();
 require_once __DIR__ . '/../config.php';
-check_maintenance('e_campaign');
-require_once __DIR__ . '/../includes/header.php';
 
-// ถ้า Login แล้ว ให้ Redirect ไปหน้าที่เหมาะสมเลย ไม่ต้องให้มาที่นี่อีก
-if (isset($_SESSION['evax_student_id'])) {
+// If already logged in, check if profile is complete
+$lineUserId = $_SESSION['line_user_id'] ?? '';
+
+if ($lineUserId !== '') {
     try {
         $pdo = db();
-        $stmt = $pdo->prepare("SELECT full_name, student_personnel_id, citizen_id, phone_number, status FROM sys_users WHERE id = :id LIMIT 1");
-        $stmt->execute([':id' => $_SESSION['evax_student_id']]);
-        $row = $stmt->fetch();
+        $stmt = $pdo->prepare("SELECT * FROM sys_users WHERE line_user_id = :line_id LIMIT 1");
+        $stmt->execute([':line_id' => $lineUserId]);
+        $user = $stmt->fetch();
 
-        $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM camp_bookings WHERE student_id = :sid AND status IN ('confirmed', 'booked')");
-        $stmtCheck->execute([':sid' => $_SESSION['evax_student_id']]);
-        $hasBooking = (int) $stmtCheck->fetchColumn() > 0;
-
-        $inviteToken = $_SESSION['invite_token'] ?? '';
-        $profileComplete = (
-            !empty($row['full_name']) &&
-            !empty($row['citizen_id']) &&
-            !empty($row['phone_number']) &&
-            !empty($row['status']) &&
-            ($row['status'] === 'other' || !empty($row['student_personnel_id']))
-        );
-
-        if ($inviteToken !== '') {
-            if ($profileComplete) {
-                // โปรไฟล์ครบ → ไปหน้า campaign invite โดยตรง (ไม่สนใจ hasBooking)
-                unset($_SESSION['invite_token']);
-                header('Location: c.php?t=' . urlencode($inviteToken));
-            } else {
-                // โปรไฟล์ยังไม่ครบ → ไปกรอก profile ก่อน (เก็บ token ไว้ใน session)
-                // save_profile.php จะ redirect กลับ campaign หลังบันทึก
+        if ($user) {
+            // Check if they have at least a name (basic profile completion)
+            if (empty($user['full_name'])) {
                 header('Location: profile.php');
+                exit;
             }
-        } elseif ($hasBooking || $profileComplete) {
+            
+            // Check for pending/confirmed bookings for redirection logic if needed
+            $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM camp_bookings b JOIN sys_users u ON b.student_id = u.student_personnel_id WHERE u.line_user_id = :line_id AND b.status IN ('confirmed', 'booked')");
+            $stmtCheck->execute([':line_id' => $lineUserId]);
+            $hasBooking = (int)$stmtCheck->fetchColumn() > 0;
+
             header('Location: hub.php');
-        } else {
-            header('Location: profile.php');
+            exit;
         }
-        exit;
     } catch (PDOException $e) {
-        // ถ้า DB error ให้ไปหน้า Login ใหม่
-        session_destroy();
+        error_log("Index login error: " . $e->getMessage());
     }
 }
 
-render_header('เข้าสู่ระบบ');
-?>
-
-<div class="flex flex-col items-center justify-center min-h-screen bg-[#f4f7fa] p-5">
-
-    <div class="w-full max-w-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
-
-        <!-- Header Logo -->
-        <div class="text-center mb-8">
-            <div
-                class="mx-auto w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-lg mb-5 rotate-3 hover:rotate-0 transition-transform duration-300">
-                <i class="fa-solid fa-syringe text-4xl text-[#0052CC]"></i>
-            </div>
-            <h1 class="text-2xl font-bold text-gray-900 font-prompt">RSU Medical Clinic Portal</h1>
-            <p class="text-gray-500 text-sm mt-1 font-prompt">คลินิกเวชกรรม มหาวิทยาลัยรังสิต</p>
-        </div>
-
-        <!-- Login Card -->
-        <div class="bg-white rounded-3xl shadow-[0_8px_40px_rgba(0,0,0,0.06)] border border-gray-100 overflow-hidden">
-
-            <!-- Header Strip -->
-            <div class="bg-gradient-to-r from-[#0052CC] to-[#0070f3] p-6 text-center">
-                <p class="text-white text-sm font-prompt opacity-90">เข้าสู่ระบบด้วยบัญชี LINE ของคุณ</p>
-                <p class="text-blue-100 text-xs mt-1 font-prompt opacity-75">เพื่อดำเนินการเข้าสู่ระบบ</p>
-            </div>
-
-            <div class="p-7">
-                <!-- LINE Login Button -->
-                <a href="../archive/line_api/line_login.php" id="btn-line-login"
-                    class="w-full flex items-center justify-center gap-3 bg-[#00c300] hover:bg-[#00a800] active:bg-[#009000] text-white font-bold py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-green-200 active:scale-[0.97] hover:shadow-green-300 hover:shadow-xl">
-                    <i class="fa-brands fa-line text-2xl"></i>
-                    <span class="text-[16px] font-prompt">เข้าสู่ระบบด้วย LINE</span>
-                </a>
-
-                <!-- Divider -->
-                <div class="flex items-center gap-3 my-6">
-                    <div class="flex-1 h-px bg-gray-100"></div>
-                    <span class="text-xs text-gray-400 font-prompt">ข้อมูลของคุณถูกปกป้องด้วย PDPA</span>
-                    <div class="flex-1 h-px bg-gray-100"></div>
-                </div>
-
-                <!-- Info Badges -->
-                <div class="grid grid-cols-3 gap-3 text-center">
-                    <div class="p-3 bg-blue-50 rounded-2xl">
-                        <i class="fa-solid fa-shield-halved text-[#0052CC] text-lg mb-1 block"></i>
-                        <p class="text-xs text-gray-600 font-prompt leading-tight">ปลอดภัย<br>100%</p>
-                    </div>
-                    <div class="p-3 bg-green-50 rounded-2xl">
-                        <i class="fa-solid fa-clock text-green-600 text-lg mb-1 block"></i>
-                        <p class="text-xs text-gray-600 font-prompt leading-tight">รวดเร็ว<br>ทันใจ</p>
-                    </div>
-                    <div class="p-3 bg-purple-50 rounded-2xl">
-                        <i class="fa-solid fa-bell text-purple-600 text-lg mb-1 block"></i>
-                        <p class="text-xs text-gray-600 font-prompt leading-tight">แจ้งเตือน</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer Note -->
-        <p class="text-center text-xs text-gray-400 mt-6 font-prompt leading-relaxed px-4">
-            การเข้าใช้งานถือว่าคุณยอมรับ<br>
-            <span class="text-[#0052CC] font-medium">นโยบายความเป็นส่วนตัว</span> และ <span
-                class="text-[#0052CC] font-medium">ข้อกำหนดการใช้งาน</span>
-        </p>
-    </div>
-</div>
-
-<?php require_once __DIR__ . '/../includes/footer.php';
-render_footer(); ?>
+// If not logged in, redirect to LINE login
+header('Location: line_login.php');
+exit;
