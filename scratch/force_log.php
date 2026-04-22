@@ -1,40 +1,33 @@
 <?php
 require_once __DIR__ . '/../config.php';
 
-echo "<h2>Activity Log Debugger</h2>";
+echo "<h2>Activity Log Debugger (Structural Check)</h2>";
 
 try {
     $pdo = db();
-    echo "1. Database Connected!<br>";
-
-    // ทดสอบเขียน Log
-    $testAction = "Debug Test";
-    $testDesc = "ทดสอบการบันทึก Log ผ่านไฟล์ force_log.php เมื่อเวลา " . date('Y-m-d H:i:s');
     
-    $res = log_activity($testAction, $testDesc);
+    // 1. ตรวจสอบคอลัมน์ที่มีอยู่ในปัจจุบัน
+    echo "<h3>1. ค้นหาโครงสร้างตารางปัจจุบัน:</h3>";
+    $stmt = $pdo->query("DESCRIBE sys_activity_logs");
+    $columns = $stmt->fetchAll();
     
-    if ($res) {
-        echo "<span style='color:green;'>2. Success! บันทึก Log ลงฐานข้อมูลเรียบร้อยแล้ว</span><br>";
-    } else {
-        echo "<span style='color:red;'>2. Failed! ฟังก์ชัน log_activity() คืนค่ากลับมาเป็น false</span><br>";
-    }
-
-    // ตรวจสอบข้อมูลในตาราง
-    $stmt = $pdo->query("SELECT * FROM sys_activity_logs ORDER BY id DESC LIMIT 5");
-    $logs = $stmt->fetchAll();
-
-    echo "<h3>รายการ 5 Log ล่าสุดในฐานข้อมูล:</h3>";
-    echo "<table border='1' cellpadding='5' style='border-collapse:collapse; width:100%'>";
-    echo "<tr><th>ID</th><th>Action</th><th>Description</th><th>Timestamp</th></tr>";
-    foreach ($logs as $log) {
-        echo "<tr>";
-        echo "<td>{$log['id']}</td>";
-        echo "<td>{$log['action']}</td>";
-        echo "<td>{$log['description']}</td>";
-        echo "<td>{$log['timestamp']}</td>";
-        echo "</tr>";
+    echo "<table border='1' cellpadding='5' style='border-collapse:collapse;'>";
+    echo "<tr><th>Field</th><th>Type</th><th>Null</th></tr>";
+    foreach ($columns as $col) {
+        echo "<tr><td>{$col['Field']}</td><td>{$col['Type']}</td><td>{$col['Null']}</td></tr>";
     }
     echo "</table>";
+
+    // 2. ทดลอง INSERT แบบ Manual เพื่อดู Error Message จริงๆ
+    echo "<h3>2. ทดลอง INSERT แบบ Manual (เพื่อดู Error):</h3>";
+    try {
+        $sql = "INSERT INTO sys_activity_logs (user_id, action, description, ip_address, user_agent) VALUES (?, ?, ?, ?, ?)";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([1, 'Debug', 'Test', '127.0.0.1', 'Manual Test']);
+        echo "<span style='color:green;'>INSERT สำเร็จ!</span>";
+    } catch (PDOException $e) {
+        echo "<span style='color:red;'>INSERT ล้มเหลว: " . $e->getMessage() . "</span>";
+    }
 
 } catch (Exception $e) {
     echo "<span style='color:red;'>Error: " . $e->getMessage() . "</span>";
