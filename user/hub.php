@@ -355,14 +355,16 @@ $thaiDate = $days[date('w')] . ", " . date('j') . " " . $months[date('n')-1] . "
                     <div class="flex items-start justify-between mb-10">
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-white border border-white/10 shadow-inner">
-                                <i class="fa-solid fa-shield-heart text-lg"></i>
+                                <i class="fa-solid fa-passport text-lg"></i>
                             </div>
                             <div>
-                                <h4 class="text-white font-black text-sm tracking-tight">สิทธิ์นักศึกษา RSU</h4>
-                                <p class="text-white/30 text-[9px] font-black uppercase tracking-[0.2em] mt-1.5 leading-none">Standard Coverage</p>
+                                <h4 class="text-white font-black text-sm tracking-tight">Student Insurance (INTL)</h4>
+                                <p class="text-white/30 text-[9px] font-black uppercase tracking-[0.2em] mt-1.5 leading-none">Muang Thai Insurance</p>
                             </div>
                         </div>
-                        <div class="w-10 h-6 rounded-lg bg-gradient-to-br from-yellow-400/80 to-yellow-600/80 border border-yellow-300/30 shadow-lg"></div>
+                        <div class="w-12 h-8 rounded-lg bg-[#F83821] flex items-center justify-center border border-white/10 shadow-lg">
+                            <span class="text-white font-black text-[8px]">MTI</span>
+                        </div>
                     </div>
                     
                     <div class="space-y-2 mb-8">
@@ -372,9 +374,9 @@ $thaiDate = $days[date('w')] . ", " . date('j') . " " . $months[date('n')-1] . "
                         </div>
                         <div class="flex items-baseline gap-1">
                             <span class="text-white text-[18px] font-black opacity-50">฿</span>
-                            <span class="text-white text-4xl font-black tracking-tighter">34,500</span>
+                            <span class="text-white text-4xl font-black tracking-tighter">40,000</span>
                         </div>
-                        <p class="text-white/20 text-[10px] font-bold">Total Limit: ฿ 45,000</p>
+                        <p class="text-white/20 text-[10px] font-bold">Max Limit per Incident: ฿ 40,000</p>
                     </div>
 
                     <div class="flex items-end justify-between pt-6 border-t border-white/10 relative z-10">
@@ -389,18 +391,17 @@ $thaiDate = $days[date('w')] . ", " . date('j') . " " . $months[date('n')-1] . "
                     </div>
                 </div>
                 
-                <!-- Progress Bar -->
-                <div class="bg-white rounded-[2.2rem] p-6 border border-slate-100 shadow-sm">
-                    <div class="flex items-center justify-between mb-4 px-1">
-                        <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Usage</p>
-                        <p class="text-slate-900 text-xs font-black">23%</p>
-                    </div>
-                    <div class="w-full h-3 bg-slate-50 rounded-full overflow-hidden border border-slate-100 p-0.5">
-                        <div class="h-full bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.3)]" style="width: 23%"></div>
-                    </div>
-                    <div class="flex items-center justify-between mt-5 px-1">
-                        <p class="text-slate-300 text-[9px] font-mono font-bold tracking-tighter">RSU-ACC-2025-01</p>
-                        <button onclick="showUpcoming('รายละเอียดกรมธรรม์')" class="text-blue-600 text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 active:scale-95 transition-all">Details <i class="fa-solid fa-chevron-right text-[8px]"></i></button>
+                <!-- Info Banner -->
+                <div class="bg-blue-600 rounded-[2.2rem] p-6 shadow-xl shadow-blue-100 relative overflow-hidden group">
+                    <div class="absolute -right-4 -top-4 w-20 h-20 bg-white/10 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
+                    <div class="flex items-start gap-4 relative z-10">
+                        <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-white shrink-0">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                        </div>
+                        <div class="space-y-1">
+                            <h5 class="text-white font-black text-xs uppercase tracking-widest">Required Documents</h5>
+                            <p class="text-white/80 text-[11px] leading-relaxed">Please present your <b>Original Passport</b> at the hospital to receive medical services.</p>
+                        </div>
                     </div>
                 </div>
             </div>
