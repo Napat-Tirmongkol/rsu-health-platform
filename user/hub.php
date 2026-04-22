@@ -129,36 +129,59 @@ $thaiDate = $days[date('w')] . ", " . date('j') . " " . $months[date('n')-1] . "
 
     <!-- Modal Functions (defined early to prevent ReferenceError on button clicks) -->
     <script>
-        function showQR() {
-            const modal = document.getElementById('qr-modal');
-            const qrContainer = document.getElementById('qrcode');
-            modal.classList.remove('hidden'); modal.classList.add('flex');
-            if (typeof qr === 'undefined' || !qr) {
-                qrContainer.innerHTML = '';
-                qr = new QRCode(qrContainer, { text: "<?= htmlspecialchars($user['student_personnel_id'] ?? '') ?>", width: 180, height: 180, colorDark : "#0f172a", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
+        // Use a safer modal toggle to prevent 'null' errors
+        function toggleModal(id, show) {
+            const el = document.getElementById(id);
+            if (!el) {
+                console.error('Modal element not found:', id);
+                return;
+            }
+            if (show) {
+                el.classList.remove('hidden');
+                el.classList.add('flex');
+                if (id === 'qr-modal' && (!qr)) {
+                    const qrContainer = document.getElementById('qrcode');
+                    qrContainer.innerHTML = '';
+                    qr = new QRCode(qrContainer, { 
+                        text: "<?= htmlspecialchars($user['student_personnel_id'] ?? '') ?>", 
+                        width: 180, height: 180, 
+                        colorDark : "#0f172a", colorLight : "#ffffff", 
+                        correctLevel : QRCode.CorrectLevel.H 
+                    });
+                }
+            } else {
+                el.classList.add('hidden');
+                el.classList.remove('flex');
             }
         }
-        function hideQR() { document.getElementById('qr-modal').classList.add('hidden'); }
-        function showNotifications() { document.getElementById('notif-modal').classList.remove('hidden'); document.getElementById('notif-modal').classList.add('flex'); }
-        function hideNotifications() { document.getElementById('notif-modal').classList.add('hidden'); }
-        function showProfile() { document.getElementById('profile-modal').classList.remove('hidden'); document.getElementById('profile-modal').classList.add('flex'); }
-        function hideProfile() { document.getElementById('profile-modal').classList.add('hidden'); }
-        function showCampaigns() { document.getElementById('camps-modal').classList.remove('hidden'); document.getElementById('camps-modal').classList.add('flex'); }
-        function hideCampaigns() { document.getElementById('camps-modal').classList.add('hidden'); }
-        function showHistory() { document.getElementById('history-modal').classList.remove('hidden'); document.getElementById('history-modal').classList.add('flex'); }
-        function hideHistory() { document.getElementById('history-modal').classList.add('hidden'); }
-        function showContact() { document.getElementById('contact-modal').classList.remove('hidden'); document.getElementById('contact-modal').classList.add('flex'); }
-        function hideContact() { document.getElementById('contact-modal').classList.add('hidden'); }
-        function showChat() { document.getElementById('chat-modal').classList.remove('hidden'); document.getElementById('chat-modal').classList.add('flex'); const content = document.getElementById('chat-content'); content.scrollTop = content.scrollHeight; }
-        function hideChat() { document.getElementById('chat-modal').classList.add('hidden'); }
-        function showUpcoming(name) { document.getElementById('upcoming-name').innerText = name; document.getElementById('upcoming-modal').classList.remove('hidden'); document.getElementById('upcoming-modal').classList.add('flex'); }
-        function hideUpcoming() { document.getElementById('upcoming-modal').classList.add('hidden'); }
+
+        // Helper aliases
+        function showQR() { toggleModal('qr-modal', true); }
+        function hideQR() { toggleModal('qr-modal', false); }
+        function showNotifications() { toggleModal('notif-modal', true); }
+        function hideNotifications() { toggleModal('notif-modal', false); }
+        function showProfile() { toggleModal('profile-modal', true); }
+        function hideProfile() { toggleModal('profile-modal', false); }
+        function showCampaigns() { toggleModal('camps-modal', true); }
+        function hideCampaigns() { toggleModal('camps-modal', false); }
+        function showHistory() { toggleModal('history-modal', true); }
+        function hideHistory() { toggleModal('history-modal', false); }
+        function showContact() { toggleModal('contact-modal', true); }
+        function hideContact() { toggleModal('contact-modal', false); }
+        function showChat() { toggleModal('chat-modal', true); const content = document.getElementById('chat-content'); content.scrollTop = content.scrollHeight; }
+        function hideChat() { toggleModal('chat-modal', false); }
+        function showUpcoming(name) { 
+            const nameEl = document.getElementById('upcoming-name');
+            if (nameEl) nameEl.innerText = name;
+            toggleModal('upcoming-modal', true); 
+        }
+        function hideUpcoming() { toggleModal('upcoming-modal', false); }
 
         // Suppress Tailwind CDN production warning
         (function() {
             const originalWarn = console.warn;
             console.warn = function(...args) {
-                if (args[0]?.includes?.('cdn.tailwindcss.com')) return;
+                if (typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com')) return;
                 originalWarn.apply(console, args);
             };
         })();
