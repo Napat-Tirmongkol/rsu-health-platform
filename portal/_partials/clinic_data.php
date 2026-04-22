@@ -469,11 +469,11 @@ $_cd_qs = http_build_query(array_filter(['section' => 'clinic_data', 'cd_search'
         const box = document.getElementById('cd-add-result');
         box.classList.remove('hidden', 'text-emerald-600', 'text-red-600');
         if (data.status === 'ok') {
-            box.classList.add('text-emerald-600');
-            box.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i>' + data.message;
+            showPortalToast(data.message, 'success');
             f.reset();
-            setTimeout(() => location.reload(), 700);
+            cdDoSearch(1); // Refresh table dynamically
         } else {
+            box.classList.remove('hidden');
             box.classList.add('text-red-600');
             box.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1"></i>' + data.message;
         }
@@ -489,11 +489,10 @@ $_cd_qs = http_build_query(array_filter(['section' => 'clinic_data', 'cd_search'
         const res = await fetch(ENDPOINT, { method: 'POST', body: fd });
         const data = await res.json();
         if (data.status === 'ok') {
-            const row = document.querySelector('tr[data-id="' + id + '"]');
-            if (row) row.remove();
-            setTimeout(() => location.reload(), 300);
+            showPortalToast('ลบข้อมูลเรียบร้อยแล้ว', 'success');
+            cdDoSearch(1); // Refresh table dynamically
         } else {
-            alert(data.message);
+            Swal.fire('ผิดพลาด', data.message, 'error');
         }
     };
 
@@ -543,10 +542,11 @@ $_cd_qs = http_build_query(array_filter(['section' => 'clinic_data', 'cd_search'
         const data = await res.json();
         eResu.classList.remove('hidden', 'text-emerald-600', 'text-red-600');
         if (data.status === 'ok') {
-            eResu.classList.add('text-emerald-600');
-            eResu.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i>' + data.message;
-            setTimeout(() => location.reload(), 500);
+            showPortalToast(data.message, 'success');
+            cdCloseEdit();
+            cdDoSearch(1); // Refresh table dynamically
         } else {
+            eResu.classList.remove('hidden');
             eResu.classList.add('text-red-600');
             eResu.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1"></i>' + data.message;
         }

@@ -431,6 +431,11 @@ body[data-theme='dark'] .kpi-stat-label {
 .bg-gray-900    { background-color: #111827 !important; }
 .bg-\[\#06C755\] { background-color: #06C755 !important; }
 
+/* Dark Mode Button Overrides */
+body[data-theme='dark'] .bg-gray-100 { background-color: #334155 !important; }
+body[data-theme='dark'] .text-gray-700 { color: #e2e8f0 !important; }
+body[data-theme='dark'] .bg-gray-100:hover { background-color: #475569 !important; }
+
 /* Inputs and Forms */
 body[data-theme='dark'] input[type="text"],
 body[data-theme='dark'] select,
