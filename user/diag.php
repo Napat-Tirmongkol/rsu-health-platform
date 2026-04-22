@@ -1,5 +1,5 @@
 <?php
-// user/diag.php — ดึงข้อมูลตัวอย่างจาก sys_faculties
+// user/diag.php — ตรวจสอบบันทึกการ Pull
 declare(strict_types=1);
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
@@ -7,26 +7,22 @@ ini_set('display_errors', '1');
 require_once __DIR__ . '/../config.php';
 $pdo = db();
 
-echo "<h2>Sampling sys_faculties Data...</h2>";
+echo "<h2>Git Pull Log Analysis</h2>";
 try {
-    $stmt = $pdo->query("SELECT * FROM sys_faculties LIMIT 1");
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    if ($row) {
-        echo "✅ Found data! Columns identified:<br>";
-        echo "<pre>" . print_r(array_keys($row), true) . "</pre>";
-        echo "Sample values:<br>";
-        echo "<pre>" . print_r($row, true) . "</pre>";
-    } else {
-        echo "❌ Table is EMPTY. Cannot identify columns via sampling.<br>";
-        
-        // Try SHOW COLUMNS as fallback
-        echo "<h3>Attempting SHOW COLUMNS...</h3>";
-        $stmt = $pdo->query("SHOW COLUMNS FROM sys_faculties");
-        $cols = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        print_r($cols);
+    $stmt = $pdo->query("SELECT * FROM sys_git_pull_log ORDER BY pulled_at DESC LIMIT 10");
+    $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    echo "<table border='1' cellpadding='5'>";
+    echo "<tr><th>Time</th><th>Status</th><th>Output</th></tr>";
+    foreach ($logs as $l) {
+        echo "<tr>";
+        echo "<td>{$l['pulled_at']}</td>";
+        echo "<td>{$l['status']}</td>";
+        echo "<td><pre>" . htmlspecialchars($l['output'] ?? '') . "</pre></td>";
+        echo "</tr>";
     }
+    echo "</table>";
 } catch (Exception $e) {
-    echo "❌ Error: " . $e->getMessage() . "<br>";
+    echo "❌ Error reading git log: " . $e->getMessage() . "<br>";
 }
 
 echo "<h2>Done!</h2>";
