@@ -45,9 +45,9 @@ try {
     $studentPersonnelId = $user['student_personnel_id'];
     
     // 3. เช็คว่าเคยกดจองกิจกรรมนี้ไปแล้วหรือยัง
-    $checkSql = "SELECT COUNT(*) FROM camp_bookings WHERE student_personnel_id = :sid AND campaign_id = :cid AND status IN ('confirmed', 'booked')";
+    $checkSql = "SELECT COUNT(*) FROM camp_bookings WHERE student_id = :sid AND campaign_id = :cid AND status IN ('confirmed', 'booked')";
     $stmtCheck = $pdo->prepare($checkSql);
-    $stmtCheck->execute([':sid' => $studentPersonnelId, ':cid' => $campaignId]);
+    $stmtCheck->execute([':sid' => $userId, ':cid' => $campaignId]);
     if ((int)$stmtCheck->fetchColumn() > 0) {
         header('Location: my_bookings.php?error=already_booked', true, 303);
         exit;
@@ -88,14 +88,11 @@ try {
 
     $bookingStatus = ($campData['is_auto_approve'] == 1) ? 'confirmed' : 'booked';
 
-    // 7. บันทึกข้อมูล (ใช้ student_personnel_id เป็นหลักตามโครงสร้างใหม่)
-    $insertSql = "INSERT INTO camp_bookings (student_id, student_personnel_id, campaign_id, slot_id, status, booking_date, booking_time) 
-                  SELECT :userId, :sid, :cid, :slot, :status, slot_date, start_time 
-                  FROM camp_slots WHERE id = :slot";
+    // 7. บันทึกข้อมูล
+    $insertSql = "INSERT INTO camp_bookings (student_id, campaign_id, slot_id, status) VALUES (:sid, :cid, :slot, :status)";
     $stmtInsert = $pdo->prepare($insertSql);
     $stmtInsert->execute([
-        ':userId' => $userId,
-        ':sid'    => $studentPersonnelId, 
+        ':sid'    => $userId, 
         ':cid'    => $campaignId, 
         ':slot'   => $slotId,
         ':status' => $bookingStatus

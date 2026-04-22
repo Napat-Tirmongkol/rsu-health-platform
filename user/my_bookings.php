@@ -20,19 +20,19 @@ try {
             a.id AS appointment_id, 
             a.status, 
             a.attended_at,
-            a.booking_date as slot_date, 
-            a.booking_time as start_time,
+            s.slot_date, 
+            s.start_time,
             c.title AS campaign_title,
             c.type AS camp_type,
             c.description AS campaign_desc
         FROM camp_bookings a
         JOIN camp_list c ON a.campaign_id = c.id
-        JOIN sys_users u ON a.student_id = u.student_personnel_id
-        WHERE u.line_user_id = :line_id
-        ORDER BY a.booking_date DESC, a.booking_time DESC
+        JOIN camp_slots s ON a.slot_id = s.id
+        WHERE a.student_id = :sid
+        ORDER BY s.slot_date DESC, s.start_time DESC
     ";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([':line_id' => $lineUserId]);
+    $stmt->execute([':sid' => $user['id']]);
     $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     error_log("my_bookings error: " . $e->getMessage());
