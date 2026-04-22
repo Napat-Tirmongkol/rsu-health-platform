@@ -304,7 +304,7 @@ function render_header(string $title = 'E-Vax'): void
       $_mFile = __DIR__ . '/../config/maintenance.json';
       $_mData = file_exists($_mFile) ? json_decode(file_get_contents($_mFile), true) : [];
       if (!empty($_mData['announcement_active']) && !empty($_mData['announcement_message'])): ?>
-        <div class="bg-gradient-to-r from-amber-500 to-orange-600 px-4 py-2.5 flex items-center gap-3 shadow-md relative z-[60]">
+        <div class="bg-amber-500 px-4 py-2.5 flex items-center gap-3 shadow-md relative z-[60]">
             <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white shrink-0 animate-pulse">
                 <i class="fa-solid fa-bullhorn text-xs"></i>
             </div>
