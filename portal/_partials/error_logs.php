@@ -478,27 +478,32 @@ $_el_filterQs = http_build_query(array_filter([
             <input type="hidden" name="log_id" id="modal_log_id">
             
             <div class="mb-5">
-                <label class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 block">เลือกสถานะ</label>
+                <label class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 block">เลือกสถานะใหม่</label>
                 <div class="grid grid-cols-3 gap-3">
-                    <label class="relative cursor-pointer group">
-                        <input type="radio" name="status" value="New" class="peer sr-only" id="status_new">
-                        <div class="px-3 py-3 rounded-2xl border-2 border-gray-100 text-center peer-checked:border-gray-400 peer-checked:bg-gray-50 transition-all group-hover:border-gray-200 group-active:scale-95">
-                            <i class="fa-solid fa-sparkles block mb-1 text-gray-400 peer-checked:text-gray-600"></i>
-                            <span class="text-[10px] font-black text-gray-400 peer-checked:text-gray-700">NEW</span>
+                    <!-- New -->
+                    <label class="relative h-24 cursor-pointer group">
+                        <input type="radio" name="modal_status" value="New" id="status_new" class="peer absolute inset-0 opacity-0 z-10 cursor-pointer">
+                        <div class="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border-2 border-gray-100 bg-white transition-all peer-checked:border-gray-500 peer-checked:bg-gray-50 group-hover:border-gray-200">
+                            <i class="fa-solid fa-sparkles text-lg mb-2 text-gray-300 peer-checked:text-gray-600 transition-colors"></i>
+                            <span class="text-[10px] font-black text-gray-400 peer-checked:text-gray-800 uppercase tracking-wider">NEW</span>
                         </div>
                     </label>
-                    <label class="relative cursor-pointer group">
-                        <input type="radio" name="status" value="Active" class="peer sr-only" id="status_active">
-                        <div class="px-3 py-3 rounded-2xl border-2 border-gray-100 text-center peer-checked:border-blue-400 peer-checked:bg-blue-50 transition-all group-hover:border-blue-200 group-active:scale-95">
-                            <i class="fa-solid fa-spinner fa-spin-pulse block mb-1 text-gray-400 peer-checked:text-blue-500"></i>
-                            <span class="text-[10px] font-black text-gray-400 peer-checked:text-blue-700">ACTIVE</span>
+                    
+                    <!-- Active -->
+                    <label class="relative h-24 cursor-pointer group">
+                        <input type="radio" name="modal_status" value="Active" id="status_active" class="peer absolute inset-0 opacity-0 z-10 cursor-pointer">
+                        <div class="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border-2 border-gray-100 bg-white transition-all peer-checked:border-blue-500 peer-checked:bg-blue-50 group-hover:border-blue-200">
+                            <i class="fa-solid fa-spinner fa-spin-pulse text-lg mb-2 text-gray-300 peer-checked:text-blue-500 transition-colors"></i>
+                            <span class="text-[10px] font-black text-gray-400 peer-checked:text-blue-800 uppercase tracking-wider">ACTIVE</span>
                         </div>
                     </label>
-                    <label class="relative cursor-pointer group">
-                        <input type="radio" name="status" value="Resolved" class="peer sr-only" id="status_resolved" onchange="toggleCommentField(this.checked)">
-                        <div class="px-3 py-3 rounded-2xl border-2 border-gray-100 text-center peer-checked:border-green-400 peer-checked:bg-green-50 transition-all group-hover:border-green-200 group-active:scale-95">
-                            <i class="fa-solid fa-check-circle block mb-1 text-gray-400 peer-checked:text-green-500"></i>
-                            <span class="text-[10px] font-black text-gray-400 peer-checked:text-green-700">RESOLVED</span>
+                    
+                    <!-- Resolved -->
+                    <label class="relative h-24 cursor-pointer group">
+                        <input type="radio" name="modal_status" value="Resolved" id="status_resolved" class="peer absolute inset-0 opacity-0 z-10 cursor-pointer" onchange="toggleCommentField(this.checked)">
+                        <div class="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border-2 border-gray-100 bg-white transition-all peer-checked:border-green-500 peer-checked:bg-green-50 group-hover:border-green-200">
+                            <i class="fa-solid fa-check-circle text-lg mb-2 text-gray-300 peer-checked:text-green-500 transition-colors"></i>
+                            <span class="text-[10px] font-black text-gray-400 peer-checked:text-green-800 uppercase tracking-wider">RESOLVED</span>
                         </div>
                     </label>
                 </div>
@@ -528,7 +533,10 @@ async function handleStatusUpdate(e) {
     e.preventDefault();
     const form = e.target;
     const logId = document.getElementById('modal_log_id').value;
-    const status = form.querySelector('input[name="status"]:checked').value;
+    const statusInput = form.querySelector('input[name="modal_status"]:checked');
+    if (!statusInput) return;
+    
+    const status = statusInput.value;
     const comment = document.getElementById('modal_comment').value;
     const submitBtn = document.getElementById('statusSubmitBtn');
     const btnText = document.getElementById('submitBtnText');
@@ -630,9 +638,10 @@ function openStatusModal(id, status, comment) {
     document.getElementById('modal_log_id').value = id;
     document.getElementById('modal_comment').value = comment || '';
     
-    const radios = document.getElementsByName('status');
+    // Reset and Select Radios
+    const radios = document.getElementsByName('modal_status');
     radios.forEach(r => {
-        if (r.value === status) r.checked = true;
+        r.checked = (r.value === status);
     });
     
     toggleCommentField(status === 'Resolved');

@@ -559,19 +559,19 @@ function statusIcon(string $s): string {
                 <label style="display:block;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:#94a3b8;margin-bottom:8px">เลือกสถานะ</label>
                 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
                     <label style="cursor:pointer" class="group">
-                        <input type="radio" name="status" value="New" style="display:none" class="status-radio" id="radio_new">
+                        <input type="radio" name="modal_status" value="New" style="display:none" class="status-radio" id="radio_new">
                         <div class="status-box" style="padding:12px 5px;text-align:center;border:2px solid #f1f5f9;border-radius:12px;font-size:10px;font-weight:800;color:#64748b;transition:all .15s">
                             <i class="fa-solid fa-sparkles" style="display:block;margin-bottom:4px;font-size:14px;opacity:.5"></i> NEW
                         </div>
                     </label>
                     <label style="cursor:pointer" class="group">
-                        <input type="radio" name="status" value="Active" style="display:none" class="status-radio" id="radio_active">
+                        <input type="radio" name="modal_status" value="Active" style="display:none" class="status-radio" id="radio_active">
                         <div class="status-box" style="padding:12px 5px;text-align:center;border:2px solid #f1f5f9;border-radius:12px;font-size:10px;font-weight:800;color:#64748b;transition:all .15s">
                             <i class="fa-solid fa-spinner fa-spin-pulse" style="display:block;margin-bottom:4px;font-size:14px;opacity:.5"></i> ACTIVE
                         </div>
                     </label>
                     <label style="cursor:pointer" class="group">
-                        <input type="radio" name="status" value="Resolved" style="display:none" class="status-radio" id="radio_resolved" onchange="toggleComment(this.checked)">
+                        <input type="radio" name="modal_status" value="Resolved" style="display:none" class="status-radio" id="radio_resolved" onchange="toggleComment(this.checked)">
                         <div class="status-box" style="padding:12px 5px;text-align:center;border:2px solid #f1f5f9;border-radius:12px;font-size:10px;font-weight:800;color:#64748b;transition:all .15s">
                             <i class="fa-solid fa-check-circle" style="display:block;margin-bottom:4px;font-size:14px;opacity:.5"></i> RESOLVED
                         </div>
@@ -611,7 +611,7 @@ async function handleStatusUpdate(e) {
     e.preventDefault();
     const form = e.target;
     const logId = document.getElementById('modal_log_id').value;
-    const statusInput = form.querySelector('input[name="status"]:checked');
+    const statusInput = form.querySelector('input[name="modal_status"]:checked');
     if (!statusInput) return;
     const status = statusInput.value;
     const comment = document.getElementById('modal_comment').value;
@@ -710,9 +710,11 @@ function openStatusModal(id, status, comment) {
     document.getElementById('modal_log_id').value = id;
     document.getElementById('modal_comment').value = comment || '';
     
-    if(status === 'New') document.getElementById('radio_new').checked = true;
-    if(status === 'Active') document.getElementById('radio_active').checked = true;
-    if(status === 'Resolved') document.getElementById('radio_resolved').checked = true;
+    // Reset and Select Radios
+    const radios = document.getElementsByName('modal_status');
+    radios.forEach(r => {
+        r.checked = (r.value === status);
+    });
     
     toggleComment(status === 'Resolved');
     document.getElementById('statusModal').style.display = 'flex';
