@@ -1574,15 +1574,15 @@ $adminListForSelect = $pdo->query("SELECT id, full_name, username FROM sys_admin
                                     </div>
 
                                     <!-- e-Campaign Card -->
-                                    <div id="govEcCard" class="premium-role-card blue p-4" style="border-radius:18px;border:1.5px solid #bfdbfe;background:#f0f7ff">
+                                    <div id="govEcCard" onclick="toggleGovAccess('govEcAccess', 'govEcRole', this)" class="premium-role-card blue p-4" style="border-radius:18px;border:1.5px solid #bfdbfe;background:#f0f7ff;cursor:pointer;transition:all 0.2s">
                                         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
                                             <div style="display:flex;align-items:center;gap:10px">
-                                                <div style="width:32px;height:32px;background:#dbeafe;color:#2563eb;border-radius:8px;display:flex;align-items:center;justify-content:center"><i class="fa-solid fa-bullhorn"></i></div>
+                                                <div id="govEcIcon" style="width:32px;height:32px;background:#dbeafe;color:#2563eb;border-radius:8px;display:flex;align-items:center;justify-content:center"><i class="fa-solid fa-bullhorn"></i></div>
                                                 <span style="font-weight:900;font-size:13px;color:#1e40af">e-Campaign System</span>
                                             </div>
-                                            <input type="checkbox" name="ec_access" id="govEcAccess" value="1" style="width:18px;height:18px;cursor:pointer">
+                                            <input type="checkbox" name="ec_access" id="govEcAccess" value="1" style="width:18px;height:18px;cursor:pointer" onclick="event.stopPropagation(); syncGovUI('govEcAccess', 'govEcRole', 'govEcCard')">
                                         </div>
-                                        <select name="ec_role" id="govEcRole" class="premium-input" style="width:100%;font-size:12px;border-color:#bfdbfe">
+                                        <select name="ec_role" id="govEcRole" class="premium-input" style="width:100%;font-size:12px;border-color:#bfdbfe" onclick="event.stopPropagation()">
                                             <option value="editor">Content Editor (จัดการกิจกรรม)</option>
                                             <option value="admin">System Administrator (ผู้ดูแลสูงสุด)</option>
                                         </select>
@@ -2344,9 +2344,40 @@ $adminListForSelect = $pdo->query("SELECT id, full_name, username FROM sys_admin
                     document.getElementById('govEcAccess').checked = parseInt(data.access_ecampaign) === 1;
                     document.getElementById('govEcRole').value = data.ecampaign_role || 'editor';
                 }
-            }
+            // Update UI States
+            syncGovUI('govEcAccess', 'govEcRole', 'govEcCard');
 
             m.style.display = 'flex';
+        }
+
+        /**
+         * Toggle helper for the whole card
+         */
+        function toggleGovAccess(checkId, selectId, cardEl) {
+            const cb = document.getElementById(checkId);
+            cb.checked = !cb.checked;
+            syncGovUI(checkId, selectId, cardEl.id);
+        }
+
+        /**
+         * Visual Sync for Roles
+         */
+        function syncGovUI(checkId, selectId, cardId) {
+            const cb = document.getElementById(checkId);
+            const sel = document.getElementById(selectId);
+            const card = document.getElementById(cardId);
+            
+            if (cb.checked) {
+                sel.disabled = false;
+                sel.style.opacity = '1';
+                card.style.filter = 'none';
+                card.style.background = (cardId === 'govEcCard' ? '#f0f7ff' : '#fffaf5');
+            } else {
+                sel.disabled = true;
+                sel.style.opacity = '0.5';
+                card.style.filter = 'grayscale(0.6)';
+                card.style.background = '#f8fafc';
+            }
         }
 
 
