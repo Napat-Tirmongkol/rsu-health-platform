@@ -63,14 +63,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
                 if ($type === 'admin') {
+                    // Ensure status column exists in sys_admins for consistency
+                    try { $pdo->exec("ALTER TABLE sys_admins ADD COLUMN status VARCHAR(20) DEFAULT 'active' AFTER role"); } catch(PDOException $e) {}
+                    
                     $role = $_POST['admin_role'] ?? 'admin';
                     if ($action === 'add_identity_gov') {
                         $hashed = password_hash($password ?: bin2hex(random_bytes(8)), PASSWORD_DEFAULT);
-                        $stmt = $pdo->prepare("INSERT INTO sys_admins (full_name, username, email, password, role) VALUES (?, ?, ?, ?, ?)");
-                        $stmt->execute([$fullName, $username, $email, $hashed, $role]);
+                        $stmt = $pdo->prepare("INSERT INTO sys_admins (full_name, username, email, password, role, status) VALUES (?, ?, ?, ?, ?, ?)");
+                        $stmt->execute([$fullName, $username, $email, $hashed, $role, $status]);
                         $targetId = (int)$pdo->lastInsertId();
                     } else {
-                        $pdo->prepare("UPDATE sys_admins SET full_name=?, username=?, email=?, role=? WHERE id=?")->execute([$fullName, $username, $email, $role, $targetId]);
+                        $pdo->prepare("UPDATE sys_admins SET full_name=?, username=?, email=?, role=?, status=? WHERE id=?")->execute([$fullName, $username, $email, $role, $status, $targetId]);
                         if (!empty($password)) $pdo->prepare("UPDATE sys_admins SET password=? WHERE id=?")->execute([password_hash($password, PASSWORD_DEFAULT), $targetId]);
                     }
                 } elseif ($type === 'staff') {

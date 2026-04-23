@@ -2349,28 +2349,6 @@ $adminListForSelect = $pdo->query("SELECT id, full_name, username FROM sys_admin
             m.style.display = 'flex';
         }
 
-        function openAddStaffModal() {
-            document.getElementById('sfAction').value = 'add_staff';
-            document.getElementById('sfModalTitle').textContent = 'เพิ่มเจ้าหน้าที่ (Staff)';
-            document.getElementById('sfForm').reset();
-            document.getElementById('sfPassword').required = true;
-            document.getElementById('sfModal').style.display = 'flex';
-        }
-
-        function openEditStaffModal(st) {
-            document.getElementById('sfAction').value = 'edit_staff';
-            document.getElementById('sfModalTitle').textContent = 'แก้ไขข้อมูลเจ้าหน้าที่';
-            document.getElementById('sfId').value = st.id;
-            document.getElementById('sfFullName').value = st.full_name;
-            document.getElementById('sfUsername').value = st.username;
-            document.getElementById('sfRole').value = st.role;
-            document.getElementById('sfStatus').value = st.account_status;
-            document.getElementById('sfAccessEc').checked = parseInt(st.access_ecampaign) === 1;
-            document.getElementById('sfEcRole').value = st.ecampaign_role;
-            document.getElementById('sfPassword').value = '';
-            document.getElementById('sfPassword').required = false;
-            document.getElementById('sfModal').style.display = 'flex';
-        }
 
         function idOpenEdit(u) {
             document.getElementById('id_edit_uid').value = u.id;
@@ -2593,7 +2571,7 @@ $adminListForSelect = $pdo->query("SELECT id, full_name, username FROM sys_admin
         }
 
         // Close modals on backdrop click
-        ['idEditModal', 'idViewModal', 'admModal', 'sfModal'].forEach(function (id) {
+        ['idEditModal', 'idViewModal', 'idGovModal', 'privModal'].forEach(function (id) {
             const el = document.getElementById(id);
             if (el) {
                 el.addEventListener('click', function (e) {
