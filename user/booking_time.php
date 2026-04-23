@@ -1,3 +1,4 @@
+<?php
 session_start();
 $lineUserId = $_SESSION['line_user_id'] ?? '';
 if ($lineUserId === '') {
