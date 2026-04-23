@@ -147,6 +147,7 @@ $greeting = ($hour >= 5 && $hour < 12) ? "สวัสดีตอนเช้�
     <script src="https://cdn.tailwindcss.com/3.4.1"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://js.pusher.com/8.0.1/pusher.min.js"></script>
     <style>
         @font-face {
             font-family: 'RSU';
@@ -675,13 +676,19 @@ $greeting = ($hour >= 5 && $hour < 12) ? "สวัสดีตอนเช้�
 
     <script>
         // Chat functionality
-        function handleChatSubmit(e) {
+        let lastChatId = 0;
+        let isPolling = false;
+
+        async function handleChatSubmit(e) {
             e.preventDefault();
             const input = document.getElementById('chat-input');
             const message = input.value.trim();
             if (!message) return;
+
             const chatContent = document.getElementById('chat-content');
             const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            // 1. Local Echo (Immediate feedback)
             const userBubble = `
                 <div class="flex flex-row-reverse items-start gap-3 max-w-[85%] ml-auto animate-in slide-in-from-right-2 duration-300">
                     <div class="space-y-1 text-right">
@@ -691,8 +698,80 @@ $greeting = ($hour >= 5 && $hour < 12) ? "สวัสดีตอนเช้�
                 </div>
             `;
             chatContent.insertAdjacentHTML('beforeend', userBubble);
-            input.value = ''; chatContent.scrollTop = chatContent.scrollHeight;
+            input.value = ''; 
+            chatContent.scrollTop = chatContent.scrollHeight;
+
+            // 2. Send to Backend
+            try {
+                const formData = new FormData();
+                formData.append('message', message);
+                const response = await fetch('ajax_chat.php?action=send', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.success) {
+                    lastChatId = result.data.id;
+                }
+            } catch (err) {
+                console.error('Chat error:', err);
+            }
         }
+
+        async function fetchMessages() {
+            if (isPolling) return;
+            isPolling = true;
+            try {
+                const response = await fetch(`ajax_chat.php?action=get&last_id=${lastChatId}`);
+                const result = await response.json();
+                if (result.success && result.messages.length > 0) {
+                    const chatContent = document.getElementById('chat-content');
+                    result.messages.forEach(msg => {
+                        if (msg.id <= lastChatId) return;
+                        lastChatId = msg.id;
+
+                        // Only show if it's from staff (user messages already handled by echo)
+                        if (msg.sender_type === 'staff') {
+                            const staffBubble = `
+                                <div class="flex items-start gap-4 max-w-[90%] animate-in slide-in-from-left duration-500">
+                                    <div class="w-9 h-9 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600 text-sm shrink-0 shadow-sm border border-orange-50 mt-1">
+                                        <i class="fa-solid fa-headset"></i>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <div class="bg-white p-5 rounded-[1.8rem] rounded-tl-none border border-slate-100 shadow-[0_10px_30px_rgba(0,0,0,0.02)]">
+                                            <p class="text-slate-700 text-[13px] leading-relaxed font-medium">${msg.message}</p>
+                                        </div>
+                                        <span class="text-[9px] text-slate-300 font-black ml-1 uppercase tracking-widest">${msg.time}</span>
+                                    </div>
+                                </div>
+                            `;
+                            chatContent.insertAdjacentHTML('beforeend', staffBubble);
+                            chatContent.scrollTop = chatContent.scrollHeight;
+                        }
+                    });
+                }
+            } finally {
+                isPolling = false;
+            }
+        }
+
+        // Initialize Real-time (Pusher or Polling)
+        document.addEventListener('DOMContentLoaded', () => {
+            const PUSHER_KEY = '<?= defined('PUSHER_KEY') ? PUSHER_KEY : '' ?>';
+            const PUSHER_CLUSTER = '<?= defined('PUSHER_CLUSTER') ? PUSHER_CLUSTER : 'ap1' ?>';
+
+            if (PUSHER_KEY) {
+                // Real-time via Pusher
+                const pusher = new Pusher(PUSHER_KEY, { cluster: PUSHER_CLUSTER });
+                const channel = pusher.subscribe(`user-chat-${<?= (int)($_SESSION['user_id'] ?? 0) ?>}`);
+                channel.bind('new-message', (data) => {
+                    fetchMessages(); // Trigger fetch when notified
+                });
+            } else {
+                // Fallback to Long Polling (Every 3 seconds)
+                setInterval(fetchMessages, 3000);
+            }
+        });
     </script>
 
     <!-- [Modal structures continue below - omitted for brevity but remain in file] -->

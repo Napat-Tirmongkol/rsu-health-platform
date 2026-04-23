@@ -241,6 +241,21 @@ $projects = [
         ]
     ],
     [
+        'id' => 'live_support_chat',
+        'title' => 'Live Support Chat',
+        'description' => 'ระบบแชทตอบกลับผู้ใช้งานแบบ Real-time — จัดการคำขอความช่วยเหลือและให้คำปรึกษาแก่ผู้ใช้งานผ่านหน้าเว็บ',
+        'icon' => 'fa-comments',
+        'bg_color' => 'bg-blue-50',
+        'icon_color' => 'text-blue-600',
+        'border_color' => 'border-blue-100',
+        'allowed_roles' => ['admin', 'superadmin', 'editor'],
+        'staff_visible' => true,
+        'badges' => ['Live Chat', 'Support'],
+        'actions' => [
+            ['label' => 'Open Chat Center', 'url' => 'support_chat.php', 'primary' => true],
+        ]
+    ],
+    [
         'id' => 'future_app',
         'title' => 'Upcoming Project...',
         'description' => 'ระบบใหม่ที่กำลังอยู่ในระหว่างการพัฒนา เพื่อเสริมสร้างศักยภาพการจัดการข้อมูลในอนาคต',

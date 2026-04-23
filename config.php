@@ -6,6 +6,12 @@ require_once __DIR__ . '/includes/csrf.php';
 require_once __DIR__ . '/includes/error_logger.php';
 require_once __DIR__ . '/config/sentry.php'; // โหลดหลัง error_logger — Sentry wraps handler chain
 
+// ── Global Secrets Injection ──────────────────────────────────────────────────
+$__secrets = require __DIR__ . '/config/secrets.php';
+foreach (['PUSHER_KEY', 'PUSHER_CLUSTER'] as $key) {
+    if (isset($__secrets[$key]) && !defined($key)) define($key, $__secrets[$key]);
+}
+
 // ── Log Retention Settings ────────────────────────────────────────────────────
 defined('ERROR_LOG_RETENTION_DAYS')    || define('ERROR_LOG_RETENTION_DAYS',    30);  // วัน
 defined('ACTIVITY_LOG_RETENTION_DAYS') || define('ACTIVITY_LOG_RETENTION_DAYS', 90);  // วัน
