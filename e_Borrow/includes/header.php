@@ -53,9 +53,11 @@ $base_url = explode('/e_Borrow', $_SERVER['SCRIPT_NAME'])[0] . '/e_Borrow/';
         window.addEventListener('DOMContentLoaded', () => document.body.classList.remove('page-transitioning'));
     </script>
 
+    <?php $user_role = $_SESSION['role'] ?? 'employee'; ?>
     <header class="header">
         <div class="flex items-center gap-3">
             <h1 class="hidden xs:block">E-Borrow</h1>
+            <?php if ($user_role !== 'employee'): ?>
             <a href="../portal/index.php"
                 class="flex items-center gap-2 p-2 sm:px-4 sm:py-2 text-sm font-bold transition-all bg-white border border-gray-100 rounded-2xl text-slate-700 hover:text-indigo-600 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/10 hover:-translate-y-0.5 active:scale-95 group dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:text-white"
                 title="กลับหน้าหลัก Portal">
@@ -64,6 +66,7 @@ $base_url = explode('/e_Borrow', $_SERVER['SCRIPT_NAME'])[0] . '/e_Borrow/';
                 </div>
                 <span class="hidden md:inline">หน้าหลัก Portal</span>
             </a>
+            <?php endif; ?>
         </div>
 
         <div class="user-info">
@@ -72,19 +75,18 @@ $base_url = explode('/e_Borrow', $_SERVER['SCRIPT_NAME'])[0] . '/e_Borrow/';
                 <strong><?php echo htmlspecialchars($_SESSION['full_name'] ?? 'ผู้ใช้'); ?></strong>
                 <span class="hidden sm:inline">
                 (<?php
-                $role = $_SESSION['role'] ?? 'viewer';
-                if ($role == 'admin') {
+                if ($user_role == 'admin') {
                     echo '<span style="color: #ffc107; font-weight: bold;">Admin <i class="fa-solid fa-crown"></i></span>';
-                } elseif ($role == 'employee') {
+                } elseif ($user_role == 'employee') {
                     echo '<span style="color: #48c774;">Staff</span>';
                 } else {
-                    echo htmlspecialchars($role);
+                    echo htmlspecialchars($user_role);
                 }
                 ?>)
                 </span>
             </div>
 
-            <button id="theme-toggle" class="theme-toggle" title="สลับโหมด มืด/สว่าง">
+            <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" title="สลับโหมด มืด/สว่าง">
                 <i class="fas fa-moon"></i>
                 <i class="fas fa-sun"></i>
             </button>
