@@ -253,7 +253,7 @@ $error = isset($_GET['error']) ? ($errors[$_GET['error']] ?? 'เกิดข้
 
             <div class="divider">หรือ</div>
 
-            <a href="../../admin/login.php" class="btn-portal">
+            <a href="../../admin/auth/login.php" class="btn-portal">
                 <i class="fa-solid fa-crown"></i>
                 เข้าสู่ระบบ Portal Admin
             </a>
