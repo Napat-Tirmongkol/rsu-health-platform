@@ -114,12 +114,21 @@ $csrfToken = get_csrf_token();
             <p class="text-xs text-gray-400 mt-0.5">ศูนย์กลางอัปเดตสิทธิ์ประกัน</p>
         </div>
     </div>
-    <div class="flex items-center gap-2">
-        <?php if ($kpi['last_sync']): ?>
-        <span class="text-xs text-gray-400 hidden sm:block">
-            ซิงค์ล่าสุด: <?= date('d/m/Y H:i', strtotime($kpi['last_sync']['synced_at'])) ?>
-        </span>
-        <?php endif; ?>
+    <div class="flex items-center gap-4">
+        <!-- Visibility Toggle -->
+        <div class="flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-xl border border-gray-100">
+            <div class="flex flex-col text-right">
+                <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">User Hub Visibility</span>
+                <span id="visibilityStatus" class="text-[10px] font-bold <?= SITE_SHOW_INSURANCE ? 'text-blue-600' : 'text-gray-400' ?> leading-none">
+                    <?= SITE_SHOW_INSURANCE ? 'SHOWING CARD' : 'HIDDEN' ?>
+                </span>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="toggleVisibility" class="sr-only peer" <?= SITE_SHOW_INSURANCE ? 'checked' : '' ?> onchange="updateVisibility(this)">
+                <div class="w-10 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
+        </div>
+
         <a href="ajax_insurance_export.php?type=active" class="bg-green-50 text-green-700 px-4 py-2 rounded-xl text-xs font-bold hover:bg-green-100 transition-colors">
             <i class="fa-solid fa-file-arrow-down mr-1"></i>Export Active
         </a>
@@ -812,6 +821,40 @@ async function submitOverride() {
             Swal.fire('ข้อผิดพลาด', data.message, 'error');
         }
     } catch (err) {
+        Swal.fire('Error', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์', 'error');
+    }
+}
+
+async function updateVisibility(el) {
+    const active = el.checked;
+    const statusEl = document.getElementById('visibilityStatus');
+    
+    const fd = new FormData();
+    fd.append('action', 'set_visibility');
+    fd.append('active', active ? '1' : '0');
+    fd.append('csrf_token', CSRF);
+    
+    try {
+        const res = await fetch('ajax_insurance_sync.php', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (data.status === 'success') {
+            statusEl.textContent = active ? 'SHOWING CARD' : 'HIDDEN';
+            statusEl.className = `text-[10px] font-bold ${active ? 'text-blue-600' : 'text-gray-400'} leading-none`;
+            Swal.fire({
+                icon: 'success',
+                title: 'อัปเดตสำเร็จ',
+                text: data.message,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+        } else {
+            el.checked = !active;
+            Swal.fire('Error', data.message, 'error');
+        }
+    } catch (e) {
+        el.checked = !active;
         Swal.fire('Error', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์', 'error');
     }
 }

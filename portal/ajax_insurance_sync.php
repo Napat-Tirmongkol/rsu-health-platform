@@ -912,4 +912,21 @@ if ($action === 'list_members') {
     exit;
 }
 
+if ($action === 'set_visibility') {
+    $active = ($_POST['active'] ?? '0') === '1';
+    $siteSettingsFile = __DIR__ . '/../config/site_settings.json';
+    $settings = file_exists($siteSettingsFile) ? json_decode(file_get_contents($siteSettingsFile), true) : [];
+    if (!is_array($settings)) $settings = [];
+    
+    $settings['show_insurance'] = $active;
+    
+    if (file_put_contents($siteSettingsFile, json_encode($settings, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
+        log_activity('update_site_settings', "Toggle Insurance Card: " . ($active ? 'ON' : 'OFF'));
+        echo json_encode(['status' => 'success', 'message' => 'อัปเดตสถานะการแสดงผลสำเร็จ!']);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'ไม่สามารถบันทึกข้อมูลได้']);
+    }
+    exit;
+}
+
 echo json_encode(['status' => 'error', 'message' => 'Unknown action']);
