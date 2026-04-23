@@ -1,7 +1,7 @@
 <?php
 // portal/support_chat.php — Premium Staff Support Chat Center
 declare(strict_types=1);
-session_start();
+// NOTE: session_start() is handled by auth.php
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/includes/auth.php';
 
