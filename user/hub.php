@@ -247,7 +247,7 @@ $greeting = ($hour >= 5 && $hour < 12) ? "สวัสดีตอนเช้�
 
         function showContact() { document.getElementById('contact-modal').classList.remove('hidden'); document.getElementById('contact-modal').classList.add('flex'); }
         function hideContact() { document.getElementById('contact-modal').classList.add('hidden'); }
-        function showChat() { document.getElementById('chat-modal').classList.remove('hidden'); document.getElementById('chat-modal').classList.add('flex'); const content = document.getElementById('chat-content'); content.scrollTop = content.scrollHeight; }
+        function showChat() { document.getElementById('chat-modal').classList.remove('hidden'); document.getElementById('chat-modal').classList.add('flex'); const content = document.getElementById('chat-content'); content.scrollTop = content.scrollHeight; if (typeof initChat === 'function') initChat(); }
         function hideChat() { document.getElementById('chat-modal').classList.add('hidden'); }
         function showUpcoming(name) { document.getElementById('upcoming-name').innerText = name; document.getElementById('upcoming-modal').classList.remove('hidden'); document.getElementById('upcoming-modal').classList.add('flex'); }
         function hideUpcoming() { document.getElementById('upcoming-modal').classList.add('hidden'); }
@@ -681,6 +681,7 @@ $greeting = ($hour >= 5 && $hour < 12) ? "สวัสดีตอนเช้�
         // Chat functionality
         let lastChatId = 0;
         let isPolling = false;
+        let chatInitialized = false;
 
         async function handleChatSubmit(e) {
             e.preventDefault();
@@ -721,20 +722,25 @@ $greeting = ($hour >= 5 && $hour < 12) ? "สวัสดีตอนเช้�
             }
         }
 
-        async function fetchMessages() {
+        async function fetchMessages(isInitialLoad = false) {
             if (isPolling) return;
             isPolling = true;
             try {
                 const response = await fetch(`ajax_chat.php?action=get&last_id=${lastChatId}`);
-                const result = await response.json();
+                const text = await response.text();
+                let result;
+                try { result = JSON.parse(text); } catch(e) {
+                    console.error('fetchMessages: bad JSON response');
+                    return;
+                }
                 if (result.success && result.messages.length > 0) {
                     const chatContent = document.getElementById('chat-content');
                     result.messages.forEach(msg => {
                         if (msg.id <= lastChatId) return;
                         lastChatId = msg.id;
 
-                        // Only show if it's from staff (user messages already handled by echo)
                         if (msg.sender_type === 'staff') {
+                            // Staff message — always show
                             const staffBubble = `
                                 <div class="flex items-start gap-4 max-w-[90%] animate-in slide-in-from-left duration-500">
                                     <div class="w-9 h-9 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600 text-sm shrink-0 shadow-sm border border-orange-50 mt-1">
@@ -749,12 +755,34 @@ $greeting = ($hour >= 5 && $hour < 12) ? "สวัสดีตอนเช้�
                                 </div>
                             `;
                             chatContent.insertAdjacentHTML('beforeend', staffBubble);
-                            chatContent.scrollTop = chatContent.scrollHeight;
+                        } else if (isInitialLoad) {
+                            // User's own past message — only show during initial history load
+                            const time = msg.time || new Date(msg.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                            const userBubble = `
+                                <div class="flex flex-row-reverse items-start gap-3 max-w-[85%] ml-auto">
+                                    <div class="space-y-1 text-right">
+                                        <div class="bg-blue-600 p-4 rounded-2xl rounded-tr-none shadow-lg shadow-blue-100"><p class="text-white text-xs leading-relaxed text-left">${msg.message}</p></div>
+                                        <span class="text-[9px] text-white/40 font-black mr-1 uppercase">${time}</span>
+                                    </div>
+                                </div>
+                            `;
+                            chatContent.insertAdjacentHTML('beforeend', userBubble);
                         }
                     });
+                    chatContent.scrollTop = chatContent.scrollHeight;
                 }
             } finally {
                 isPolling = false;
+            }
+        }
+
+        // Called when user opens the chat modal
+        async function initChat() {
+            if (!chatInitialized) {
+                chatInitialized = true;
+                lastChatId = 0;
+                document.getElementById('chat-content').innerHTML = '';
+                await fetchMessages(true); // Load full history
             }
         }
 
