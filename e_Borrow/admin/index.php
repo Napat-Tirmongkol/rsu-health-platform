@@ -92,12 +92,12 @@ include('../includes/header.php');
 ?>
 
 <script>
-  // Suppress Tailwind CDN production warning (intentional use for development)
-  const originalWarn = console.warn;
-  console.warn = function(...args) {
-    if (typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com')) return;
-    originalWarn.apply(console, args);
-  };
+    // Suppress Tailwind CDN production warning (intentional use for development)
+    const originalWarn = console.warn;
+    console.warn = function (...args) {
+        if (typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com')) return;
+        originalWarn.apply(console, args);
+    };
 </script>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -171,28 +171,34 @@ include('../includes/header.php');
        all the Tailwind classes below to force a dark theme.
     ========================================================= */
     body.dark-mode {
-        background-color: #0f172a !important; /* slate-900 */
-        color: #f1f5f9 !important; /* slate-100 */
+        background-color: #0f172a !important;
+        /* slate-900 */
+        color: #f1f5f9 !important;
+        /* slate-100 */
     }
 
     /* Cards, Modals, and Elements with White Background */
     body.dark-mode .bg-white {
-        background-color: #1e293b !important; /* slate-800 */
-        border-color: #334155 !important; /* slate-700 */
+        background-color: #1e293b !important;
+        /* slate-800 */
+        border-color: #334155 !important;
+        /* slate-700 */
     }
 
     /* Text Colors */
     body.dark-mode .text-gray-900,
     body.dark-mode .text-gray-800,
     body.dark-mode .text-slate-800 {
-        color: #f8fafc !important; /* slate-50 */
+        color: #f8fafc !important;
+        /* slate-50 */
     }
 
     body.dark-mode .text-gray-600,
     body.dark-mode .text-gray-500,
     body.dark-mode .text-slate-600,
     body.dark-mode .text-slate-500 {
-        color: #94a3b8 !important; /* slate-400 */
+        color: #94a3b8 !important;
+        /* slate-400 */
     }
 
     /* Borders */
@@ -214,28 +220,35 @@ include('../includes/header.php');
         background-color: rgba(59, 130, 246, 0.15) !important;
         border-color: rgba(59, 130, 246, 0.3) !important;
     }
+
     body.dark-mode .border-b-blue-50 {
         border-bottom-color: rgba(59, 130, 246, 0.3) !important;
     }
+
     body.dark-mode .bg-amber-50 {
         background-color: rgba(245, 158, 11, 0.15) !important;
         border-color: rgba(245, 158, 11, 0.3) !important;
     }
+
     body.dark-mode .hover\:bg-amber-200:hover {
         border-color: #f59e0b !important;
         background-color: rgba(245, 158, 11, 0.25) !important;
     }
+
     body.dark-mode .bg-red-50 {
         background-color: rgba(239, 68, 68, 0.15) !important;
         border-color: rgba(239, 68, 68, 0.3) !important;
     }
+
     body.dark-mode .hover\:bg-red-50\/40:hover {
         background-color: rgba(239, 68, 68, 0.15) !important;
     }
+
     body.dark-mode .bg-emerald-50 {
         background-color: rgba(16, 185, 129, 0.15) !important;
         border-color: rgba(16, 185, 129, 0.3) !important;
     }
+
     body.dark-mode .bg-green-50 {
         background-color: rgba(34, 197, 94, 0.15) !important;
         border-color: rgba(34, 197, 94, 0.3) !important;
@@ -247,13 +260,16 @@ include('../includes/header.php');
         color: #f1f5f9 !important;
         border: 1px solid #334155 !important;
     }
+
     body.dark-mode .swal2-title {
         color: #f8fafc !important;
         border-bottom-color: #334155 !important;
     }
+
     body.dark-mode .swal2-html-container {
         color: #cbd5e1 !important;
     }
+
     body.dark-mode .swal2-html-container strong {
         color: #f8fafc !important;
     }
@@ -286,12 +302,9 @@ include('../includes/header.php');
             <p class="text-gray-500 mt-2 text-sm font-medium">สถิติการยืม-คืน อุปกรณ์ทางการแพทย์ และเวชภัณฑ์ (Real-time)
             </p>
         </div>
-        
+
         <div class="flex items-center gap-3 w-full sm:w-auto">
-            <a href="../portal/index.php"
-                class="flex-1 sm:flex-none justify-center bg-white border border-gray-200 text-gray-800 px-5 py-2.5 rounded-xl font-bold text-sm hover:shadow-lg hover:border-gray-300 hover:text-blue-600 hover:-translate-y-0.5 transition-all flex items-center gap-2">
-                <i class="fas fa-arrow-left"></i> กลับหน้าหลัก
-            </a>
+
             <a href="admin/walkin_borrow.php"
                 class="flex-1 sm:flex-none justify-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex items-center gap-2">
                 <i class="fas fa-qrcode"></i> ยืม/คืน (Walk-in)
@@ -301,113 +314,115 @@ include('../includes/header.php');
 
     <!-- STATS GRID แบบใหม่ (Role-Based) -->
     <?php if ($user_role === 'admin' || $user_role === 'editor'): ?>
-    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
 
-        <!-- STAT 1: พร้อมใช้งาน -->
-        <div
-            class="group bg-gradient-to-br from-[#0B6623] to-[#1a8c35] p-6 rounded-[24px] shadow-lg shadow-green-900/20 text-white relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 animate-slide-up">
+            <!-- STAT 1: พร้อมใช้งาน -->
             <div
-                class="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-500">
-            </div>
-            <div class="flex justify-between items-start relative z-10">
-                <div>
-                    <p class="text-green-100 text-sm font-semibold mb-1 uppercase tracking-wide">พร้อมใช้งาน</p>
-                    <h3 id="kp-available" class="text-4xl font-black transition-all duration-300">
-                        <?= number_format((float) $count_available) ?>
-                    </h3>
+                class="group bg-gradient-to-br from-[#0B6623] to-[#1a8c35] p-6 rounded-[24px] shadow-lg shadow-green-900/20 text-white relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 animate-slide-up">
+                <div
+                    class="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-500">
+                </div>
+                <div class="flex justify-between items-start relative z-10">
+                    <div>
+                        <p class="text-green-100 text-sm font-semibold mb-1 uppercase tracking-wide">พร้อมใช้งาน</p>
+                        <h3 id="kp-available" class="text-4xl font-black transition-all duration-300">
+                            <?= number_format((float) $count_available) ?>
+                        </h3>
+                    </div>
+                    <div
+                        class="w-14 h-14 bg-white/20 backdrop-blur-md rounded-[18px] flex items-center justify-center text-white shadow-inner">
+                        <i class="fas fa-box-open text-2xl"></i>
+                    </div>
                 </div>
                 <div
-                    class="w-14 h-14 bg-white/20 backdrop-blur-md rounded-[18px] flex items-center justify-center text-white shadow-inner">
-                    <i class="fas fa-box-open text-2xl"></i>
+                    class="mt-4 flex items-center gap-2 text-[11px] text-green-100/90 font-bold bg-green-900/30 px-3 py-1.5 rounded-full w-max border border-green-800/40 tracking-wider">
+                    <i class="fas fa-check-circle"></i> อุปกรณ์นอนรออยู่ในคลัง
                 </div>
             </div>
-            <div
-                class="mt-4 flex items-center gap-2 text-[11px] text-green-100/90 font-bold bg-green-900/30 px-3 py-1.5 rounded-full w-max border border-green-800/40 tracking-wider">
-                <i class="fas fa-check-circle"></i> อุปกรณ์นอนรออยู่ในคลัง
-            </div>
-        </div>
 
-        <!-- STAT 2: กำลังถูกยืม -->
-        <div
-            class="group bg-white p-6 rounded-[24px] shadow-sm border border-gray-100 relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1 animate-slide-up delay-100">
-            <div class="absolute right-0 top-0 w-2 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
-            <div class="flex justify-between items-start">
-                <div>
-                    <p class="text-gray-500 text-sm font-semibold mb-1 uppercase tracking-wide">กำลังถูกยืม</p>
-                    <h3 id="kp-borrowed" class="text-4xl font-black text-gray-800 transition-all duration-300">
-                        <?= number_format((float) $count_borrowed) ?>
-                    </h3>
+            <!-- STAT 2: กำลังถูกยืม -->
+            <div
+                class="group bg-white p-6 rounded-[24px] shadow-sm border border-gray-100 relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1 animate-slide-up delay-100">
+                <div class="absolute right-0 top-0 w-2 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-500 text-sm font-semibold mb-1 uppercase tracking-wide">กำลังถูกยืม</p>
+                        <h3 id="kp-borrowed" class="text-4xl font-black text-gray-800 transition-all duration-300">
+                            <?= number_format((float) $count_borrowed) ?>
+                        </h3>
+                    </div>
+                    <div
+                        class="w-14 h-14 bg-blue-50 text-blue-600 rounded-[18px] flex items-center justify-center shadow-inner">
+                        <i class="fas fa-briefcase-medical text-2xl group-hover:scale-110 transition-transform"></i>
+                    </div>
                 </div>
                 <div
-                    class="w-14 h-14 bg-blue-50 text-blue-600 rounded-[18px] flex items-center justify-center shadow-inner">
-                    <i class="fas fa-briefcase-medical text-2xl group-hover:scale-110 transition-transform"></i>
+                    class="mt-4 flex items-center gap-2 text-[11px] text-blue-600 font-bold bg-blue-50 w-max px-3 py-1.5 rounded-full border border-blue-100 tracking-wider">
+                    <i class="fas fa-people-carry"></i> อยู่ระหว่างการใช้งานจริง
                 </div>
             </div>
-            <div
-                class="mt-4 flex items-center gap-2 text-[11px] text-blue-600 font-bold bg-blue-50 w-max px-3 py-1.5 rounded-full border border-blue-100 tracking-wider">
-                <i class="fas fa-people-carry"></i> อยู่ระหว่างการใช้งานจริง
-            </div>
-        </div>
 
-        <!-- STAT 3: ส่งซ่อมบำรุง -->
-        <div
-            class="group bg-white p-6 rounded-[24px] shadow-sm border border-gray-100 relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-1 animate-slide-up delay-200">
-            <div class="absolute right-0 top-0 w-2 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
-            <div class="flex justify-between items-start">
-                <div>
-                    <p class="text-gray-500 text-sm font-semibold mb-1 uppercase tracking-wide">ส่งซ่อมบำรุง</p>
-                    <h3 id="kp-maintenance" class="text-4xl font-black text-gray-800 transition-all duration-300">
-                        <?= number_format((float) $count_maintenance) ?>
-                    </h3>
+            <!-- STAT 3: ส่งซ่อมบำรุง -->
+            <div
+                class="group bg-white p-6 rounded-[24px] shadow-sm border border-gray-100 relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-1 animate-slide-up delay-200">
+                <div class="absolute right-0 top-0 w-2 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-500 text-sm font-semibold mb-1 uppercase tracking-wide">ส่งซ่อมบำรุง</p>
+                        <h3 id="kp-maintenance" class="text-4xl font-black text-gray-800 transition-all duration-300">
+                            <?= number_format((float) $count_maintenance) ?>
+                        </h3>
+                    </div>
+                    <div
+                        class="w-14 h-14 bg-amber-50 text-amber-500 rounded-[18px] flex items-center justify-center shadow-inner">
+                        <i class="fas fa-tools text-2xl group-hover:rotate-12 transition-transform"></i>
+                    </div>
                 </div>
                 <div
-                    class="w-14 h-14 bg-amber-50 text-amber-500 rounded-[18px] flex items-center justify-center shadow-inner">
-                    <i class="fas fa-tools text-2xl group-hover:rotate-12 transition-transform"></i>
+                    class="mt-4 flex items-center gap-2 text-[11px] text-amber-600 font-bold bg-amber-50 w-max px-3 py-1.5 rounded-full border border-amber-100 tracking-wider">
+                    <i class="fas fa-exclamation-triangle"></i> ไม่พร้อมสำหรับการใช้งาน
                 </div>
             </div>
-            <div
-                class="mt-4 flex items-center gap-2 text-[11px] text-amber-600 font-bold bg-amber-50 w-max px-3 py-1.5 rounded-full border border-amber-100 tracking-wider">
-                <i class="fas fa-exclamation-triangle"></i> ไม่พร้อมสำหรับการใช้งาน
-            </div>
-        </div>
 
-        <!-- STAT 4: เกินกำหนด -->
-        <div
-            class="group bg-gradient-to-br from-[#dc2626] to-[#991b1b] p-6 rounded-[24px] shadow-lg shadow-red-900/20 text-white relative overflow-hidden transition-all duration-300 hover:-translate-y-1 animate-slide-up delay-300 <?= $count_overdue == 0 ? 'opacity-40 grayscale pointer-events-none' : 'hover:shadow-xl' ?>">
+            <!-- STAT 4: เกินกำหนด -->
             <div
-                class="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-500">
-            </div>
-            <div class="flex justify-between items-start relative z-10">
-                <div>
-                    <p class="text-red-100 text-sm font-semibold mb-1 uppercase tracking-wide">เกินกำหนดคืน</p>
-                    <h3 id="kp-overdue" class="text-4xl font-black transition-all duration-300">
-                        <?= number_format((float) $count_overdue) ?>
-                    </h3>
+                class="group bg-gradient-to-br from-[#dc2626] to-[#991b1b] p-6 rounded-[24px] shadow-lg shadow-red-900/20 text-white relative overflow-hidden transition-all duration-300 hover:-translate-y-1 animate-slide-up delay-300 <?= $count_overdue == 0 ? 'opacity-40 grayscale pointer-events-none' : 'hover:shadow-xl' ?>">
+                <div
+                    class="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-500">
+                </div>
+                <div class="flex justify-between items-start relative z-10">
+                    <div>
+                        <p class="text-red-100 text-sm font-semibold mb-1 uppercase tracking-wide">เกินกำหนดคืน</p>
+                        <h3 id="kp-overdue" class="text-4xl font-black transition-all duration-300">
+                            <?= number_format((float) $count_overdue) ?>
+                        </h3>
+                    </div>
+                    <div
+                        class="w-14 h-14 bg-white/20 backdrop-blur-md rounded-[18px] flex items-center justify-center text-white shadow-inner <?= $count_overdue > 0 ? 'animate-pulse' : '' ?>">
+                        <i class="fas fa-history text-2xl"></i>
+                    </div>
                 </div>
                 <div
-                    class="w-14 h-14 bg-white/20 backdrop-blur-md rounded-[18px] flex items-center justify-center text-white shadow-inner <?= $count_overdue > 0 ? 'animate-pulse' : '' ?>">
-                    <i class="fas fa-history text-2xl"></i>
+                    class="mt-4 flex items-center gap-2 text-[11px] text-red-100 font-bold bg-red-900/40 px-3 py-1.5 rounded-full w-max border border-red-800/40 tracking-wider">
+                    <i class="fa-solid fa-bullhorn"></i> ต้องติดตามด่วน (ค่าปรับไหล)
                 </div>
             </div>
-            <div
-                class="mt-4 flex items-center gap-2 text-[11px] text-red-100 font-bold bg-red-900/40 px-3 py-1.5 rounded-full w-max border border-red-800/40 tracking-wider">
-                <i class="fa-solid fa-bullhorn"></i> ต้องติดตามด่วน (ค่าปรับไหล)
-            </div>
-        </div>
 
-    </div>
+        </div>
     <?php else: ?>
-    <!-- STAFF QUICK ACTIONS (Mobile First) -->
-    <div class="grid grid-cols-2 gap-4 mb-8 animate-slide-up">
-        <a href="admin/return_dashboard.php" class="bg-blue-600 text-white p-5 rounded-[20px] shadow-lg shadow-blue-600/30 flex flex-col items-center justify-center text-center hover:bg-blue-700 transition-colors">
-            <i class="fas fa-undo-alt text-3xl mb-2 opacity-90"></i>
-            <span class="font-bold text-[15px]">รับคืนอุปกรณ์</span>
-        </a>
-        <a href="admin/walkin_borrow.php" class="bg-emerald-600 text-white p-5 rounded-[20px] shadow-lg shadow-emerald-600/30 flex flex-col items-center justify-center text-center hover:bg-emerald-700 transition-colors">
-            <i class="fas fa-qrcode text-3xl mb-2 opacity-90"></i>
-            <span class="font-bold text-[15px]">จ่ายอุปกรณ์</span>
-        </a>
-    </div>
+        <!-- STAFF QUICK ACTIONS (Mobile First) -->
+        <div class="grid grid-cols-2 gap-4 mb-8 animate-slide-up">
+            <a href="admin/return_dashboard.php"
+                class="bg-blue-600 text-white p-5 rounded-[20px] shadow-lg shadow-blue-600/30 flex flex-col items-center justify-center text-center hover:bg-blue-700 transition-colors">
+                <i class="fas fa-undo-alt text-3xl mb-2 opacity-90"></i>
+                <span class="font-bold text-[15px]">รับคืนอุปกรณ์</span>
+            </a>
+            <a href="admin/walkin_borrow.php"
+                class="bg-emerald-600 text-white p-5 rounded-[20px] shadow-lg shadow-emerald-600/30 flex flex-col items-center justify-center text-center hover:bg-emerald-700 transition-colors">
+                <i class="fas fa-qrcode text-3xl mb-2 opacity-90"></i>
+                <span class="font-bold text-[15px]">จ่ายอุปกรณ์</span>
+            </a>
+        </div>
     <?php endif; ?>
 
     <!-- BOTTOM SECTION: LISTS & ACTIVITY -->
@@ -583,111 +598,111 @@ include('../includes/header.php');
         </div>
 
         <?php if ($user_role === 'admin' || $user_role === 'editor'): ?>
-        <!-- RIGHT COLUMN (Span 1 on XL -> 3) -->
-        <div class="flex flex-col gap-6">
+            <!-- RIGHT COLUMN (Span 1 on XL -> 3) -->
+            <div class="flex flex-col gap-6">
 
-            <!-- Quick Actions คล้าย e-Campaign -->
-            <div class="grid grid-cols-2 lg:grid-cols-2 xl:grid-cols-1 gap-4">
+                <!-- Quick Actions คล้าย e-Campaign -->
+                <div class="grid grid-cols-2 lg:grid-cols-2 xl:grid-cols-1 gap-4">
 
-                <a href="admin/manage_fines.php"
-                    class="relative overflow-hidden bg-white border border-gray-200 p-6 rounded-[24px] flex flex-col justify-between hover:border-emerald-300 hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-1 transition-all group">
-                    <div
-                        class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-4 border border-emerald-100">
-                        <i class="fas fa-clipboard-list text-xl"></i>
-                    </div>
-                    <div>
-                        <span
-                            class="block font-black text-gray-900 text-[17px] mb-1 group-hover:text-emerald-600 transition-colors">ประวัติธุรกรรม</span>
-                        <span class="text-gray-500 text-[12px] leading-tight block">ติดตามการยืม/คืน
-                            อดีตถึงปัจจุบัน</span>
-                    </div>
-                    <i
-                        class="fas fa-arrow-right absolute bottom-6 right-6 text-xl text-emerald-500 opacity-0 -translate-x-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0"></i>
-                </a>
-
-                <a href="admin/manage_equipment.php"
-                    class="relative overflow-hidden bg-white border border-gray-200 p-6 rounded-[24px] flex flex-col justify-between hover:border-blue-300 hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1 transition-all group">
-                    <div
-                        class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-4 border border-blue-100">
-                        <i class="fas fa-box text-xl"></i>
-                    </div>
-                    <div>
-                        <span
-                            class="block font-black text-gray-900 text-[17px] mb-1 group-hover:text-blue-600 transition-colors">คลังอุปกรณ์
-                            (Inventory)</span>
-                        <span class="text-gray-500 text-[12px] leading-tight block">จัดการสต็อก เพิ่ม/ลบ
-                            อุปกรณ์ในระบบ</span>
-                    </div>
-                    <i
-                        class="fas fa-arrow-right absolute bottom-6 right-6 text-xl text-blue-500 opacity-0 -translate-x-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0"></i>
-                </a>
-            </div>
-
-            <!-- สัดส่วน Chart -->
-            <div class="bg-white rounded-[24px] shadow-sm border border-gray-100 flex flex-col mt-2">
-                <div class="p-5 border-b border-gray-50 flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-500"><i
-                            class="fas fa-chart-pie"></i></div>
-                    <h3 class="font-bold text-gray-900 text-[15px]">สัดส่วนสถานะอุปกรณ์</h3>
-                </div>
-                <div class="p-6 flex justify-center pb-8 border-b-[5px] border-b-blue-50">
-                    <div style="width: 100%; max-width: 260px;">
-                        <canvas id="equipmentStatusChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Activity Log -->
-            <div
-                class="bg-white rounded-[24px] shadow-sm border border-gray-100 flex flex-col items-stretch overflow-hidden">
-                <div class="p-5 border-b border-gray-50 bg-slate-50/50">
-                    <h3 class="font-bold text-slate-800 text-[15px] flex items-center gap-2">
-                        <i class="fas fa-history text-slate-400"></i> ความเคลื่อนไหวล่าสุด
-                    </h3>
-                </div>
-                <div class="p-2">
-                    <?php if (empty($recent_activity)): ?>
-                        <div class="p-8 text-center text-gray-400 text-sm italic">ยังไม่มีความเคลื่อนไหวในขณะนี้</div>
-                    <?php else: ?>
-                        <div class="flex flex-col">
-                            <?php foreach ($recent_activity as $act):
-                                $icon = '<i class="fas fa-circle text-[8px] text-blue-500"></i>';
-                                $name = htmlspecialchars($act['student_name'] ?? 'N/A');
-                                $eq = htmlspecialchars($act['equipment_name']);
-                                if ($act['approval_status'] == 'pending') {
-                                    $icon = '<i class="fas fa-circle text-[8px] text-amber-500"></i>';
-                                    $txt = "<strong class='text-gray-900'>$name</strong> ขอยืม <u class='decoration-gray-300'>$eq</u>";
-                                } elseif ($act['approval_status'] == 'rejected') {
-                                    $icon = '<i class="fas fa-circle text-[8px] text-gray-300"></i>';
-                                    $txt = "ปฏิเสธคำขอของ <strong class='text-gray-900'>$name</strong> (<span class='text-gray-400'>$eq</span>)";
-                                } elseif ($act['status'] == 'returned') {
-                                    $icon = '<i class="fas fa-circle text-[8px] text-emerald-500 animate-pulse"></i>';
-                                    $txt = "<strong class='text-gray-900'>$name</strong> ส่งคืนแล้ว ($eq)";
-                                } elseif ($act['approval_status'] == 'approved') {
-                                    $icon = '<i class="fas fa-circle text-[8px] text-blue-500"></i>';
-                                    $txt = "อนุมัติให้ <strong class='text-gray-900'>$name</strong> นำออก ($eq)";
-                                } elseif ($act['approval_status'] == 'staff_added') {
-                                    $icon = '<i class="fas fa-circle text-[8px] text-purple-500"></i>';
-                                    $txt = "Walk-in <strong class='text-gray-900'>$name</strong> เบิก ($eq)";
-                                } else {
-                                    $txt = "อัปเดตสถานะ $eq";
-                                }
-                                ?>
-                                <div
-                                    class="flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl transition-colors border-b border-gray-50 last:border-0 border-solid mx-2">
-                                    <div
-                                        class="mt-0.5 flex-shrink-0 w-6 h-6 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center">
-                                        <?= $icon ?>
-                                    </div>
-                                    <p class="text-[12px] text-slate-600 leading-relaxed font-medium"><?= $txt ?></p>
-                                </div>
-                            <?php endforeach; ?>
+                    <a href="admin/manage_fines.php"
+                        class="relative overflow-hidden bg-white border border-gray-200 p-6 rounded-[24px] flex flex-col justify-between hover:border-emerald-300 hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-1 transition-all group">
+                        <div
+                            class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-4 border border-emerald-100">
+                            <i class="fas fa-clipboard-list text-xl"></i>
                         </div>
-                    <?php endif; ?>
-                </div>
-            </div>
+                        <div>
+                            <span
+                                class="block font-black text-gray-900 text-[17px] mb-1 group-hover:text-emerald-600 transition-colors">ประวัติธุรกรรม</span>
+                            <span class="text-gray-500 text-[12px] leading-tight block">ติดตามการยืม/คืน
+                                อดีตถึงปัจจุบัน</span>
+                        </div>
+                        <i
+                            class="fas fa-arrow-right absolute bottom-6 right-6 text-xl text-emerald-500 opacity-0 -translate-x-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0"></i>
+                    </a>
 
-        </div>
+                    <a href="admin/manage_equipment.php"
+                        class="relative overflow-hidden bg-white border border-gray-200 p-6 rounded-[24px] flex flex-col justify-between hover:border-blue-300 hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1 transition-all group">
+                        <div
+                            class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-4 border border-blue-100">
+                            <i class="fas fa-box text-xl"></i>
+                        </div>
+                        <div>
+                            <span
+                                class="block font-black text-gray-900 text-[17px] mb-1 group-hover:text-blue-600 transition-colors">คลังอุปกรณ์
+                                (Inventory)</span>
+                            <span class="text-gray-500 text-[12px] leading-tight block">จัดการสต็อก เพิ่ม/ลบ
+                                อุปกรณ์ในระบบ</span>
+                        </div>
+                        <i
+                            class="fas fa-arrow-right absolute bottom-6 right-6 text-xl text-blue-500 opacity-0 -translate-x-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0"></i>
+                    </a>
+                </div>
+
+                <!-- สัดส่วน Chart -->
+                <div class="bg-white rounded-[24px] shadow-sm border border-gray-100 flex flex-col mt-2">
+                    <div class="p-5 border-b border-gray-50 flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-500"><i
+                                class="fas fa-chart-pie"></i></div>
+                        <h3 class="font-bold text-gray-900 text-[15px]">สัดส่วนสถานะอุปกรณ์</h3>
+                    </div>
+                    <div class="p-6 flex justify-center pb-8 border-b-[5px] border-b-blue-50">
+                        <div style="width: 100%; max-width: 260px;">
+                            <canvas id="equipmentStatusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Log -->
+                <div
+                    class="bg-white rounded-[24px] shadow-sm border border-gray-100 flex flex-col items-stretch overflow-hidden">
+                    <div class="p-5 border-b border-gray-50 bg-slate-50/50">
+                        <h3 class="font-bold text-slate-800 text-[15px] flex items-center gap-2">
+                            <i class="fas fa-history text-slate-400"></i> ความเคลื่อนไหวล่าสุด
+                        </h3>
+                    </div>
+                    <div class="p-2">
+                        <?php if (empty($recent_activity)): ?>
+                            <div class="p-8 text-center text-gray-400 text-sm italic">ยังไม่มีความเคลื่อนไหวในขณะนี้</div>
+                        <?php else: ?>
+                            <div class="flex flex-col">
+                                <?php foreach ($recent_activity as $act):
+                                    $icon = '<i class="fas fa-circle text-[8px] text-blue-500"></i>';
+                                    $name = htmlspecialchars($act['student_name'] ?? 'N/A');
+                                    $eq = htmlspecialchars($act['equipment_name']);
+                                    if ($act['approval_status'] == 'pending') {
+                                        $icon = '<i class="fas fa-circle text-[8px] text-amber-500"></i>';
+                                        $txt = "<strong class='text-gray-900'>$name</strong> ขอยืม <u class='decoration-gray-300'>$eq</u>";
+                                    } elseif ($act['approval_status'] == 'rejected') {
+                                        $icon = '<i class="fas fa-circle text-[8px] text-gray-300"></i>';
+                                        $txt = "ปฏิเสธคำขอของ <strong class='text-gray-900'>$name</strong> (<span class='text-gray-400'>$eq</span>)";
+                                    } elseif ($act['status'] == 'returned') {
+                                        $icon = '<i class="fas fa-circle text-[8px] text-emerald-500 animate-pulse"></i>';
+                                        $txt = "<strong class='text-gray-900'>$name</strong> ส่งคืนแล้ว ($eq)";
+                                    } elseif ($act['approval_status'] == 'approved') {
+                                        $icon = '<i class="fas fa-circle text-[8px] text-blue-500"></i>';
+                                        $txt = "อนุมัติให้ <strong class='text-gray-900'>$name</strong> นำออก ($eq)";
+                                    } elseif ($act['approval_status'] == 'staff_added') {
+                                        $icon = '<i class="fas fa-circle text-[8px] text-purple-500"></i>';
+                                        $txt = "Walk-in <strong class='text-gray-900'>$name</strong> เบิก ($eq)";
+                                    } else {
+                                        $txt = "อัปเดตสถานะ $eq";
+                                    }
+                                    ?>
+                                    <div
+                                        class="flex items-start gap-4 p-3 hover:bg-slate-50 rounded-xl transition-colors border-b border-gray-50 last:border-0 border-solid mx-2">
+                                        <div
+                                            class="mt-0.5 flex-shrink-0 w-6 h-6 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center">
+                                            <?= $icon ?>
+                                        </div>
+                                        <p class="text-[12px] text-slate-600 leading-relaxed font-medium"><?= $txt ?></p>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+            </div>
         <?php endif; ?>
     </div>
 </div>
