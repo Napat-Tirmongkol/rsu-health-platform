@@ -98,10 +98,10 @@ $thaiDate = $days[date('w')] . ", " . date('j') . " " . $months[date('n')-1] . "
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>RSU Medical Hub</title>
-    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+    <link rel="icon" type="image/x-icon" href="../favicon.ico?v=<?= APP_VERSION ?>">
     <script src="https://cdn.tailwindcss.com/3.4.1"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css?v=<?= APP_VERSION ?>" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js?v=<?= APP_VERSION ?>"></script>
     <style>
         @font-face { font-family: 'RSU'; src: url('../assets/fonts/RSU_Regular.ttf') format('truetype'); font-weight: normal; }
         @font-face { font-family: 'RSU'; src: url('../assets/fonts/RSU_BOLD.ttf') format('truetype'); font-weight: bold; }
@@ -292,6 +292,7 @@ $thaiDate = $days[date('w')] . ", " . date('j') . " " . $months[date('n')-1] . "
 
             <footer class="pt-10 pb-16 text-center opacity-30">
                 <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">© 2568 RSU Medical Services</p>
+                <p class="text-slate-400 text-[8px] font-black uppercase tracking-[0.2em] mt-2">v<?= APP_VERSION ?> · build <?= APP_BUILD ?></p>
             </footer>
         </main>
 

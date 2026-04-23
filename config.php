@@ -13,6 +13,10 @@ defined('ACTIVITY_LOG_RETENTION_DAYS') || define('ACTIVITY_LOG_RETENTION_DAYS', 
 // ── Finance Settings ──────────────────────────────────────────────────────────
 defined('FINE_RATE_PER_DAY') || define('FINE_RATE_PER_DAY', 10); // ค่าปรับวันละ 10 บาท
 
+// ── Application Versioning ────────────────────────────────────────────────────
+defined('APP_VERSION') || define('APP_VERSION', '2.2.0'); // เวอร์ชันหลัก
+defined('APP_BUILD')   || define('APP_BUILD',   '20260423.01'); // วันที่และลำดับการอัปเดต
+
 // ── Site Settings ─────────────────────────────────────────────────────────────
 $__siteSettingsFile = __DIR__ . '/config/site_settings.json';
 $__siteSettings = file_exists($__siteSettingsFile) ? json_decode(file_get_contents($__siteSettingsFile), true) : [];
