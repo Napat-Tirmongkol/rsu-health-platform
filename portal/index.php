@@ -2344,6 +2344,7 @@ $adminListForSelect = $pdo->query("SELECT id, full_name, username FROM sys_admin
                     document.getElementById('govEcAccess').checked = parseInt(data.access_ecampaign) === 1;
                     document.getElementById('govEcRole').value = data.ecampaign_role || 'editor';
                 }
+            }
             // Update UI States
             syncGovUI('govEcAccess', 'govEcRole', 'govEcCard');
 
