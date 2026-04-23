@@ -89,7 +89,7 @@ try {
 // Helpers
 function getInitials($name) {
     $parts = explode(' ', trim($name));
-    return strtoupper(substr($parts[0], 0, 1) . (isset($parts[1]) ? substr($parts[1], 0, 1) : ''));
+    return mb_strtoupper(mb_substr($parts[0], 0, 1, 'UTF-8') . (isset($parts[1]) ? mb_substr($parts[1], 0, 1, 'UTF-8') : ''), 'UTF-8');
 }
 
 function getCampStyle($type): array {
