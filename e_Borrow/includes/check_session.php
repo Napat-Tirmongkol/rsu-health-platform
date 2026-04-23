@@ -13,7 +13,7 @@ if (!function_exists('_eborrow_abs_url')) {
         $adminDir = rtrim(str_replace(
             str_replace('/', DIRECTORY_SEPARATOR, $_SERVER['DOCUMENT_ROOT']),
             '',
-            realpath(__DIR__ . '/../admin')
+            realpath(__DIR__ . '/..')
         ), DIRECTORY_SEPARATOR);
         $adminUrl = $proto . '://' . $host . '/' . ltrim(str_replace(DIRECTORY_SEPARATOR, '/', $adminDir), '/');
         return $adminUrl . '/' . ltrim($relativePath, '/');
