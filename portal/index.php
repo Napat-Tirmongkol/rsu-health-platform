@@ -1234,7 +1234,7 @@ $adminListForSelect = $pdo->query("SELECT id, full_name, username FROM sys_admin
                     </div>
 
                     <!-- PANEL: Staff Matrix -->
-                    <div id="id-panel-staff" class="id-panel" style="display:none">
+                    <div id="id-panel-staff" class="id-panel">
                         <div style="background:#fff;border-radius:20px;border:1.5px solid #e2e8f0;overflow:hidden">
                             <div style="padding:18px 24px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:8px">
                                 <div style="width:4px;height:18px;background:#2563eb;border-radius:99px;flex-shrink:0"></div>
