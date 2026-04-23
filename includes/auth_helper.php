@@ -62,7 +62,8 @@ function requestPasswordReset(string $email, string $type): array {
             'info'
         );
 
-        $sent = smtp_send($email, $subject, $body);
+        $secrets = get_secrets();
+        $sent = smtp_send($email, $subject, $body, $secrets);
 
         if ($sent) {
             log_activity("Password Reset Requested", "ส่งลิงก์รีเซ็ตรหัสผ่านไปที่ $email ($type)", (int)$user['id']);
