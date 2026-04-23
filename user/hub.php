@@ -102,7 +102,8 @@ $thaiDate = $days[date('w')] . ", " . date('j') . " " . $months[date('n')-1] . "
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" 
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>RSU Medical Hub</title>
     <link rel="icon" type="image/x-icon" href="../favicon.ico?v=<?= APP_VERSION ?>">
     <script src="https://cdn.tailwindcss.com/3.4.1"></script>
@@ -199,12 +200,13 @@ $thaiDate = $days[date('w')] . ", " . date('j') . " " . $months[date('n')-1] . "
             </div>
 
             <!-- Identity Card -->
-            <div onclick="showProfile()" class="relative overflow-hidden bg-gradient-to-br from-[#0052CC] via-[#0066FF] to-[#0052CC] rounded-[3rem] p-8 shadow-[0_25px_50px_-12px_rgba(0,82,204,0.3)] group active:scale-[0.97] transition-all cursor-pointer">
+            <div onclick="showProfile()" 
+                 class="relative overflow-hidden bg-gradient-to-br from-[#0052CC] via-[#0066FF] to-[#0052CC] rounded-[3rem] p-8 shadow-[0_25px_50px_-12px_rgba(0,82,204,0.3)] group active:scale-[0.97] transition-all cursor-pointer">
                 <div class="absolute -right-6 -top-6 w-48 h-48 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
                 <div class="relative z-10 text-left">
                     <div class="flex items-center gap-5 mb-10">
                         <div class="w-20 h-20 rounded-[2rem] overflow-hidden border-2 border-white/20 shadow-2xl">
-                            <img src="<?= $user['picture_url'] ?? 'https://ui-avatars.com/api/?name='.urlencode($user['full_name']); ?>" class="w-full h-full object-cover">
+                            <img src="<?= $user['picture_url'] ?? 'https://ui-avatars.com/api/?name='.urlencode($user['full_name']); ?>" class="w-full h-full object-cover" />
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="text-blue-100/80 text-sm font-bold mb-1">สวัสดี 👋</p>
@@ -303,7 +305,10 @@ $thaiDate = $days[date('w')] . ", " . date('j') . " " . $months[date('n')-1] . "
         </main>
 
         <!-- Navigation -->
-        <nav class="fixed bottom-0 left-0 right-0 z-[70] bg-white/90 backdrop-blur-2xl border-t border-slate-50 px-8 py-4 pb-10 flex justify-between items-center max-w-md mx-auto shadow-xl">
+        <nav class="fixed bottom-0 left-0 right-0 z-[70] 
+                    bg-white/90 backdrop-blur-2xl border-t border-slate-50 
+                    px-8 py-4 pb-10 flex justify-between items-center 
+                    max-w-md mx-auto shadow-xl">
             <button onclick="location.reload()" class="flex flex-col items-center gap-1.5 text-blue-600 transition-all scale-110">
                 <i class="fa-solid fa-house-chimney text-xl"></i>
                 <span class="text-[8px] font-black uppercase tracking-[0.1em]">Home</span>
