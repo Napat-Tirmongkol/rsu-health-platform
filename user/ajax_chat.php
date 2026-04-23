@@ -6,10 +6,25 @@ require_once __DIR__ . '/../config.php';
 
 header('Content-Type: application/json');
 
-// 1. Auth Check
+// 1. Auth Check — ใช้ user_id ใน session (set จาก hub.php)
+//    ถ้าไม่มี ให้ fallback หา user_id จาก line_user_id
 $userId = $_SESSION['user_id'] ?? null;
+
+if (!$userId && !empty($_SESSION['line_user_id'])) {
+    try {
+        $pdo_tmp = db();
+        $s = $pdo_tmp->prepare("SELECT id FROM sys_users WHERE line_user_id = :lid LIMIT 1");
+        $s->execute([':lid' => $_SESSION['line_user_id']]);
+        $row = $s->fetch();
+        if ($row) {
+            $userId = (int)$row['id'];
+            $_SESSION['user_id'] = $userId; // cache ไว้
+        }
+    } catch (Exception $e) {}
+}
+
 if (!$userId) {
-    echo json_encode(['success' => false, 'error' => 'Unauthorized']);
+    echo json_encode(['success' => false, 'error' => 'Unauthorized', 'debug' => 'No user_id in session']);
     exit;
 }
 

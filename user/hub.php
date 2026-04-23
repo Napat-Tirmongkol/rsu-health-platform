@@ -33,6 +33,9 @@ try {
         exit;
     }
 
+    // ── Store user ID in session for AJAX endpoints ──
+    $_SESSION['user_id'] = (int)$user['id'];
+
     // Campaigns (all active)
     $stmt = $pdo->prepare("
         SELECT c.*,
