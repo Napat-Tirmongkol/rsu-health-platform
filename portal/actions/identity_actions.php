@@ -77,18 +77,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         if (!empty($password)) $pdo->prepare("UPDATE sys_admins SET password=? WHERE id=?")->execute([password_hash($password, PASSWORD_DEFAULT), $targetId]);
                     }
                 } elseif ($type === 'staff') {
-                    $ebRole = $_POST['eb_role'] ?? 'employee';
+                    // Ensure access_eborrow column exists
+                    try { $pdo->exec("ALTER TABLE sys_staff ADD COLUMN access_eborrow TINYINT(1) DEFAULT 1 AFTER role"); } catch(PDOException $e) {}
+
+                    $ebAccess = (int)($_POST['eb_access'] ?? 0);
+                    $ebRole   = $_POST['eb_role'] ?? 'employee';
                     $ecAccess = (int)($_POST['ec_access'] ?? 0);
-                    $ecRole = $_POST['ec_role'] ?? 'editor';
+                    $ecRole   = $_POST['ec_role'] ?? 'editor';
                     
                     if ($action === 'add_identity_gov') {
                         $hashed = password_hash($password ?: bin2hex(random_bytes(8)), PASSWORD_DEFAULT);
-                        $pdo->prepare("INSERT INTO sys_staff (full_name, username, password_hash, role, account_status, access_ecampaign, ecampaign_role) VALUES (?,?,?,?,?,?,?)")
-                            ->execute([$fullName, $username, $hashed, $ebRole, $status, $ecAccess, $ecRole]);
+                        $pdo->prepare("INSERT INTO sys_staff (full_name, username, password_hash, role, access_eborrow, account_status, access_ecampaign, ecampaign_role) VALUES (?,?,?,?,?,?,?,?)")
+                            ->execute([$fullName, $username, $hashed, $ebRole, $ebAccess, $status, $ecAccess, $ecRole]);
                         $targetId = (int)$pdo->lastInsertId();
                     } else {
-                        $pdo->prepare("UPDATE sys_staff SET full_name=?, username=?, role=?, account_status=?, access_ecampaign=?, ecampaign_role=? WHERE id=?")
-                            ->execute([$fullName, $username, $ebRole, $status, $ecAccess, $ecRole, $targetId]);
+                        $pdo->prepare("UPDATE sys_staff SET full_name=?, username=?, role=?, access_eborrow=?, account_status=?, access_ecampaign=?, ecampaign_role=? WHERE id=?")
+                            ->execute([$fullName, $username, $ebRole, $ebAccess, $status, $ecAccess, $ecRole, $targetId]);
                         if (!empty($password)) $pdo->prepare("UPDATE sys_staff SET password_hash=? WHERE id=?")->execute([password_hash($password, PASSWORD_DEFAULT), $targetId]);
                     }
                 }

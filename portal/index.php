@@ -2338,6 +2338,7 @@ $adminListForSelect = $pdo->query("SELECT id, full_name, username FROM sys_admin
                 if (type === 'admin') {
                     document.getElementById('govAdminRole').value = data.role || 'admin';
                 } else {
+                    document.getElementById('govEbAccess').checked = (data.access_eborrow === undefined) ? true : (parseInt(data.access_eborrow) === 1);
                     document.getElementById('govEbRole').value = data.role || 'employee';
                     document.getElementById('govEcAccess').checked = parseInt(data.access_ecampaign) === 1;
                     document.getElementById('govEcRole').value = data.ecampaign_role || 'editor';
