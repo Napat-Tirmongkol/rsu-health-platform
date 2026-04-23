@@ -1040,12 +1040,8 @@ $adminListForSelect = $pdo->query("SELECT id, full_name, username FROM sys_admin
                     <!-- PANEL: Master Users -->
                     <div id="id-panel-users" class="id-panel active">
                         <?php
-                        $statsUserType = ['student' => 0, 'staff' => 0, 'other' => 0];
-                        foreach ($idUsers as $u) {
-                            $statKey = in_array($u['status'], ['student', 'staff']) ? $u['status'] : 'other';
-                            $statsUserType[$statKey]++;
-                        }
-                        $totalUsersCalc = count($idUsers);
+                        // Stats are pre-calculated in identity_queries.php via SQL
+                        $totalUsersCalc = $totalIdUsers;
                         $pctStudent = $totalUsersCalc > 0 ? round(($statsUserType['student'] / $totalUsersCalc) * 100) : 0;
                         $pctStaff = $totalUsersCalc > 0 ? round(($statsUserType['staff'] / $totalUsersCalc) * 100) : 0;
                         $pctOther = $totalUsersCalc > 0 ? (100 - $pctStudent - $pctStaff) : 0;

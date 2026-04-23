@@ -11,6 +11,15 @@ $idSearch = $_GET['id_search'] ?? '';
 $idUsers = []; 
 $totalIdUsers = (int) $pdo->query("SELECT COUNT(*) FROM sys_users")->fetchColumn();
 
+// Fetch stats for the distribution bar (optimized SQL)
+$statsUserType = ['student' => 0, 'staff' => 0, 'other' => 0];
+$typeRows = $pdo->query("SELECT status, COUNT(*) as cnt FROM sys_users GROUP BY status")->fetchAll(PDO::FETCH_ASSOC);
+foreach ($typeRows as $row) {
+    if ($row['status'] === 'student') $statsUserType['student'] = (int)$row['cnt'];
+    elseif ($row['status'] === 'staff') $statsUserType['staff'] = (int)$row['cnt'];
+    else $statsUserType['other'] += (int)$row['cnt'];
+}
+
 $idActiveCount = (int) $pdo->query("
     SELECT COUNT(DISTINCT id) FROM sys_users
     WHERE id IN (SELECT student_id FROM camp_bookings WHERE student_id IS NOT NULL)
