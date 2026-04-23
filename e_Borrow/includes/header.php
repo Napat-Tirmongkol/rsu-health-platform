@@ -96,11 +96,6 @@ $base_url = explode('/e_Borrow', $_SERVER['SCRIPT_NAME'])[0] . '/e_Borrow/';
         </div>
 
         <div class="user-info">
-            <a href="../portal/profile.php" class="flex items-center gap-2 mr-2 hover:opacity-80 transition-opacity group" title="จัดการโปรไฟล์">
-                <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 group-hover:border-indigo-400 transition-colors">
-                    <i class="fas fa-user-circle text-lg"></i>
-                </div>
-            </a>
             <div class="user-greeting">
                 <span>สวัสดี,</span> 
                 <strong><?php echo htmlspecialchars($_SESSION['full_name'] ?? 'ผู้ใช้'); ?></strong>
