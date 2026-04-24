@@ -204,7 +204,7 @@ $projects = [
         'allowed_roles' => ['admin', 'superadmin', 'editor'],
         'badges' => ['Insurance', 'Sync'],
         'actions' => [
-            ['label' => 'Open Insurance Sync Hub', 'url' => 'insurance_sync.php', 'primary' => true],
+            ['label' => 'Open Insurance Sync Hub', 'url' => 'javascript:switchSection(\'insurance_sync\', document.querySelector(\'[data-section=insurance_sync]\'))', 'primary' => true],
         ]
     ],
 
@@ -716,6 +716,10 @@ try {
             <button class="psb-item" data-section="identity" onclick="switchSection('identity',this)">
                 <div class="psb-icon"><i class="fa-solid fa-id-card-clip" style="color:#2563eb"></i></div>
                 <span class="psb-label" style="color:#1d4ed8;font-weight:900">Identity & Governance</span>
+            </button>
+            <button class="psb-item" data-section="insurance_sync" onclick="switchSection('insurance_sync',this)">
+                <div class="psb-icon"><i class="fa-solid fa-shield-halved" style="color:#0ea5e9"></i></div>
+                <span class="psb-label" style="color:#0284c7;font-weight:900">Insurance Hub</span>
             </button>
             <?php if ($adminRole === 'superadmin' || !empty($_SESSION['access_system_logs'])): ?>
             <button class="psb-item" data-section="activity_logs" onclick="switchSection('activity_logs',this)">
@@ -2112,6 +2116,18 @@ try {
             <div id="section-ai_assistant" class="portal-section"
                 style="<?= $activeSection==='ai_assistant'?'':'display:none;' ?> width:100%; height:calc(100vh - 60px); overflow:hidden;">
                 <?php include __DIR__ . '/_partials/ai_assistant.php'; ?>
+            </div>
+
+            <!-- ════════════ SECTION: INSURANCE SYNC HUB ════════════ -->
+            <div id="section-insurance_sync" class="portal-section"
+                style="<?= $activeSection==='insurance_sync'?'':'display:none;' ?> width:100%; height:calc(100vh - 60px); background:#f8fafc; overflow-y:auto;">
+                <?php 
+                if ($adminRole === 'superadmin' || !empty($_SESSION['access_insurance'])) {
+                    include __DIR__ . '/_partials/insurance_sync.php'; 
+                } else {
+                    echo '<div style="padding:100px;text-align:center;font-weight:900;color:#dc2626"><i class="fa-solid fa-shield-slash mb-4" style="font-size:4rem;display:block"></i> ACCESS DENIED</div>';
+                }
+                ?>
             </div>
 
             <!-- ════════════ SECTION: CLINIC DATA ════════════ -->
