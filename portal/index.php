@@ -1107,8 +1107,9 @@ try {
             </div><!-- /section-dashboard -->
 
             <!-- ════════════ SECTION: ANNOUNCEMENTS ════════════ -->
-            <div id="section-announcements" class="portal-section" style="display:none">
-                <div class="max-w-[1100px] mx-auto px-5 md:px-8 py-8">
+            <div id="section-announcements" class="portal-section" 
+                style="<?= $activeSection==='announcements'?'':'display:none;' ?> width:100%; height:calc(100vh - 60px); background:#f8fafc; overflow-y:auto;">
+                <div class="px-5 md:px-8 py-8">
 
                     <?php if ($ann_saved): ?>
                     <div style="display:flex;align-items:center;gap:10px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:14px;padding:12px 18px;margin-bottom:20px;font-size:13px;font-weight:700;color:#15803d">
@@ -1311,8 +1312,9 @@ try {
             </form>
 
             <!-- ════════════ SECTION: IDENTITY & GOVERNANCE ════════════ -->
-            <div id="section-identity" class="portal-section" style="display:none">
-                <div class="max-w-[1280px] mx-auto px-5 md:px-8 py-8">
+            <div id="section-identity" class="portal-section" 
+                style="<?= $activeSection==='identity'?'':'display:none;' ?> width:100%; height:calc(100vh - 60px); background:#f8fafc; overflow-y:auto;">
+                <div class="px-5 md:px-8 py-8">
 
                     <?php if ($idSaved): ?>
                         <div id="id-toast"
@@ -2096,7 +2098,7 @@ try {
             */ ?>
 
             <div id="section-settings" class="portal-section"
-                style="<?= $activeSection==='settings'?'':'display:none;' ?> background:#f1f5f9; overflow-y:auto;">
+                style="<?= $activeSection==='settings'?'':'display:none;' ?> width:100%; height:calc(100vh - 60px); background:#f1f5f9; overflow-y:auto;">
                 <?php 
                 if ($adminRole === 'superadmin' || !empty($_SESSION['access_site_settings'])) {
                     include __DIR__ . '/_partials/settings.php'; 
@@ -2114,13 +2116,13 @@ try {
 
             <!-- ════════════ SECTION: CLINIC DATA ════════════ -->
             <div id="section-clinic_data" class="portal-section"
-                style="<?= $activeSection==='clinic_data'?'':'display:none;' ?> background:#f8fafc; overflow-y:auto;">
+                style="<?= $activeSection==='clinic_data'?'':'display:none;' ?> width:100%; height:calc(100vh - 60px); background:#f8fafc; overflow-y:auto;">
                 <?php include __DIR__ . '/_partials/clinic_data.php'; ?>
             </div>
 
             <!-- ════════════ SECTION: ACTIVITY LOGS ════════════ -->
             <div id="section-activity_logs" class="portal-section"
-                style="<?= $activeSection==='activity_logs'?'':'display:none;' ?> background:#f8fafc; overflow-y:auto;">
+                style="<?= $activeSection==='activity_logs'?'':'display:none;' ?> width:100%; height:calc(100vh - 60px); background:#f8fafc; overflow-y:auto;">
                 <?php 
                 if ($adminRole === 'superadmin' || !empty($_SESSION['access_system_logs'])) {
                     include __DIR__ . '/_partials/activity_logs.php'; 
@@ -2132,7 +2134,7 @@ try {
 
             <!-- ════════════ SECTION: ERROR LOGS ════════════ -->
             <div id="section-error_logs" class="portal-section"
-                style="<?= $activeSection==='error_logs'?'':'display:none;' ?> background:#f8fafc; overflow-y:auto;">
+                style="<?= $activeSection==='error_logs'?'':'display:none;' ?> width:100%; height:calc(100vh - 60px); background:#f8fafc; overflow-y:auto;">
                 <?php 
                 if ($adminRole === 'superadmin' || !empty($_SESSION['access_system_logs'])) {
                     include __DIR__ . '/_partials/error_logs.php'; 
@@ -2144,7 +2146,7 @@ try {
 
             <!-- ════════════ SECTION: EMAIL LOGS ════════════ -->
             <div id="section-email_logs" class="portal-section"
-                style="<?= $activeSection==='email_logs'?'':'display:none;' ?> background:#f8fafc; overflow-y:auto;">
+                style="<?= $activeSection==='email_logs'?'':'display:none;' ?> width:100%; height:calc(100vh - 60px); background:#f8fafc; overflow-y:auto;">
                 <?php 
                 if ($adminRole === 'superadmin' || !empty($_SESSION['access_system_logs'])) {
                     include __DIR__ . '/_partials/email_logs.php'; 
@@ -2156,7 +2158,7 @@ try {
 
             <!-- ════════════ SECTION: SMTP SETTINGS ════════════ -->
             <div id="section-smtp_settings" class="portal-section"
-                style="<?= $activeSection==='smtp_settings'?'':'display:none;' ?> background:#f8fafc; overflow-y:auto;">
+                style="<?= $activeSection==='smtp_settings'?'':'display:none;' ?> width:100%; height:calc(100vh - 60px); background:#f8fafc; overflow-y:auto;">
                 <?php 
                 if ($adminRole === 'superadmin' || !empty($_SESSION['access_site_settings'])) {
                     include __DIR__ . '/_partials/smtp_settings.php'; 
@@ -2174,7 +2176,7 @@ try {
 
             <!-- ════════════ SECTION: LINE MESSAGING API ════════════ -->
             <div id="section-line_settings" class="portal-section"
-                style="<?= $activeSection==='line_settings'?'':'display:none;' ?> background:#f8fafc; overflow-y:auto;">
+                style="<?= $activeSection==='line_settings'?'':'display:none;' ?> width:100%; height:calc(100vh - 60px); background:#f8fafc; overflow-y:auto;">
                 <?php 
                 if ($adminRole === 'superadmin' || !empty($_SESSION['access_site_settings'])) {
                     include __DIR__ . '/_partials/line_settings.php'; 
@@ -2186,8 +2188,8 @@ try {
 
             <!-- ════════════ SECTION: PRIVILEGE INVENTORY (ISO 27001) ════════════ -->
             <div id="section-privilege_inventory" class="portal-section" 
-                style="<?= $activeSection==='privilege_inventory'?'':'display:none;' ?> background:#f8fafc; overflow-y:auto;">
-                <div class="max-w-[1280px] mx-auto px-5 md:px-8 py-8">
+                style="<?= $activeSection==='privilege_inventory'?'':'display:none;' ?> width:100%; height:calc(100vh - 60px); background:#f8fafc; overflow-y:auto;">
+                <div class="px-5 md:px-8 py-8">
                     <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px">
                         <div>
                             <div class="sec-title" style="margin-bottom:2px">🛡️ Privileged Access Inventory</div>

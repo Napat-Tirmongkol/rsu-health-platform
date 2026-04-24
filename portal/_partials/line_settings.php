@@ -29,7 +29,7 @@ $webhookUrl = "$protocol://$host$uri";
     .line-card  { background:#fff; border-radius:1.5rem; border:1.5px solid #e5e7eb; padding:1.75rem; margin-bottom:1.25rem; }
 </style>
 
-<div class="max-w-[1000px] mx-auto px-4 py-8">
+<div class="px-4 py-8">
 
     <!-- Header -->
     <div class="mb-8 flex items-center justify-between">
