@@ -2,25 +2,22 @@
 // user/c.php — Premium Campaign Invite Landing
 declare(strict_types=1);
 session_start();
-require_once __DIR__ . '/../config.php';
-check_maintenance('e_campaign');
 
-// ตรวจสอบว่า login แล้วหรือยัง (ผ่าน LINE)
+// 1. ตรวจสอบ Login เบื้องต้น (ทำก่อนโหลดไฟล์หนักๆ เพื่อให้ Redirect สะอาดที่สุด)
 $lineUserId = $_SESSION['line_user_id'] ?? '';
 if ($lineUserId === '') {
-    // เก็บ token ไว้ใน session เพื่อใช้หลังจาก login สำเร็จ
     $_SESSION['invite_token'] = trim($_GET['t'] ?? '');
-    
-    // ส่งไปที่หน้า Login โดยใช้ Header ปกติ (302 Found)
     header('Location: ../archive/line_api/line_login.php', true, 302);
-    
-    // หาก Header โดนบล็อก ให้ใช้ Meta Refresh เป็นแผนสำรอง
+    // แผนสำรองกรณี Header โดนบล็อก
     echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=../archive/line_api/line_login.php"></head><body></body></html>';
     exit;
 }
 
+// 2. ถ้า Login แล้วค่อยโหลด Config และจัดการข้อมูล
+require_once __DIR__ . '/../config.php';
+check_maintenance('e_campaign');
+
 $pdo = db();
-// ดึงข้อมูล User (ดึงมาเพื่อเช็คสถานะโปรไฟล์เฉยๆ)
 $stmt = $pdo->prepare("SELECT id FROM sys_users WHERE line_user_id = :line_id LIMIT 1");
 $stmt->execute([':line_id' => $lineUserId]);
 $user = $stmt->fetch();
