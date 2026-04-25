@@ -12,7 +12,7 @@ if ($lineUserId === '') {
 
 $campaignId = isset($_GET['campaign_id']) ? (int)$_GET['campaign_id'] : 0;
 if ($campaignId <= 0) {
-    header('Location: booking_campaign.php');
+    header('Location: hub.php');
     exit;
 }
 
@@ -100,7 +100,7 @@ function getDensity($d, $stats) {
         
         <!-- ── Clean White Header ── -->
         <header class="glass-header sticky top-0 z-[60] px-6 py-5 flex items-center justify-between border-b border-slate-100">
-            <button onclick="window.location.href='booking_campaign.php'" class="w-11 h-11 flex items-center justify-center bg-slate-50 rounded-2xl text-slate-400 active:scale-90 transition-all">
+            <button onclick="window.location.href='hub.php'" class="w-11 h-11 flex items-center justify-center bg-slate-50 rounded-2xl text-slate-400 active:scale-90 transition-all">
                 <i class="fa-solid fa-chevron-left"></i>
             </button>
             <h1 class="text-lg font-black text-slate-900 tracking-tight">เลือกวันที่รับบริการ</h1>
@@ -175,7 +175,7 @@ function getDensity($d, $stats) {
 
             <!-- ── Action Bar ── -->
             <div class="flex gap-4">
-                <button onclick="window.location.href='booking_campaign.php'" class="flex-1 h-14 bg-white border border-slate-100 text-slate-400 font-black rounded-2xl active:scale-95 transition-all">ย้อนกลับ</button>
+                <button onclick="window.location.href='hub.php'" class="flex-1 h-14 bg-white border border-slate-100 text-slate-400 font-black rounded-2xl active:scale-95 transition-all">ย้อนกลับ</button>
                 <button id="btn-next" onclick="goToTime()" disabled class="flex-[2] h-14 bg-slate-100 text-slate-300 font-black rounded-2xl active:scale-95 transition-all shadow-xl shadow-slate-100">ถัดไป</button>
             </div>
         </main>

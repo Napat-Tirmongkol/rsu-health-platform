@@ -23,7 +23,7 @@ $day        = (int)($_GET['day']         ?? 0);
 $campaignId = (int)($_GET['campaign_id'] ?? 0);
 
 if ($year == 0 || $month == 0 || $day == 0 || $campaignId == 0) {
-    header('Location: booking_campaign.php');
+    header('Location: hub.php');
     exit;
 }
 
@@ -41,12 +41,12 @@ try {
     $stmtCamp->execute([':id' => $campaignId]);
     $campaign = $stmtCamp->fetch(PDO::FETCH_ASSOC);
     if (!$campaign) {
-        header('Location: booking_campaign.php');
+        header('Location: hub.php');
         exit;
     }
 } catch (PDOException $e) {
     error_log("booking_time campaign fetch error: " . $e->getMessage());
-    header('Location: booking_campaign.php');
+    header('Location: hub.php');
     exit;
 }
 
