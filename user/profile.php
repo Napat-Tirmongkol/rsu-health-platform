@@ -96,9 +96,14 @@ try {
                 <i class="fa-solid fa-chevron-left"></i>
             </button>
             <h1 class="text-lg font-black text-slate-900 tracking-tight"><?= __('profile.heading_edit') ?></h1>
-            <a href="logout.php" class="w-11 h-11 flex items-center justify-center bg-red-50 text-red-500 rounded-2xl active:scale-90 transition-all shadow-sm">
-                <i class="fa-solid fa-power-off"></i>
-            </a>
+            <div class="flex items-center gap-2">
+                <a href="<?= lang_switch_url() ?>" class="w-11 h-11 flex items-center justify-center bg-slate-50 text-slate-400 rounded-2xl font-black text-[10px] active:scale-90 transition-all">
+                    <?= __('lang.switch') ?>
+                </a>
+                <a href="logout.php" class="w-11 h-11 flex items-center justify-center bg-red-50 text-red-500 rounded-2xl active:scale-90 transition-all shadow-sm">
+                    <i class="fa-solid fa-power-off"></i>
+                </a>
+            </div>
         </header>
 
         <main class="px-6 pt-8 pb-12">

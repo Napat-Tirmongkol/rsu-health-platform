@@ -97,8 +97,10 @@ $months = ["มกราคม", "กุมภาพันธ์", "มีนา
             <button onclick="window.location.href='hub.php'" class="w-11 h-11 flex items-center justify-center bg-slate-50 rounded-2xl text-slate-400 active:scale-90 transition-all">
                 <i class="fa-solid fa-chevron-left"></i>
             </button>
-            <h1 class="text-lg font-black text-slate-900 tracking-tight">รายการนัดหมาย</h1>
-            <div class="w-11 h-11"></div>
+            <h1 class="text-lg font-black text-slate-900 tracking-tight"><?= __('bookings.heading') ?></h1>
+            <a href="<?= lang_switch_url() ?>" class="w-11 h-11 flex items-center justify-center bg-slate-50 text-slate-400 rounded-2xl font-black text-[10px] active:scale-90 transition-all">
+                <?= __('lang.switch') ?>
+            </a>
         </header>
 <?php
 function renderBookingCard($b): void {

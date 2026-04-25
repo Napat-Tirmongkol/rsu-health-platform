@@ -170,6 +170,8 @@ return [
     'hub.quick_health_sub' => 'จอง / ดูประวัติ',
     'hub.quick_borrow' => 'ยืมอุปกรณ์',
     'hub.quick_borrow_sub' => 'ระบบ e-Borrow',
+    'hub.service_count' => 'การเข้าใช้บริการ',
+    'hub.borrow_count' => 'รายการยืมของ',
 
     // ── profile.php ──────────────────────────────────────────────────────────
     'profile.page_title' => 'ข้อมูลส่วนตัว - RSU Medical Hub',

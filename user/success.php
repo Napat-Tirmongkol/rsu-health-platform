@@ -79,8 +79,10 @@ $displayCode = 'CAMP-' . str_pad((string)$appointmentId, 5, '0', STR_PAD_LEFT);
         <!-- ── Clean White Header ── -->
         <header class="glass-header sticky top-0 z-[60] px-6 py-5 flex items-center justify-between border-b border-slate-100 shadow-sm shadow-slate-50">
             <div class="w-11 h-11"></div>
-            <h1 class="text-lg font-black text-slate-900 tracking-tight">ยืนยันการจอง</h1>
-            <div class="w-11 h-11"></div>
+            <h1 class="text-lg font-black text-slate-900 tracking-tight"><?= __('success.page_title') ?></h1>
+            <a href="<?= lang_switch_url() ?>" class="w-11 h-11 flex items-center justify-center bg-slate-50 text-slate-400 rounded-2xl font-black text-[10px] active:scale-90 transition-all">
+                <?= __('lang.switch') ?>
+            </a>
         </header>
 
         <div class="p-5 flex flex-col h-full animate-in fade-in slide-in-from-bottom-8 duration-700">

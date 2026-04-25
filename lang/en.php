@@ -170,6 +170,8 @@ return [
     'hub.quick_health_sub' => 'Book / History',
     'hub.quick_borrow' => 'Borrow Tool',
     'hub.quick_borrow_sub' => 'e-Borrow System',
+    'hub.service_count' => 'Services Used',
+    'hub.borrow_count' => 'Items Borrowed',
 
     // ── profile.php ──────────────────────────────────────────────────────────
     'profile.page_title' => 'Profile - RSU Medical Hub',
