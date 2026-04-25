@@ -21,9 +21,27 @@ $csrfToken = get_csrf_token();
 <div class="px-5 md:px-8 py-8 space-y-8">
 
     <!-- Header -->
-    <div>
-        <div class="sec-title" style="margin-bottom:4px">🛡️ Insurance Sync Hub</div>
-        <p style="font-size:13px;color:#64748b">จัดการข้อมูลสิทธิ์ประกันสุขภาพของบุคลากรและนักศึกษา</p>
+    <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <div class="sec-title" style="margin-bottom:4px">🛡️ Insurance Sync Hub</div>
+            <p style="font-size:13px;color:#64748b">จัดการข้อมูลสิทธิ์ประกันสุขภาพของบุคลากรและนักศึกษา</p>
+        </div>
+        <!-- Visibility Toggle -->
+        <div class="flex items-center gap-3 bg-white px-4 py-2.5 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="flex flex-col text-right">
+                <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">แสดงการ์ดให้ User</span>
+                <span id="insVisibilityLabel" class="text-[10px] font-bold leading-none <?= defined('SITE_SHOW_INSURANCE') && SITE_SHOW_INSURANCE ? 'text-blue-600' : 'text-gray-400' ?>">
+                    <?= defined('SITE_SHOW_INSURANCE') && SITE_SHOW_INSURANCE ? 'เปิดใช้งาน' : 'ปิดอยู่' ?>
+                </span>
+            </div>
+            <label class="toggle">
+                <input type="checkbox" id="insToggleVisibility"
+                    <?= defined('SITE_SHOW_INSURANCE') && SITE_SHOW_INSURANCE ? 'checked' : '' ?>
+                    onchange="updateInsVisibility(this)">
+                <div class="toggle-track"></div>
+                <div class="toggle-thumb"></div>
+            </label>
+        </div>
     </div>
 
     <!-- Upload Section -->
@@ -259,6 +277,25 @@ $csrfToken = get_csrf_token();
     document.getElementById('insMemberSearch').addEventListener('keydown', e => {
         if (e.key === 'Enter') loadInsMembers(1);
     });
+
+    window.updateInsVisibility = function(cb) {
+        const fd = new FormData();
+        fd.append('action', 'set_visibility');
+        fd.append('csrf_token', CSRF);
+        fd.append('active', cb.checked ? '1' : '0');
+        fetch('ajax_insurance_sync.php', { method: 'POST', body: fd })
+            .then(r => r.json())
+            .then(data => {
+                const lbl = document.getElementById('insVisibilityLabel');
+                if (data.status === 'success') {
+                    lbl.textContent  = cb.checked ? 'เปิดใช้งาน' : 'ปิดอยู่';
+                    lbl.className    = `text-[10px] font-bold leading-none ${cb.checked ? 'text-blue-600' : 'text-gray-400'}`;
+                } else {
+                    cb.checked = !cb.checked;
+                    alert(data.message);
+                }
+            });
+    };
 
     loadInsMembers(1);
 })();
