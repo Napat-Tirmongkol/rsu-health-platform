@@ -243,7 +243,7 @@ $csrfToken = get_csrf_token();
             const data = await res.json();
 
             resultDiv.classList.remove('hidden');
-            if (data.status === 'success') {
+            if (data.status === 'ok') {
                 resultDiv.innerHTML = `
                     <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-5 flex items-start gap-4">
                         <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600 shrink-0 text-lg">
@@ -413,7 +413,7 @@ $csrfToken = get_csrf_token();
         try {
             const res  = await fetch('ajax_insurance_sync.php', { method: 'POST', body: fd });
             const data = await res.json();
-            if (data.status === 'success') {
+            if (data.status === 'ok') {
                 closeInsMemberModal();
                 loadInsMembers(1);
             } else {
@@ -438,7 +438,7 @@ $csrfToken = get_csrf_token();
             .then(r => r.json())
             .then(data => {
                 const lbl = document.getElementById('insVisibilityLabel');
-                if (data.status === 'success') {
+                if (data.status === 'ok') {
                     lbl.textContent  = cb.checked ? 'เปิดใช้งาน' : 'ปิดอยู่';
                     lbl.className    = `text-[10px] font-bold leading-none ${cb.checked ? 'text-blue-600' : 'text-gray-400'}`;
                 } else {

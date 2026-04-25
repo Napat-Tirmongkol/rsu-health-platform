@@ -5,17 +5,16 @@ declare(strict_types=1);
 require_once __DIR__ . '/includes/auth.php';
 header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../includes/ajax_helpers.php';
 
 $adminRole = $_SESSION['admin_role'] ?? '';
 $isStaff   = !empty($_SESSION['is_ecampaign_staff']);
 if (($isStaff && $adminRole === '') || !in_array($adminRole, ['admin', 'superadmin', 'editor'], true)) {
-    echo json_encode(['status' => 'error', 'message' => 'ไม่มีสิทธิ์เข้าถึงระบบนี้']);
-    exit;
+    json_err('ไม่มีสิทธิ์เข้าถึงระบบนี้', 403);
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
-    exit;
+    json_err('Method Not Allowed', 405);
 }
 
 // CSRF: accept same-origin header OR session token
@@ -24,14 +23,11 @@ $expectedOrigin = $proto . '://' . ($_SERVER['HTTP_HOST'] ?? '');
 $originOk       = (($_SERVER['HTTP_ORIGIN'] ?? '') === $expectedOrigin);
 $sessionOk      = verify_csrf_token($_POST['csrf_token'] ?? '');
 if (!$originOk && !$sessionOk) {
-    http_response_code(403);
-    echo json_encode(['status' => 'error', 'message' => 'CSRF validation failed กรุณาโหลดหน้าใหม่']);
-    exit;
+    json_err('CSRF validation failed กรุณาโหลดหน้าใหม่', 403);
 }
 
 if (empty($_POST) && !empty($_SERVER['CONTENT_LENGTH']) && (int)$_SERVER['CONTENT_LENGTH'] > 0) {
-    echo json_encode(['status' => 'error', 'message' => 'ไฟล์มีขนาดใหญ่เกิน limit (' . ini_get('post_max_size') . ')']);
-    exit;
+    json_err('ไฟล์มีขนาดใหญ่เกิน limit (' . ini_get('post_max_size') . ')');
 }
 
 $action = $_POST['action'] ?? '';
@@ -112,15 +108,13 @@ function norm_date(?string $d): ?string
 // ══════════════════════════════════════════════════════════════════════════════
 if ($action === 'upload') {
     if (!isset($_FILES['insurance_file']) || $_FILES['insurance_file']['error'] !== UPLOAD_ERR_OK) {
-        echo json_encode(['status' => 'error', 'message' => 'กรุณาเลือกไฟล์ก่อนอัปโหลด']);
-        exit;
+        json_err('กรุณาเลือกไฟล์ก่อนอัปโหลด');
     }
 
     $raw    = file_get_contents($_FILES['insurance_file']['tmp_name']);
     $parsed = parse_csv(decode_csv($raw));
     if (isset($parsed['error'])) {
-        echo json_encode(['status' => 'error', 'message' => $parsed['error']]);
-        exit;
+        json_err($parsed['error']);
     }
 
     ensure_insurance_table($pdo);
@@ -152,8 +146,8 @@ if ($action === 'upload') {
     $existing = $pdo->query("SELECT member_id FROM insurance_members")->fetchAll(PDO::FETCH_COLUMN);
     $existSet = array_flip($existing);
 
-    $cntNew        = 0;
-    $cntUpdated    = 0;
+    $cntNew         = 0;
+    $cntUpdated     = 0;
     $cntInactivated = 0;
 
     $upsert = $pdo->prepare("
@@ -207,20 +201,17 @@ if ($action === 'upload') {
         $pdo->commit();
     } catch (Exception $e) {
         $pdo->rollBack();
-        echo json_encode(['status' => 'error', 'message' => 'เกิดข้อผิดพลาด: ' . $e->getMessage()]);
-        exit;
+        json_err('เกิดข้อผิดพลาด: ' . $e->getMessage());
     }
 
     log_activity('insurance_upload', "total={$totalCsv}, new={$cntNew}, updated={$cntUpdated}, inactivated={$cntInactivated}");
 
-    echo json_encode([
-        'status'           => 'success',
-        'total_csv'        => $totalCsv,
-        'total_new'        => $cntNew,
-        'total_updated'    => $cntUpdated,
-        'total_inactivated'=> $cntInactivated,
+    json_ok([
+        'total_csv'         => $totalCsv,
+        'total_new'         => $cntNew,
+        'total_updated'     => $cntUpdated,
+        'total_inactivated' => $cntInactivated,
     ]);
-    exit;
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -246,12 +237,12 @@ if ($action === 'list_members') {
         $params[':s3'] = "%{$search}%";
     }
     if ($fType !== '') {
-        $where[]        = 'member_status = :ft';
-        $params[':ft']  = $fType;
+        $where[]       = 'member_status = :ft';
+        $params[':ft'] = $fType;
     }
     if (in_array($fStatus, ['Active', 'Inactive'], true)) {
-        $where[]        = 'insurance_status = :fs';
-        $params[':fs']  = $fStatus;
+        $where[]       = 'insurance_status = :fs';
+        $params[':fs'] = $fStatus;
     }
 
     $wSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
@@ -269,54 +260,39 @@ if ($action === 'list_members') {
     ");
     $stmt->execute($params);
 
-    echo json_encode([
-        'status'   => 'ok',
+    json_ok([
         'total'    => $total,
         'page'     => $page,
         'per_page' => $perPage,
         'members'  => $stmt->fetchAll(PDO::FETCH_ASSOC),
     ]);
-    exit;
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
 // ACTION: save_member — insert or update a single member record
 // ══════════════════════════════════════════════════════════════════════════════
 if ($action === 'save_member') {
-    $mid     = trim($_POST['member_id']        ?? '');
-    $isEdit  = ($_POST['is_edit']              ?? '0') === '1';
-    $fn      = trim($_POST['full_name']        ?? '');
-    $ms      = trim($_POST['member_status']    ?? '');
-    $ins     = $_POST['insurance_status']      ?? 'Active';
-    $cid     = trim($_POST['citizen_id']       ?? '');
-    $pn      = trim($_POST['policy_number']    ?? '');
-    $cs      = trim($_POST['coverage_start']   ?? '') ?: null;
-    $ce      = trim($_POST['coverage_end']     ?? '') ?: null;
-    $rem     = trim($_POST['remarks']          ?? '');
+    $mid    = trim($_POST['member_id']      ?? '');
+    $isEdit = ($_POST['is_edit']            ?? '0') === '1';
+    $fn     = trim($_POST['full_name']      ?? '');
+    $ms     = trim($_POST['member_status']  ?? '');
+    $ins    = $_POST['insurance_status']    ?? 'Active';
+    $cid    = trim($_POST['citizen_id']     ?? '');
+    $pn     = trim($_POST['policy_number']  ?? '');
+    $cs     = trim($_POST['coverage_start'] ?? '') ?: null;
+    $ce     = trim($_POST['coverage_end']   ?? '') ?: null;
+    $rem    = trim($_POST['remarks']        ?? '');
 
-    if ($mid === '') {
-        echo json_encode(['status' => 'error', 'message' => 'กรุณาระบุรหัสสมาชิก']);
-        exit;
-    }
-    if (!in_array($ins, ['Active', 'Inactive'], true)) {
-        echo json_encode(['status' => 'error', 'message' => 'สถานะสิทธิ์ไม่ถูกต้อง']);
-        exit;
-    }
+    if ($mid === '') json_err('กรุณาระบุรหัสสมาชิก');
+    if (!in_array($ins, ['Active', 'Inactive'], true)) json_err('สถานะสิทธิ์ไม่ถูกต้อง');
 
     ensure_insurance_table($pdo);
 
     if ($isEdit) {
-        $exists = (int)$pdo->prepare("SELECT COUNT(*) FROM insurance_members WHERE member_id = :mid")
-            ->execute([':mid' => $mid]) ?
-            (function() use ($pdo, $mid) {
-                $s = $pdo->prepare("SELECT COUNT(*) FROM insurance_members WHERE member_id = :mid");
-                $s->execute([':mid' => $mid]);
-                return (int)$s->fetchColumn();
-            })() : 0;
-
-        if (!$exists) {
-            echo json_encode(['status' => 'error', 'message' => 'ไม่พบสมาชิกรหัส ' . htmlspecialchars($mid)]);
-            exit;
+        $s = $pdo->prepare("SELECT COUNT(*) FROM insurance_members WHERE member_id = :mid");
+        $s->execute([':mid' => $mid]);
+        if ((int)$s->fetchColumn() === 0) {
+            json_err('ไม่พบสมาชิกรหัส ' . htmlspecialchars($mid));
         }
 
         $pdo->prepare("
@@ -337,8 +313,7 @@ if ($action === 'save_member') {
         $dup = $pdo->prepare("SELECT COUNT(*) FROM insurance_members WHERE member_id = :mid");
         $dup->execute([':mid' => $mid]);
         if ((int)$dup->fetchColumn() > 0) {
-            echo json_encode(['status' => 'error', 'message' => "รหัสสมาชิก {$mid} มีอยู่ในระบบแล้ว"]);
-            exit;
+            json_err("รหัสสมาชิก {$mid} มีอยู่ในระบบแล้ว");
         }
 
         $pdo->prepare("
@@ -352,8 +327,7 @@ if ($action === 'save_member') {
         log_activity('insurance_add', "เพิ่มสมาชิก member_id={$mid}");
     }
 
-    echo json_encode(['status' => 'success']);
-    exit;
+    json_ok();
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -377,13 +351,11 @@ if ($action === 'set_visibility') {
             ON DUPLICATE KEY UPDATE setting_value = :val2
         ")->execute([':val' => $activeVal, ':val2' => $activeVal]);
     } catch (Exception $e) {
-        echo json_encode(['status' => 'error', 'message' => 'ไม่สามารถบันทึกข้อมูลได้: ' . $e->getMessage()]);
-        exit;
+        json_err('ไม่สามารถบันทึกข้อมูลได้: ' . $e->getMessage());
     }
 
     log_activity('update_site_settings', 'Toggle Insurance Card: ' . ($active ? 'ON' : 'OFF'));
-    echo json_encode(['status' => 'success']);
-    exit;
+    json_ok();
 }
 
-echo json_encode(['status' => 'error', 'message' => 'Unknown action']);
+json_err('Unknown action');
