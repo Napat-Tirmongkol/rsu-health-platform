@@ -242,6 +242,11 @@ $typeColor = ['vaccine' => '#0052CC', 'training' => '#6366f1', 'health_check' =>
     <!-- Scanner Box -->
     <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden mb-4">
         <div class="p-4">
+            <div class="flex justify-end mb-3">
+                <button id="btnToggleCam" class="text-[10px] font-bold text-[#0052CC] bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors">
+                    <i class="fa-solid fa-video mr-1"></i>ปิดกล้อง
+                </button>
+            </div>
             <div id="qr-reader" class="w-full rounded-2xl overflow-hidden scanner-ring"></div>
             <div class="mt-4 text-center">
                 <p id="scan-status" class="text-sm font-bold text-[#0052CC] animate-pulse">กำลังเปิดกล้อง...</p>
@@ -250,13 +255,13 @@ $typeColor = ['vaccine' => '#0052CC', 'training' => '#6366f1', 'health_check' =>
 
         <!-- Manual input -->
         <div class="border-t border-gray-100 px-4 py-3">
-            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2">หรือกรอก Booking ID</p>
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-3">หรือใช้เครื่องยิงบาร์โค้ด / กรอกรหัส</p>
             <div class="flex gap-2">
-                <input type="number" id="manualId" placeholder="เช่น 42" min="1"
-                    class="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100">
+                <input type="text" id="manualId" placeholder="เช่น 42 หรือรหัสจากเครื่องยิง"
+                    class="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all">
                 <button onclick="submitManual()"
-                    class="bg-[#0052CC] hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-bold transition-colors active:scale-95">
-                    <i class="fa-solid fa-check"></i>
+                    class="bg-[#0052CC] hover:bg-blue-700 text-white px-5 py-3 rounded-xl text-sm font-bold transition-colors active:scale-95">
+                    <i class="fa-solid fa-paper-plane"></i>
                 </button>
             </div>
         </div>
@@ -356,7 +361,7 @@ function selectCampaign(id, name) {
 
 // ── Camera ─────────────────────────────────────────────────────────────────
 function startCamera() {
-    if (html5QrCode) return; // already running
+    if (html5QrCode && html5QrCode.isScanning) return; // already running
     html5QrCode = new Html5Qrcode('qr-reader');
     setStatus('กำลังเปิดกล้อง...', 'blue');
 
@@ -370,6 +375,7 @@ function startCamera() {
         () => { /* frame errors: ignore */ }
     ).then(() => {
         setStatus('พร้อมสแกน', 'green');
+        document.getElementById('btnToggleCam').innerHTML = '<i class="fa-solid fa-video mr-1"></i>ปิดกล้อง';
     }).catch(err => {
         console.error(err);
         setStatus('ไม่สามารถเปิดกล้องได้ — ลองกรอก ID แทน', 'red');
@@ -464,12 +470,13 @@ function processCheckin(qrData, isManual, isConfirmed = false) {
 }
 
 function submitManual() {
-    const id = document.getElementById('manualId').value.trim();
-    if (!id || isNaN(id) || parseInt(id) <= 0) {
-        showToast('error', 'กรุณากรอก Booking ID ที่ถูกต้อง');
+    const val = document.getElementById('manualId').value.trim();
+    if (!val) {
+        showToast('error', 'กรุณากรอกรหัส หรือใช้เครื่องยิงบาร์โค้ด');
         return;
     }
-    processCheckin('BOOKING-ID:' + id, true);
+    processCheckin(val, true);
+    document.getElementById('manualId').value = ''; // ล้างค่าหลังส่ง
 }
 
 // ── UI helpers ─────────────────────────────────────────────────────────────
@@ -556,8 +563,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Enter') submitManual();
     });
 
+    // Camera Toggle handler
+    document.getElementById('btnToggleCam')?.addEventListener('click', async () => {
+        if (html5QrCode && html5QrCode.isScanning) {
+            await html5QrCode.stop();
+            document.getElementById('btnToggleCam').innerHTML = '<i class="fa-solid fa-video-slash mr-1"></i>เปิดกล้อง';
+            setStatus('ปิดกล้องแล้ว', 'gray');
+        } else {
+            startCamera();
+        }
+    });
+
     // QR File Upload handler
-    document.getElementById('qr-file')?.addEventListener('change', e => {
+    document.getElementById('qr-file')?.addEventListener('change', async e => {
         if (!activeCampaignId) {
             showToast('warning', 'กรุณาเลือกแคมเปญก่อน');
             e.target.value = '';
@@ -572,17 +590,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         setStatus('กำลังอ่านรูปภาพ...', 'orange');
-        html5QrCode.scanFile(file, true)
-            .then(decoded => {
-                processCheckin(decoded, false);
-                e.target.value = '';
-            })
-            .catch(err => {
-                console.error(err);
-                showToast('error', 'ไม่พบ QR Code ในรูปภาพนี้');
-                setStatus('พร้อมสแกน', 'green');
-                e.target.value = '';
-            });
+        
+        try {
+            // หยุดกล้องชั่วคราวถ้ากำลังสแกนอยู่
+            if (html5QrCode.isScanning) {
+                await html5QrCode.pause();
+            }
+
+            const decoded = await html5QrCode.scanFile(file, true);
+            processCheckin(decoded, false);
+            e.target.value = '';
+        } catch (err) {
+            console.error(err);
+            showToast('error', 'ไม่พบ QR Code ในรูปภาพนี้');
+            setStatus('พร้อมสแกน', 'green');
+            e.target.value = '';
+            
+            // กลับมาเปิดกล้องต่อ
+            if (html5QrCode.getState() === 3) { // PAUSED
+                html5QrCode.resume();
+            }
+        }
     });
 });
 </script>

@@ -78,6 +78,14 @@ require_once __DIR__ . '/../config.php';
 </div>
 
 <div class="max-w-md mx-auto p-5 mt-4">
+    <!-- ปุ่มเปิด/ปิดกล้อง -->
+    <div class="flex justify-center mb-6">
+        <button id="btn-toggle-camera" class="bg-blue-600 text-white px-6 py-2.5 rounded-2xl font-bold text-sm shadow-lg hover:bg-blue-700 active:scale-95 transition-all flex items-center gap-2">
+            <i class="fa-solid fa-camera"></i>
+            <span id="toggle-text">ปิดกล้อง</span>
+        </button>
+    </div>
+
     <div class="bg-white p-4 rounded-3xl shadow-lg border border-gray-100 relative overflow-hidden" id="scanner-container">
         <div id="reader" class="w-full rounded-2xl overflow-hidden bg-black relative"></div>
         <div class="mt-6 text-center pb-2">
@@ -95,6 +103,18 @@ require_once __DIR__ . '/../config.php';
             <span class="text-sm font-semibold text-gray-600">เลือกรูปภาพเพื่อสแกน</span>
             <input type="file" id="qr-input-file" accept="image/*" class="hidden">
         </label>
+    </div>
+
+    <!-- ส่วนกรอกรหัส/ใช้เครื่องยิงบาร์โค้ด -->
+    <div class="mt-4 bg-white p-6 rounded-3xl shadow-lg border border-gray-100">
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-3">กรอกรหัส หรือใช้เครื่องยิงบาร์โค้ด</p>
+        <div class="flex gap-2">
+            <input type="text" id="manual-input-id" placeholder="เช่น 42 หรือรหัสจากเครื่องยิง" class="flex-1 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-blue-400 transition-all">
+            <button id="btn-submit-manual" class="bg-blue-600 text-white px-5 py-3 rounded-2xl font-bold text-sm shadow-md hover:bg-blue-700 active:scale-95 transition-all">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </div>
+        <p class="text-[9px] text-gray-400 mt-2"><i class="fa-solid fa-circle-info mr-1"></i>เครื่องยิงบาร์โค้ดจะทำงานอัตโนมัติเมื่อวางเคอร์เซอร์ในช่องนี้</p>
     </div>
 </div>
 
@@ -189,52 +209,108 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
-    // เริ่มเปิดกล้อง โดยบังคับใช้กล้องหลัง (environment)
-    html5QrCode.start(
-        { facingMode: "environment" }, 
-        { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 },
-        (decodedText, decodedResult) => {
-            html5QrCode.pause(); // หยุดกล้องตอนสแกนติด
-            processQRCode(decodedText);
-        },
-        (errorMessage) => {
-            // ไม่ต้องทำอะไร ปล่อยให้มันหา QR ต่อไป
+    // ฟังก์ชันเปิด/ปิดกล้อง
+    const toggleBtn = document.getElementById('btn-toggle-camera');
+    const toggleText = document.getElementById('toggle-text');
+
+    async function startCamera() {
+        try {
+            await html5QrCode.start(
+                { facingMode: "environment" }, 
+                { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 },
+                (decodedText) => {
+                    html5QrCode.pause();
+                    processQRCode(decodedText);
+                },
+                () => {}
+            );
+            document.getElementById('scan-status').innerText = 'พร้อมสแกน...';
+            document.getElementById('scan-status').className = 'text-sm font-bold text-green-500 animate-pulse';
+            toggleBtn.className = 'bg-blue-600 text-white px-6 py-2.5 rounded-2xl font-bold text-sm shadow-lg hover:bg-blue-700 active:scale-95 transition-all flex items-center gap-2';
+            toggleText.innerText = 'ปิดกล้อง';
+        } catch (err) {
+            console.error("Camera error", err);
+            document.getElementById('scan-status').innerText = 'ไม่สามารถเปิดกล้องได้';
+            document.getElementById('scan-status').className = 'text-sm font-bold text-red-500';
         }
-    ).catch((err) => {
-        console.error("Camera error", err);
-        document.getElementById('scan-status').innerText = 'ไม่สามารถเปิดกล้องได้';
-        document.getElementById('scan-status').className = 'text-sm font-bold text-red-500';
+    }
+
+    async function stopCamera() {
+        if (html5QrCode.isScanning) {
+            await html5QrCode.stop();
+            document.getElementById('scan-status').innerText = 'ปิดกล้องแล้ว';
+            document.getElementById('scan-status').className = 'text-sm font-bold text-gray-400';
+            toggleBtn.className = 'bg-gray-500 text-white px-6 py-2.5 rounded-2xl font-bold text-sm shadow-lg hover:bg-gray-600 active:scale-95 transition-all flex items-center gap-2';
+            toggleText.innerText = 'เปิดกล้อง';
+        }
+    }
+
+    toggleBtn.addEventListener('click', async () => {
+        if (html5QrCode.isScanning) {
+            await stopCamera();
+        } else {
+            await startCamera();
+        }
     });
+
+    // เริ่มต้นเปิดกล้อง
+    startCamera();
 
     // เพิ่มตัวดักจับการอัปโหลดไฟล์
     const fileInput = document.getElementById('qr-input-file');
-    fileInput.addEventListener('change', e => {
+    fileInput.addEventListener('change', async e => {
         if (e.target.files.length === 0) return;
         const imageFile = e.target.files[0];
         
         document.getElementById('scan-status').innerText = 'กำลังประมวลผลรูปภาพ...';
         document.getElementById('scan-status').className = 'text-sm font-bold text-orange-500 animate-pulse';
 
-        // ใช้ html5QrCode สแกนจากไฟล์
-        html5QrCode.scanFile(imageFile, true)
-            .then(decodedText => {
-                processQRCode(decodedText);
-                fileInput.value = ''; // clear input
-            })
-            .catch(err => {
-                console.error(err);
-                Swal.fire({
-                    title: 'ไม่พบ QR Code',
-                    text: 'ไม่สามารถอ่าน QR Code จากรูปภาพนี้ได้ กรุณาลองด้วยรูปภาพอื่น',
-                    icon: 'error',
-                    confirmButtonColor: '#0052CC',
-                    customClass: { title: 'font-prompt', popup: 'font-prompt rounded-3xl' }
-                });
-                document.getElementById('scan-status').innerText = 'พร้อมสแกน...';
-                document.getElementById('scan-status').className = 'text-sm font-bold text-green-500 animate-pulse';
-                fileInput.value = ''; // clear input
+        try {
+            // หยุดการสแกนจากกล้องชั่วคราว (ถ้าเปิดอยู่) ก่อนจะสแกนไฟล์
+            if (html5QrCode.isScanning) {
+                await html5QrCode.pause();
+            }
+
+            // ใช้ html5QrCode สแกนจากไฟล์
+            const decodedText = await html5QrCode.scanFile(imageFile, true);
+            processQRCode(decodedText);
+            fileInput.value = ''; // clear input
+        } catch (err) {
+            console.error(err);
+            Swal.fire({
+                title: 'ไม่พบ QR Code',
+                text: 'ไม่สามารถอ่าน QR Code จากรูปภาพนี้ได้ กรุณาลองด้วยรูปภาพอื่น',
+                icon: 'error',
+                confirmButtonColor: '#0052CC',
+                customClass: { title: 'font-prompt', popup: 'font-prompt rounded-3xl' }
             });
+            
+            // กลับไปสถานะเดิม
+            document.getElementById('scan-status').innerText = 'พร้อมสแกน...';
+            document.getElementById('scan-status').className = 'text-sm font-bold text-green-500 animate-pulse';
+            fileInput.value = ''; // clear input
+            
+            // กลับมาเปิดกล้องต่อ (ถ้าโดนหยุดไป)
+            if (html5QrCode.getState() === 3) { // 3 = PAUSED
+                html5QrCode.resume();
+            }
+        }
+    // จัดการการกรอกรหัส/เครื่องยิงบาร์โค้ด
+    const manualInput = document.getElementById('manual-input-id');
+    const btnSubmitManual = document.getElementById('btn-submit-manual');
+
+    function submitManual() {
+        const val = manualInput.value.trim();
+        if (val) {
+            processQRCode(val);
+            manualInput.value = '';
+        }
+    }
+
+    manualInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') submitManual();
     });
+    btnSubmitManual.addEventListener('click', submitManual);
 });
 </script>
 </body>
