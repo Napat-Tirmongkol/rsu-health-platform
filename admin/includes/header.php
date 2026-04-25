@@ -241,6 +241,12 @@ if (!function_exists('renderPageHeader')) {
             <?php navLink('../admin/index.php', 'fa-chart-pie', 'Dashboard', $cur); ?>
         </div>
 
+        <!-- Analytics -->
+        <div class="nav-section-label">Analytics</div>
+        <div class="space-y-0.5 mb-1">
+            <?php navLink('../admin/kpi.php', 'fa-gauge-high', 'KPI Dashboard', $cur); ?>
+        </div>
+
         <!-- Campaign Management -->
         <div class="nav-section-label">Campaign</div>
         <div class="space-y-0.5">

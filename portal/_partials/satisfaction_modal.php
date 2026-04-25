@@ -454,22 +454,17 @@
     document.getElementById('smBtnContent').innerHTML =
       '<div class="sm-spinner"></div><span>กำลังส่ง...</span>';
 
-    /* Simulate API call */
-    setTimeout(() => {
-      _showSuccess();
-      setTimeout(closeSurveyModal, 2000);
-    }, 900);
+    const fd = new FormData();
+    fd.append('rating',  _rating);
+    fd.append('comment', comment);
+    fd.append('context', window.location.pathname);
 
-    /* ── Replace this block with a real fetch() in production ──
-    fetch('/api/survey', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ rating: _rating, comment })
-    })
-    .then(r => r.json())
-    .then(() => { _showSuccess(); setTimeout(closeSurveyModal, 2000); })
-    .catch(() => { btn.disabled = false; btn.classList.remove('sm-loading'); });
-    */
+    fetch('../admin/ajax/ajax_save_survey.php', { method: 'POST', body: fd })
+      .then(d => {
+        if (d.ok) { _showSuccess(); setTimeout(closeSurveyModal, 2000); }
+        else { btn.disabled = false; btn.classList.remove('sm-loading'); }
+      })
+      .catch(() => { btn.disabled = false; btn.classList.remove('sm-loading'); });
   };
 
   function _showSuccess() {
