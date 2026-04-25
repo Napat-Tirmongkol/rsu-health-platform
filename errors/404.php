@@ -1,226 +1,66 @@
 <?php http_response_code(404); ?>
-<!doctype html>
+<!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>404 — ไม่พบหน้าที่ต้องการ</title>
-  <link rel="icon" href="/e-campaignv2/favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Prompt', sans-serif;
-      background: #f4f7f5;
-      min-height: 100dvh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      color: #0f172a;
-    }
-
-    .card {
-      background: #fff;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 24px;
-      padding: 48px 44px 40px;
-      max-width: 400px;
-      width: 100%;
-      text-align: center;
-      animation: up .5s cubic-bezier(.16,1,.3,1) both;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* top accent bar */
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, #2e9e63, #6ee7b7);
-      border-radius: 24px 24px 0 0;
-    }
-
-    @keyframes up {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .ghost-num {
-      font-size: 7rem;
-      font-weight: 900;
-      color: #f0faf4;
-      line-height: 1;
-      letter-spacing: -.04em;
-      margin-bottom: -8px;
-      user-select: none;
-    }
-
-    .icon-wrap {
-      width: 56px;
-      height: 56px;
-      background: #f0faf4;
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 20px;
-      color: #2e9e63;
-      font-size: 22px;
-      border: 1.5px solid #c7e8d5;
-    }
-
-    h1 {
-      font-size: 20px;
-      font-weight: 800;
-      color: #0f172a;
-      margin-bottom: 8px;
-      letter-spacing: -.01em;
-    }
-
-    .subtitle {
-      font-size: 13px;
-      font-weight: 500;
-      color: #64748b;
-      line-height: 1.7;
-      margin-bottom: 32px;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #f0faf4;
-      color: #2e7d52;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      padding: 4px 12px;
-      border-radius: 99px;
-      border: 1px solid #c7e8d5;
-      margin-bottom: 24px;
-    }
-
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      background: #2e9e63;
-      color: #fff;
-      font-family: 'Prompt', sans-serif;
-      font-weight: 700;
-      font-size: 13px;
-      padding: 12px 28px;
-      border-radius: 12px;
-      text-decoration: none;
-      border: none;
-      cursor: pointer;
-      width: 100%;
-      transition: background .18s, transform .18s;
-      letter-spacing: .01em;
-    }
-    .btn-primary:hover {
-      background: #237a4c;
-      transform: translateY(-1px);
-    }
-
-    .btn-ghost {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      color: #94a3b8;
-      font-family: 'Prompt', sans-serif;
-      font-size: 12px;
-      font-weight: 600;
-      text-decoration: none;
-      background: none;
-      border: none;
-      cursor: pointer;
-      margin-top: 10px;
-      padding: 6px 12px;
-      border-radius: 8px;
-      transition: color .18s, background .18s;
-      width: 100%;
-    }
-    .btn-ghost:hover {
-      color: #374151;
-      background: #f8fafc;
-    }
-
-    .divider {
-      height: 1px;
-      background: #f1f5f9;
-      margin: 28px 0;
-    }
-
-    .help-row {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      font-size: 11px;
-      color: #94a3b8;
-      font-weight: 500;
-    }
-    .help-row a {
-      color: #2e9e63;
-      font-weight: 700;
-      text-decoration: none;
-    }
-    .help-row a:hover { text-decoration: underline; }
-
-    @media (max-width: 480px) {
-      .card { padding: 36px 24px 32px; }
-      .ghost-num { font-size: 5rem; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .card { animation: none; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>404 — ไม่พบหน้าที่ต้องการ | RSU Medical Hub</title>
+    <script src="https://cdn.tailwindcss.com/3.4.1"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @font-face { font-family:'RSU'; src:url('../assets/fonts/RSU_Regular.ttf') format('truetype'); }
+        @font-face { font-family:'RSU'; src:url('../assets/fonts/RSU_BOLD.ttf') format('truetype'); font-weight:bold; }
+        body { font-family:'RSU', sans-serif; background-color: #F8FAFF; }
+        .premium-gradient { background: linear-gradient(135deg, #2e9e63 0%, #10b981 100%); }
+        .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.5); }
+    </style>
 </head>
-<body>
-  <div class="card">
-    <div class="badge">
-      <i class="fa-solid fa-magnifying-glass" style="font-size:9px"></i>
-      Error 404
+<body class="min-h-screen flex items-center justify-center p-6 bg-[#f0f4f9]">
+    <div class="w-full max-w-md text-center animate-in zoom-in fade-in duration-700">
+        <div class="glass-card rounded-[3.5rem] p-12 shadow-[0_30px_80px_rgba(0,0,0,0.06)] relative overflow-hidden">
+            <!-- Decorative circles -->
+            <div class="absolute -right-20 -top-20 w-48 h-48 bg-green-50 rounded-full blur-3xl opacity-30"></div>
+            <div class="absolute -left-20 -bottom-20 w-48 h-48 bg-emerald-50 rounded-full blur-3xl opacity-30"></div>
+            
+            <div class="relative z-10">
+                <div class="mb-6">
+                    <span class="px-4 py-1.5 bg-green-50 text-green-600 rounded-full text-[10px] font-black uppercase tracking-[0.2em] border border-green-100">Error 404</span>
+                </div>
+                
+                <h1 class="text-[8rem] font-black text-slate-100 leading-none mb-4 select-none tracking-tighter drop-shadow-sm">404</h1>
+                
+                <div class="w-20 h-20 premium-gradient rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-green-100 -mt-16 relative z-20">
+                    <i class="fa-solid fa-compass text-white text-3xl animate-pulse"></i>
+                </div>
+                
+                <h2 class="text-3xl font-black text-slate-900 mb-4 tracking-tight">ไม่พบหน้าที่ต้องการ</h2>
+                <p class="text-slate-400 text-sm font-bold mb-10 leading-relaxed px-4">
+                    ขออภัย ไม่พบหน้าที่คุณกำลังมองหา<br>
+                    อาจถูกย้าย ลบออก หรือ URL ไม่ถูกต้องครับ
+                </p>
+                
+                <div class="space-y-4">
+                    <a href="javascript:history.back()" 
+                       class="flex items-center justify-center gap-3 w-full py-5 premium-gradient text-white font-black rounded-2xl shadow-lg shadow-green-100 transition-all active:scale-95 text-sm uppercase tracking-wider">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        กลับหน้าก่อนหน้า
+                    </a>
+                    
+                    <a href="/e-campaignv2/user/hub.php" 
+                       class="flex items-center justify-center gap-3 w-full py-5 bg-white text-slate-400 font-black rounded-2xl border border-slate-100 hover:bg-slate-50 transition-all active:scale-95 text-sm uppercase tracking-wider">
+                        <i class="fa-solid fa-house"></i>
+                        ไปหน้าหลัก
+                    </a>
+                </div>
+                
+                <div class="mt-10 pt-8 border-t border-slate-100 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-circle-info text-green-300 text-[10px]"></i>
+                    <span class="text-slate-300 text-[10px] font-black uppercase tracking-widest">RSU Medical Clinic Services</span>
+                </div>
+            </div>
+        </div>
+        
+        <p class="mt-8 text-slate-300 text-[10px] font-black uppercase tracking-[0.3em]">System Health: Online</p>
     </div>
-
-    <div class="ghost-num">404</div>
-
-    <div class="icon-wrap">
-      <i class="fa-solid fa-compass"></i>
-    </div>
-
-    <h1>ไม่พบหน้าที่ต้องการ</h1>
-    <p class="subtitle">
-      ขออภัย ไม่พบหน้าที่คุณกำลังมองหา<br>
-      อาจถูกย้าย ลบออก หรือ URL ไม่ถูกต้อง
-    </p>
-
-    <a href="javascript:history.back()" class="btn-primary">
-      <i class="fa-solid fa-arrow-left" style="font-size:11px"></i>
-      กลับหน้าก่อนหน้า
-    </a>
-    <a href="/" class="btn-ghost">
-      <i class="fa-solid fa-house" style="font-size:10px"></i>
-      ไปหน้าแรก
-    </a>
-
-    <div class="divider"></div>
-
-    <div class="help-row">
-      <i class="fa-solid fa-circle-info" style="font-size:10px"></i>
-      หากพบปัญหา กรุณาติดต่อ
-      <a href="mailto:healthy@rsu.ac.th">healthy@rsu.ac.th</a>
-    </div>
-  </div>
 </body>
 </html>

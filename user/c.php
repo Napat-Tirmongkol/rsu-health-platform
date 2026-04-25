@@ -23,13 +23,13 @@ if ($lineUserId === '') {
             @font-face { font-family:'RSU'; src:url('../assets/fonts/RSU_Regular.ttf') format('truetype'); }
             @font-face { font-family:'RSU'; src:url('../assets/fonts/RSU_BOLD.ttf') format('truetype'); font-weight:bold; }
             body { font-family:'RSU', sans-serif; background:#F8FAFF; }
-            .premium-gradient { background: linear-gradient(135deg, #0052CC 0%, #0070F3 100%); }
+            .premium-gradient { background: linear-gradient(135deg, #2e9e63 0%, #10b981 100%); }
         </style>
     </head>
     <body class="flex items-center justify-center min-h-screen p-6">
         <div class="w-full max-w-md text-center">
             <div class="bg-white rounded-[3rem] p-10 shadow-xl border border-slate-100">
-                <div class="w-20 h-20 premium-gradient rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-lg shadow-blue-100">
+                <div class="w-20 h-20 premium-gradient rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-lg shadow-green-100">
                     <i class="fa-solid fa-user-shield text-white text-3xl"></i>
                 </div>
                 <h1 class="text-slate-900 font-bold text-2xl mb-4">กรุณาเข้าสู่ระบบด้วย LINE</h1>
@@ -107,16 +107,16 @@ $isActive = in_array($campaign['status'], ['active', 'private']);
         @font-face { font-family:'RSU'; src:url('../assets/fonts/RSU_Regular.ttf') format('truetype'); }
         @font-face { font-family:'RSU'; src:url('../assets/fonts/RSU_BOLD.ttf') format('truetype'); font-weight:bold; }
         body { font-family:'RSU', sans-serif; background-color: #f0f4f9; }
-        .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.4); }
+        .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.4); }
         .premium-shadow { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08); }
-        .rsu-blue { color: #0052CC; }
-        .rsu-bg-blue { background-color: #0052CC; }
+        .rsu-main-color { color: #2e9e63; }
+        .rsu-bg-main { background-color: #2e9e63; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
     <div class="w-full max-w-lg glass-card rounded-[2.5rem] premium-shadow overflow-hidden p-8 text-center">
         <div class="mb-6">
-            <span class="px-4 py-1.5 bg-blue-50 text-blue-600 rounded-full text-xs font-bold uppercase tracking-wider">แคมเปญพิเศษ</span>
+            <span class="px-4 py-1.5 bg-green-50 text-green-600 rounded-full text-xs font-bold uppercase tracking-wider border border-green-100">แคมเปญพิเศษ</span>
         </div>
         
         <h1 class="text-3xl font-bold text-slate-800 mb-4 leading-tight"><?= htmlspecialchars($campaign['title']) ?></h1>
@@ -145,7 +145,7 @@ $isActive = in_array($campaign['status'], ['active', 'private']);
             </div>
         <?php else: ?>
             <a href="booking_date.php?campaign_id=<?= $campaign['id'] ?>" 
-               class="block w-full rsu-bg-blue hover:bg-blue-700 text-white font-bold py-6 rounded-3xl shadow-xl shadow-blue-100 transition-all active:scale-95 text-lg">
+               class="block w-full rsu-bg-main hover:bg-emerald-700 text-white font-bold py-6 rounded-3xl shadow-xl shadow-green-100 transition-all active:scale-95 text-lg">
                 <i class="fa-solid fa-calendar-check mr-2"></i>
                 จองคิวทันที
             </a>

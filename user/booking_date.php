@@ -92,7 +92,7 @@ function getDensity($d, $stats) {
         @font-face { font-family: 'RSU'; src: url('../assets/fonts/RSU_BOLD.ttf') format('truetype'); font-weight: bold; }
         body { font-family: 'RSU', sans-serif; background-color: #F8FAFF; }
         .glass-header { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
-        .active-day { background: #0052CC !important; color: white !important; box-shadow: 0 10px 20px rgba(0, 82, 204, 0.2); }
+        .active-day { background: #2e9e63 !important; color: white !important; box-shadow: 0 10px 20px rgba(46, 158, 99, 0.2); }
     </style>
 </head>
 <body class="pb-32">
@@ -191,7 +191,7 @@ function getDensity($d, $stats) {
                 <span class="text-[8px] font-black uppercase tracking-[0.1em]">Booking</span>
             </button>
             <div class="relative -mt-14">
-                <button onclick="window.location.href='hub.php?action=campaigns'" class="w-16 h-16 bg-blue-600 rounded-[1.8rem] rotate-45 flex items-center justify-center text-white shadow-[0_15px_30px_rgba(0,82,204,0.4)] border-[6px] border-[#F8FAFF] active:scale-90 transition-all group">
+                <button onclick="window.location.href='hub.php?action=campaigns'" class="w-16 h-16 bg-[#2e9e63] rounded-[1.8rem] rotate-45 flex items-center justify-center text-white shadow-[0_15px_30px_rgba(46,158,99,0.4)] border-[6px] border-[#F8FAFF] active:scale-90 transition-all group">
                     <i class="fa-solid fa-plus text-2xl -rotate-45 group-hover:scale-125 transition-transform"></i>
                 </button>
             </div>
@@ -217,7 +217,7 @@ function getDensity($d, $stats) {
             const btnNext = document.getElementById('btn-next');
             btnNext.disabled = false;
             btnNext.classList.remove('bg-slate-100', 'text-slate-300', 'shadow-slate-100');
-            btnNext.classList.add('bg-blue-600', 'text-white', 'shadow-blue-100');
+            btnNext.classList.add('bg-[#2e9e63]', 'text-white', 'shadow-green-100');
         }
 
         function changeMonth(y, m) {

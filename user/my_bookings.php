@@ -174,7 +174,7 @@ function renderBookingCard($b): void {
                         <p class="font-bold text-gray-900 text-[15px] leading-tight">
                             <?= $dow ?>, <?= $dateLabel ?>
                         </p>
-                        <p class="text-[13px] text-[#0052CC] font-semibold mt-0.5">
+                        <p class="text-[13px] text-[#2e9e63] font-semibold mt-0.5">
                             <i class="fa-regular fa-clock text-xs mr-1"></i><?= $timeLabel ?>
                         </p>
                     </div>
@@ -247,8 +247,8 @@ function renderBookingCard($b): void {
     <!-- Quick stats panel -->
     <div class="px-6 mb-8">
         <div class="bg-gray-50/80 backdrop-blur-md border border-gray-100 rounded-3xl p-4 shadow-sm flex gap-3">
-            <div class="flex-1 bg-white rounded-2xl p-3 text-center border border-blue-100/50 shadow-sm">
-                <p class="text-xl font-black text-[#0052CC]"><?= count($upcomingBookings) ?></p>
+            <div class="flex-1 bg-white rounded-2xl p-3 text-center border border-green-100/50 shadow-sm">
+                <p class="text-xl font-black text-[#2e9e63]"><?= count($upcomingBookings) ?></p>
                 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5"><?= __('bookings.stat_pending') ?></p>
             </div>
             <div class="flex-1 bg-white rounded-2xl p-3 text-center border border-gray-100 shadow-sm">
@@ -269,7 +269,7 @@ function renderBookingCard($b): void {
     <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-1.5 mb-5 flex">
         <button id="tab-upcoming"
                 onclick="switchTab('upcoming')"
-                class="flex-1 py-2.5 text-sm font-bold rounded-xl bg-[#0052CC] text-white shadow-md transition-all">
+                class="flex-1 py-2.5 text-sm font-bold rounded-xl bg-[#2e9e63] text-white shadow-md transition-all">
             <i class="fa-solid fa-calendar-clock mr-1.5 text-xs"></i>
             <?= __('bookings.tab_upcoming') ?>
             <span class="ml-1 bg-white/25 text-white px-2 py-0.5 rounded-full text-[10px]"><?= count($upcomingBookings) ?></span>
@@ -287,8 +287,8 @@ function renderBookingCard($b): void {
     <div id="content-upcoming" class="space-y-3">
         <?php if (count($upcomingBookings) === 0): ?>
         <div class="flex flex-col items-center justify-center py-16 text-center">
-            <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-4">
-                <i class="fa-regular fa-calendar-check text-3xl text-blue-300"></i>
+            <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-4">
+                <i class="fa-regular fa-calendar-check text-3xl text-green-300"></i>
             </div>
             <p class="font-bold text-gray-700 text-base"><?= __('bookings.no_upcoming') ?></p>
             <p class="text-sm text-gray-400 mt-1"><?= __('bookings.no_upcoming_sub') ?></p>
@@ -318,8 +318,8 @@ function renderBookingCard($b): void {
 <!-- Floating Action Button -->
 <div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto p-4 z-20">
     <div class="bg-white/80 backdrop-blur-md rounded-2xl border border-gray-100 shadow-xl p-2">
-        <a href="booking_campaign.php"
-           class="flex w-full items-center justify-center gap-2 bg-gradient-to-r from-[#0052CC] to-[#0070f3] hover:from-[#0047b3] hover:to-[#005fd9] text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-200 active:scale-[0.97]">
+        <a href="hub.php"
+           class="flex w-full items-center justify-center gap-2 bg-gradient-to-r from-[#2e9e63] to-[#10b981] hover:from-[#237a4c] hover:to-[#059669] text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-green-200 active:scale-[0.97]">
             <i class="fa-solid fa-plus"></i>
             <span class="font-prompt"><?= __('bookings.add_btn') ?></span>
         </a>
@@ -363,7 +363,7 @@ function renderBookingCard($b): void {
                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
                         <i class="fa-solid fa-layer-group mr-1"></i><?= __('bookings.modal_lbl_activity') ?>
                     </p>
-                    <p id="modal-campaign" class="font-bold text-[#0052CC] text-base font-prompt"></p>
+                    <p id="modal-campaign" class="font-bold text-[#2e9e63] text-base font-prompt"></p>
                 </div>
                 <div class="h-px bg-gray-200"></div>
                 <div class="grid grid-cols-2 gap-4">
@@ -392,7 +392,7 @@ function renderBookingCard($b): void {
 
             <!-- QR Code -->
             <div id="modal-qr-section" class="text-center">
-                <div class="inline-block bg-white p-4 rounded-2xl border-2 border-gray-100 shadow-[0_4px_24px_rgba(0,82,204,0.08)] mb-3 relative">
+                <div class="inline-block bg-white p-4 rounded-2xl border-2 border-gray-100 shadow-[0_4px_24px_rgba(46,158,99,0.08)] mb-3 relative">
                     <img id="modal-qrcode" src="" alt="QR Code" class="w-44 h-44 mx-auto" />
                     <div id="modal-qr-overlay"
                          class="absolute inset-0 bg-white/90 backdrop-blur-sm hidden items-center justify-center rounded-xl flex-col gap-2">
@@ -419,7 +419,7 @@ function switchTab(tab) {
     const btnHis = document.getElementById('tab-history');
     const contUp  = document.getElementById('content-upcoming');
     const contHis = document.getElementById('content-history');
-    const activeClass = 'flex-1 py-2.5 text-sm font-bold rounded-xl bg-[#0052CC] text-white shadow-md transition-all';
+    const activeClass = 'flex-1 py-2.5 text-sm font-bold rounded-xl bg-[#2e9e63] text-white shadow-md transition-all';
     const inactiveClass = 'flex-1 py-2.5 text-sm font-bold rounded-xl text-gray-500 hover:text-gray-700 transition-all';
     if (tab === 'upcoming') {
         btnUp.className  = activeClass;
@@ -442,7 +442,7 @@ function switchTab(tab) {
 Swal.fire({
     title: '<?= __('bookings.swal_dup_title') ?>',
     text: '<?= __('bookings.swal_dup_text') ?>',
-    icon: 'warning', confirmButtonColor: '#0052CC', confirmButtonText: '<?= __('bookings.swal_dup_btn') ?>',
+    icon: 'warning', confirmButtonColor: '#2e9e63', confirmButtonText: '<?= __('bookings.swal_dup_btn') ?>',
     customClass: { popup: 'font-prompt rounded-2xl', confirmButton: 'font-prompt rounded-xl px-5' }
 });
 window.history.replaceState(null, null, window.location.pathname);
@@ -592,12 +592,12 @@ function openLogout() {
             <i class="fa-solid fa-house-chimney text-xl"></i>
             <span class="text-[8px] font-black uppercase tracking-[0.1em]">Home</span>
         </button>
-        <button onclick="location.reload()" class="flex flex-col items-center gap-1.5 text-blue-600 transition-all scale-110">
+        <button onclick="location.reload()" class="flex flex-col items-center gap-1.5 text-green-600 transition-all scale-110">
             <i class="fa-solid fa-calendar-day text-xl"></i>
             <span class="text-[8px] font-black uppercase tracking-[0.1em]">Booking</span>
         </button>
         <div class="relative -mt-14">
-            <button onclick="window.location.href='hub.php#camps'" class="w-16 h-16 bg-blue-600 rounded-[1.8rem] rotate-45 flex items-center justify-center text-white shadow-[0_15px_30px_rgba(0,82,204,0.4)] border-[6px] border-[#F8FAFF] active:scale-90 transition-all group">
+            <button onclick="window.location.href='hub.php#camps'" class="w-16 h-16 bg-[#2e9e63] rounded-[1.8rem] rotate-45 flex items-center justify-center text-white shadow-[0_15px_30px_rgba(46,158,99,0.4)] border-[6px] border-[#F8FAFF] active:scale-90 transition-all group">
                 <i class="fa-solid fa-plus text-2xl -rotate-45 group-hover:scale-125 transition-transform"></i>
             </button>
         </div>

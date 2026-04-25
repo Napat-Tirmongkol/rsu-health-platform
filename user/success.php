@@ -116,14 +116,14 @@ $displayCode = 'CAMP-' . str_pad((string)$appointmentId, 5, '0', STR_PAD_LEFT);
                             ];
                             foreach ($rows as $row): ?>
                             <div class="flex gap-4 items-start">
-                                <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
-                                    <i class="fa-solid <?= $row['icon'] ?> text-[#0052CC]"></i>
+                                <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center shrink-0">
+                                    <i class="fa-solid <?= $row['icon'] ?> text-[#2e9e63]"></i>
                                 </div>
                                 <div>
                                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">
                                         <?= htmlspecialchars($row['label']) ?>
                                     </p>
-                                    <p class="font-bold <?= !empty($row['accent']) ? 'text-[#0052CC]' : 'text-gray-900' ?> text-lg font-prompt">
+                                    <p class="font-bold <?= !empty($row['accent']) ? 'text-[#2e9e63]' : 'text-gray-900' ?> text-lg font-prompt">
                                         <?= htmlspecialchars($row['value'], ENT_QUOTES, 'UTF-8') ?>
                                     </p>
                                 </div>
@@ -145,7 +145,7 @@ $displayCode = 'CAMP-' . str_pad((string)$appointmentId, 5, '0', STR_PAD_LEFT);
                 <!-- Action Bar -->
                 <div class="w-full flex flex-col gap-3 pb-8">
                     <a href="my_bookings.php"
-                       class="w-full flex items-center justify-center bg-[#0052CC] hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all shadow-sm font-prompt active:scale-[0.98]">
+                       class="w-full flex items-center justify-center bg-[#2e9e63] hover:bg-emerald-700 text-white font-bold py-4 rounded-xl transition-all shadow-sm font-prompt active:scale-[0.98]">
                         <i class="fa-solid fa-list-check mr-2"></i> <?= htmlspecialchars(__('success.view_all_btn')) ?>
                     </a>
                 </div>
@@ -158,12 +158,12 @@ $displayCode = 'CAMP-' . str_pad((string)$appointmentId, 5, '0', STR_PAD_LEFT);
                 <i class="fa-solid fa-house-chimney text-xl"></i>
                 <span class="text-[8px] font-black uppercase tracking-[0.1em]">Home</span>
             </button>
-            <button onclick="window.location.href='my_bookings.php'" class="flex flex-col items-center gap-1.5 text-blue-600 transition-all scale-110">
+            <button onclick="window.location.href='my_bookings.php'" class="flex flex-col items-center gap-1.5 text-green-600 transition-all scale-110">
                 <i class="fa-solid fa-calendar-day text-xl"></i>
                 <span class="text-[8px] font-black uppercase tracking-[0.1em]">Booking</span>
             </button>
             <div class="relative -mt-14">
-                <button onclick="window.location.href='hub.php#camps'" class="w-16 h-16 bg-blue-600 rounded-[1.8rem] rotate-45 flex items-center justify-center text-white shadow-[0_15px_30px_rgba(0,82,204,0.4)] border-[6px] border-[#F8FAFF] active:scale-90 transition-all group">
+                <button onclick="window.location.href='hub.php#camps'" class="w-16 h-16 bg-[#2e9e63] rounded-[1.8rem] rotate-45 flex items-center justify-center text-white shadow-[0_15px_30px_rgba(46,158,99,0.4)] border-[6px] border-[#F8FAFF] active:scale-90 transition-all group">
                     <i class="fa-solid fa-plus text-2xl -rotate-45 group-hover:scale-125 transition-transform"></i>
                 </button>
             </div>

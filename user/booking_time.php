@@ -114,12 +114,12 @@ $jsT = [
 <div class="p-5 pb-56 -mt-6 relative z-10 flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-500">
     <div class="flex-1">
         <div class="flex items-center gap-3 mb-6">
-            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-xl shrink-0">
-                <i class="fa-solid fa-clock text-[#0052CC]"></i>
+            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-xl shrink-0">
+                <i class="fa-solid fa-clock text-[#2e9e63]"></i>
             </div>
             <div>
                 <h2 class="text-xl font-bold text-gray-900 leading-tight"><?= htmlspecialchars(__('time.heading')) ?></h2>
-                <p class="text-sm text-[#0052CC] font-semibold mt-0.5"><?= $displayDate ?></p>
+                <p class="text-sm text-[#2e9e63] font-semibold mt-0.5"><?= $displayDate ?></p>
             </div>
         </div>
 
@@ -160,7 +160,7 @@ $jsT = [
                                 <div class="flex items-center gap-3">
                                     <input type="radio" id="slot-radio-<?= $slot['id'] ?>" name="slot_id"
                                            value="<?= $slot['id'] ?>" <?= $isFull ? 'disabled' : 'required' ?>
-                                           class="w-5 h-5 text-[#0052CC] focus:ring-[#0052CC] border-gray-300 cursor-pointer disabled:cursor-not-allowed"
+                                           class="w-5 h-5 text-[#2e9e63] focus:ring-[#2e9e63] border-gray-300 cursor-pointer disabled:cursor-not-allowed"
                                            data-time="<?= $timeStr ?>">
                                     <span class="font-bold text-gray-900 text-lg font-prompt"><?= $timeStr ?></span>
                                 </div>
@@ -181,7 +181,7 @@ $jsT = [
                     <?= htmlspecialchars(__('time.back')) ?>
                 </a>
                 <button type="submit"
-                        class="flex-1 bg-[#0052CC] hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all shadow-sm active:scale-[0.98] font-prompt">
+                        class="flex-1 bg-[#2e9e63] hover:bg-emerald-700 text-white font-bold py-4 rounded-xl transition-all shadow-sm active:scale-[0.98] font-prompt">
                     <?= htmlspecialchars(__('time.confirm_btn')) ?>
                 </button>
             </div>
@@ -212,7 +212,7 @@ document.addEventListener('DOMContentLoaded', function () {
             html: confirmText,
             icon: 'question',
             showCancelButton: true,
-            confirmButtonColor: '#0052CC',
+            confirmButtonColor: '#2e9e63',
             cancelButtonColor: '#6B7280',
             confirmButtonText: T.swal_confirm,
             cancelButtonText: T.swal_cancel,
@@ -246,7 +246,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 title: T.swal_full_title,
                                 text:  T.swal_full_text,
                                 icon: 'warning',
-                                confirmButtonColor: '#0052CC',
+                                confirmButtonColor: '#2e9e63',
                                 confirmButtonText: T.swal_ok,
                                 customClass: { title: 'font-prompt', popup: 'font-prompt rounded-2xl', confirmButton: 'font-prompt rounded-xl' }
                             });
@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <span class="text-[8px] font-black uppercase tracking-[0.1em]">Booking</span>
         </button>
         <div class="relative -mt-14">
-            <button onclick="window.location.href='hub.php#camps'" class="w-16 h-16 bg-blue-600 rounded-[1.8rem] rotate-45 flex items-center justify-center text-white shadow-[0_15px_30px_rgba(0,82,204,0.4)] border-[6px] border-[#F8FAFF] active:scale-90 transition-all group">
+            <button onclick="window.location.href='hub.php#camps'" class="w-16 h-16 bg-[#2e9e63] rounded-[1.8rem] rotate-45 flex items-center justify-center text-white shadow-[0_15px_30px_rgba(46,158,99,0.4)] border-[6px] border-[#F8FAFF] active:scale-90 transition-all group">
                 <i class="fa-solid fa-plus text-2xl -rotate-45 group-hover:scale-125 transition-transform"></i>
             </button>
         </div>
