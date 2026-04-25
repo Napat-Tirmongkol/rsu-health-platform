@@ -59,7 +59,7 @@ function getBadge($type): array {
 
 $today = date('Y-m-d');
 $isExpired = $campaign && $campaign['available_until'] && ($campaign['available_until'] < $today);
-$isInactive = $campaign && ($campaign['status'] !== 'active' || $isExpired);
+$isInactive = $campaign && (!in_array($campaign['status'], ['active', 'private']) || $isExpired);
 $remaining = $campaign ? max(0, (int)$campaign['total_capacity'] - $usedSeats) : 0;
 $isFull = ($remaining <= 0 && $campaign);
 
