@@ -89,19 +89,16 @@ $csrfToken = get_csrf_token();
                 <input type="text" id="insMemberSearch" placeholder="ค้นหารหัส / ชื่อ / เลขบัตร..."
                     class="h-10 pl-9 pr-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:ring-4 focus:ring-blue-500/10 outline-none w-60">
             </div>
-            <select id="insFilterType" class="h-10 px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:ring-4 focus:ring-blue-500/10 outline-none">
+            <select id="insFilterType" onchange="loadInsMembers(1)" class="h-10 px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:ring-4 focus:ring-blue-500/10 outline-none">
                 <option value="">ทุกประเภท</option>
                 <option value="บุคลากร">บุคลากร</option>
                 <option value="นักศึกษา">นักศึกษา</option>
             </select>
-            <select id="insFilterStatus" class="h-10 px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:ring-4 focus:ring-blue-500/10 outline-none">
+            <select id="insFilterStatus" onchange="loadInsMembers(1)" class="h-10 px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:ring-4 focus:ring-blue-500/10 outline-none">
                 <option value="">ทุกสถานะ</option>
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
             </select>
-            <button onclick="loadInsMembers(1)" class="h-10 px-5 bg-slate-900 text-white rounded-xl font-black text-sm active:scale-95 transition-all">
-                ค้นหา
-            </button>
             <button onclick="openInsMemberModal(null)" class="h-10 px-5 bg-[#0052CC] text-white rounded-xl font-black text-sm active:scale-95 transition-all flex items-center gap-2">
                 <i class="fa-solid fa-plus text-xs"></i> เพิ่มสมาชิก
             </button>
