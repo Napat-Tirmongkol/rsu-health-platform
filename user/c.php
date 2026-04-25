@@ -10,8 +10,8 @@ $lineUserId = $_SESSION['line_user_id'] ?? '';
 if ($lineUserId === '') {
     // เก็บ token ไว้ใน session เพื่อใช้หลังจาก login สำเร็จ
     $_SESSION['invite_token'] = trim($_GET['t'] ?? '');
-    // ข้ามไปเรียก LINE Login โดยตรงเพื่อลดทอนจำนวน Redirect
-    header('Location: ../archive/line_api/line_login.php', true, 302);
+    // ใช้ Javascript Redirect แทน Header เพื่อเลี่ยงการถูกบล็อกโดย Mobile Browser (LINE/Facebook)
+    echo "<script>window.location.href='../archive/line_api/line_login.php';</script>";
     exit;
 }
 
