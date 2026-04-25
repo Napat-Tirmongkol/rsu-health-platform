@@ -81,7 +81,7 @@ try {
         @font-face { font-family: 'RSU'; src: url('../assets/fonts/RSU_BOLD.ttf') format('truetype'); font-weight: bold; }
         body { font-family: 'RSU', sans-serif; background-color: #F8FAFF; -webkit-tap-highlight-color: transparent; }
         .glass-header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
-        .nav-item-active { color: #2563eb; }
+        .nav-item-active { color: #2e9e63; }
         .nav-item-inactive { color: #94a3b8; }
         .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
     </style>
@@ -120,8 +120,8 @@ try {
                         $_customVal = $_isCustomPrefix ? $userData['prefix'] : '';
                         ?>
                         <select name="name_title" id="name_title" onchange="toggleCustomTitle()" required
-                            class="w-full h-14 px-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-50 outline-none transition-all font-bold text-slate-700">
-                            <option value="" disabled <?= $_selectVal === '' ? 'selected' : '' ?>><?= __('profile.ph_prefix') ?></option>
+                            class="w-full h-14 px-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-green-50 outline-none transition-all font-bold text-slate-700">
+                            <option value="" disabled <?= $_selectVal === '' ? 'selected' : '' ?>><?= __('profile.select_placeholder') ?></option>
                             <option value="นาย" <?= $_selectVal === 'นาย' ? 'selected' : '' ?>>นาย</option>
                             <option value="นาง" <?= $_selectVal === 'นาง' ? 'selected' : '' ?>>นาง</option>
                             <option value="นางสาว" <?= $_selectVal === 'นางสาว' ? 'selected' : '' ?>>นางสาว</option>
@@ -145,12 +145,12 @@ try {
                         <div class="space-y-1.5">
                             <label class="text-sm font-bold text-slate-700"><?= __('profile.lbl_first_name') ?> <span class="text-red-500">*</span></label>
                             <input type="text" name="first_name" required value="<?= htmlspecialchars($userData['first_name']) ?>"
-                                class="w-full h-14 px-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-50 outline-none font-bold">
+                                class="w-full h-14 px-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-green-50 outline-none font-bold">
                         </div>
                         <div class="space-y-1.5">
                             <label class="text-sm font-bold text-slate-700"><?= __('profile.lbl_last_name') ?> <span class="text-red-500">*</span></label>
                             <input type="text" name="last_name" required value="<?= htmlspecialchars($userData['last_name']) ?>"
-                                class="w-full h-14 px-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-50 outline-none font-bold">
+                                class="w-full h-14 px-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-green-50 outline-none font-bold">
                         </div>
                     </div>
 
@@ -161,7 +161,7 @@ try {
                             <?php foreach(['male' => 'ชาย', 'female' => 'หญิง', 'other' => 'อื่นๆ'] as $v => $l): ?>
                             <label class="flex-1 cursor-pointer">
                                 <input type="radio" name="gender" value="<?= $v ?>" required class="peer hidden" <?= $userData['gender'] === $v ? 'checked' : '' ?>>
-                                <div class="py-4 text-center rounded-2xl border border-slate-100 bg-slate-50 font-bold text-sm text-slate-400 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-600 transition-all"><?= $l ?></div>
+                                <div class="py-4 text-center rounded-2xl border border-slate-100 bg-slate-50 font-bold text-sm text-slate-400 peer-checked:bg-[#2e9e63] peer-checked:text-white peer-checked:border-[#2e9e63] transition-all"><?= $l ?></div>
                             </label>
                             <?php endforeach; ?>
                         </div>
@@ -189,22 +189,22 @@ try {
                             <div class="flex gap-2 mb-3">
                                 <label class="flex-1 cursor-pointer">
                                     <input type="radio" name="id_type" value="citizen" class="peer hidden" <?= !$isPassport ? 'checked' : '' ?>>
-                                    <div class="py-2.5 text-center border border-slate-100 bg-slate-50 rounded-xl peer-checked:bg-blue-50 peer-checked:border-blue-200 peer-checked:text-blue-600 font-bold text-[10px] transition-all"><?= __('profile.lbl_identity_th') ?></div>
+                                    <div class="py-2.5 text-center border border-slate-100 bg-slate-50 rounded-xl peer-checked:bg-green-50 peer-checked:border-green-200 peer-checked:text-[#2e9e63] font-bold text-[10px] transition-all"><?= __('profile.lbl_identity_th') ?></div>
                                 </label>
                                 <label class="flex-1 cursor-pointer">
                                     <input type="radio" name="id_type" value="passport" class="peer hidden" <?= $isPassport ? 'checked' : '' ?>>
-                                    <div class="py-2.5 text-center border border-slate-100 bg-slate-50 rounded-xl peer-checked:bg-blue-50 peer-checked:border-blue-200 peer-checked:text-blue-600 font-bold text-[10px] transition-all">Passport</div>
+                                    <div class="py-2.5 text-center border border-slate-100 bg-slate-50 rounded-xl peer-checked:bg-green-50 peer-checked:border-green-200 peer-checked:text-[#2e9e63] font-bold text-[10px] transition-all">Passport</div>
                                 </label>
                             </div>
                             <input type="text" id="citizen_id" name="citizen_id" required value="<?= htmlspecialchars($userData['citizen_id']) ?>"
-                                class="w-full h-14 px-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-50 outline-none font-bold" 
+                                class="w-full h-14 px-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-green-50 outline-none font-bold" 
                                 placeholder="<?= __('profile.lbl_citizen_id') ?>">
                         </div>
 
                         <div id="student_id_container" class="space-y-1.5">
                             <label for="id_number" class="text-sm font-bold text-slate-700"><?= __('profile.lbl_id') ?> <span class="text-red-500">*</span></label>
                             <input type="text" id="id_number" name="id_number" value="<?= htmlspecialchars($userData['id_number']) ?>"
-                                class="w-full h-14 px-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-50 outline-none font-bold"
+                                class="w-full h-14 px-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-green-50 outline-none font-bold"
                                 placeholder="<?= __('profile.id_placeholder') ?>">
                         </div>
                     </div>
@@ -214,7 +214,7 @@ try {
                         <label for="department" class="text-sm font-bold text-slate-700">คณะ / หน่วยงาน <span class="text-red-500">*</span></label>
                         <div class="relative">
                             <input type="text" id="department" name="department" list="faculty-datalist" value="<?= htmlspecialchars($userData['department']) ?>"
-                                class="w-full h-14 px-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-50 outline-none font-bold"
+                                class="w-full h-14 px-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-green-50 outline-none font-bold"
                                 placeholder="<?= __('profile.dept_placeholder') ?>">
                             <datalist id="faculty-datalist">
                                 <?php foreach ($_facultyList as $_f) echo "<option value='".htmlspecialchars($_f['name_th'])."'>"; ?>
@@ -233,13 +233,13 @@ try {
                     <div class="space-y-1.5">
                         <label class="text-sm font-bold text-slate-700"><?= __('profile.lbl_phone') ?> <span class="text-red-500">*</span></label>
                         <input type="tel" name="phone_number" required value="<?= htmlspecialchars($userData['phone']) ?>"
-                            class="w-full h-14 px-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-50 outline-none font-bold">
+                            class="w-full h-14 px-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-green-50 outline-none font-bold">
                     </div>
 
                     <div class="space-y-1.5">
                         <label class="text-sm font-bold text-slate-700"><?= __('profile.lbl_email') ?> (Optional)</label>
                         <input type="email" id="email" name="email" value="<?= htmlspecialchars($userData['email']) ?>"
-                            class="w-full h-14 px-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-50 outline-none font-bold">
+                            class="w-full h-14 px-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-green-50 outline-none font-bold">
                         <p class="text-[11px] text-amber-600 font-bold mt-2 px-1"><i class="fa-solid fa-circle-info mr-1"></i> <?= __('profile.msg_email_benefit') ?></p>
                     </div>
 
@@ -248,11 +248,41 @@ try {
                 <!-- PDPA Content -->
                 <div class="bg-white rounded-[2.5rem] p-8 border border-slate-50 shadow-sm space-y-6">
                     <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest"><?= __('profile.pdpa_title') ?></h3>
-                    <div class="bg-slate-50 p-5 rounded-3xl text-[12px] text-slate-500 leading-relaxed max-h-40 overflow-y-auto custom-scrollbar border border-slate-100">
-                        <?= __('profile.pdpa_intro') ?>
+                    <div class="bg-slate-50 p-6 rounded-3xl text-[12px] text-slate-500 leading-relaxed max-h-64 overflow-y-auto custom-scrollbar border border-slate-100 space-y-4">
+                        <div class="text-slate-900 font-black mb-2"><?= __('profile.pdpa_welcome') ?></div>
+                        <p><?= __('profile.pdpa_intro') ?></p>
+                        
+                        <div class="space-y-3">
+                            <div>
+                                <div class="font-black text-slate-700"><?= __('profile.pdpa_item1_title') ?></div>
+                                <p><?= __('profile.pdpa_item1_desc') ?></p>
+                            </div>
+                            <div>
+                                <div class="font-black text-slate-700"><?= __('profile.pdpa_item2_title') ?></div>
+                                <p><?= __('profile.pdpa_item2_desc') ?></p>
+                            </div>
+                            <div>
+                                <div class="font-black text-slate-700"><?= __('profile.pdpa_item3_title') ?></div>
+                                <p><?= __('profile.pdpa_item3_desc') ?></p>
+                            </div>
+                            <div>
+                                <div class="font-black text-slate-700"><?= __('profile.pdpa_item4_title') ?></div>
+                                <p><?= __('profile.pdpa_item4_desc') ?></p>
+                            </div>
+                        </div>
+
+                        <div class="pt-2">
+                            <div class="font-black text-slate-700 underline underline-offset-4 decoration-slate-200 mb-1"><?= __('profile.pdpa_retention_title') ?></div>
+                            <p><?= __('profile.pdpa_retention_desc') ?></p>
+                        </div>
+
+                        <div class="pt-1">
+                            <div class="font-black text-slate-700 underline underline-offset-4 decoration-slate-200 mb-1"><?= __('profile.pdpa_rights_title') ?></div>
+                            <p><?= __('profile.pdpa_rights_desc') ?></p>
+                        </div>
                     </div>
                     <label class="flex items-center gap-4 p-5 bg-white rounded-3xl border border-slate-100 cursor-pointer active:scale-95 transition-all">
-                        <input type="checkbox" name="agreed" value="1" required <?= $isEditing ? 'checked' : '' ?> class="w-6 h-6 rounded-lg text-blue-600 focus:ring-blue-500">
+                        <input type="checkbox" name="agreed" value="1" required <?= $isEditing ? 'checked' : '' ?> class="w-6 h-6 rounded-lg text-[#2e9e63] focus:ring-[#2e9e63]">
                         <span class="text-xs text-slate-600 font-bold"><?= __('profile.lbl_agree') ?></span>
                     </label>
                 </div>
@@ -280,7 +310,7 @@ try {
                 <span class="text-[8px] font-black uppercase tracking-[0.1em]">Booking</span>
             </button>
             <div class="relative -mt-14">
-                <button onclick="window.location.href='hub.php#camps'" class="w-16 h-16 bg-blue-600 rounded-[1.8rem] rotate-45 flex items-center justify-center text-white shadow-[0_15px_30px_rgba(0,82,204,0.4)] border-[6px] border-[#F8FAFF] active:scale-90 transition-all group">
+                <button onclick="window.location.href='hub.php#camps'" class="w-16 h-16 bg-[#2e9e63] rounded-[1.8rem] rotate-45 flex items-center justify-center text-white shadow-[0_15px_30px_rgba(46,158,99,0.4)] border-[6px] border-[#F8FAFF] active:scale-90 transition-all group">
                     <i class="fa-solid fa-plus text-2xl -rotate-45 group-hover:scale-125 transition-transform"></i>
                 </button>
             </div>
@@ -288,7 +318,7 @@ try {
                 <i class="fa-solid fa-heart-pulse text-xl"></i>
                 <span class="text-[8px] font-black uppercase tracking-[0.1em]">Health</span>
             </button>
-            <button onclick="window.location.href='profile.php'" class="flex flex-col items-center gap-1.5 text-blue-600 transition-all scale-110">
+            <button onclick="window.location.href='profile.php'" class="flex flex-col items-center gap-1.5 text-[#2e9e63] transition-all scale-110">
                 <i class="fa-solid fa-user-ninja text-xl"></i>
                 <span class="text-[8px] font-black uppercase tracking-[0.1em]">Account</span>
             </button>

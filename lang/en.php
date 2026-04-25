@@ -205,6 +205,7 @@ return [
     'profile.id_placeholder' => 'Enter 7-digit ID',
     'profile.dept_placeholder' => 'Ex. College of Medicine',
     'profile.pdpa_agree' => 'I have read and agree to the privacy policy terms',
+    'profile.lbl_agree' => 'I agree to the privacy policy and terms',
     'profile.optional' => '(Optional)',
     'profile.email_note' => 'If skipped, you will not receive confirmation and approval notifications.',
     'profile.pdpa_title' => 'Personal Data Protection Policy (PDPA Consent)',
