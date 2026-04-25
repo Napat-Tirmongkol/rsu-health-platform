@@ -3,17 +3,63 @@
 declare(strict_types=1);
 session_start();
 
-// 1. ตรวจสอบ Login เบื้องต้น (ทำก่อนโหลดไฟล์หนักๆ เพื่อให้ Redirect สะอาดที่สุด)
+// 1. ตรวจสอบ Login เบื้องต้น
 $lineUserId = $_SESSION['line_user_id'] ?? '';
 if ($lineUserId === '') {
     $_SESSION['invite_token'] = trim($_GET['t'] ?? '');
     
-    // ใช้ Absolute URL เต็มรูปแบบ เพื่อป้องกันความสับสนของ Browser
-    $loginUrl = "https://healthycampus.rsu.ac.th/e-campaignv2/archive/line_api/line_login.php";
-    
-    header("Location: $loginUrl", true, 302);
-    // แผนสำรองกรณี Header โดนบล็อก (ใช้ Absolute URL เช่นกัน)
-    echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=' . $loginUrl . '"></head><body></body></html>';
+    // แสดงหน้า Gateway สวยๆ ให้ผู้ใช้กด Login เองเพื่อข้ามระบบ Security ของ Browser
+    ?>
+    <!DOCTYPE html>
+    <html lang="th">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+        <title>RSU Medical Hub - Login Required</title>
+        <script src="https://cdn.tailwindcss.com/3.4.1"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+        <style>
+            @font-face { font-family:'RSU'; src:url('../assets/fonts/RSU_Regular.ttf') format('truetype'); }
+            @font-face { font-family:'RSU'; src:url('../assets/fonts/RSU_BOLD.ttf') format('truetype'); font-weight:bold; }
+            body { font-family:'RSU', sans-serif; background:#F8FAFF; overflow:hidden; }
+            .premium-gradient { background: linear-gradient(135deg, #0052CC 0%, #0070F3 100%); }
+        </style>
+    </head>
+    <body class="flex items-center justify-center min-h-screen p-6">
+        <div class="w-full max-w-md text-center animate-in zoom-in fade-in duration-700">
+            <div class="bg-white rounded-[3.5rem] p-10 shadow-[0_30px_80px_rgba(0,0,0,0.1)] border border-slate-50 relative overflow-hidden">
+                <div class="absolute -right-20 -top-20 w-48 h-48 bg-blue-50 rounded-full blur-3xl opacity-50"></div>
+                <div class="absolute -left-20 -bottom-20 w-48 h-48 bg-emerald-50 rounded-full blur-3xl opacity-50"></div>
+                
+                <div class="relative z-10">
+                    <div class="w-24 h-24 premium-gradient rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 shadow-xl shadow-blue-200">
+                        <i class="fa-solid fa-user-shield text-white text-4xl"></i>
+                    </div>
+                    
+                    <h1 class="text-slate-900 font-black text-3xl mb-4 leading-tight">เข้าสู่ระบบเพื่อดำเนินการต่อ</h1>
+                    <p class="text-slate-400 text-sm font-bold mb-10 leading-relaxed px-4">
+                        คุณกำลังจะเข้าสู่แคมเปญ <span class="text-blue-600">นัดหมายพิเศษ</span><br>
+                        กรุณายืนยันตัวตนผ่าน LINE เพื่อความปลอดภัยครับ
+                    </p>
+                    
+                    <a href="https://healthycampus.rsu.ac.th/e-campaignv2/archive/line_api/line_login.php" 
+                       class="flex items-center justify-center gap-4 w-full h-20 bg-[#06C755] hover:bg-[#05b34c] text-white font-black rounded-3xl shadow-[0_20px_40px_rgba(6,199,85,0.25)] active:scale-95 transition-all text-base tracking-widest uppercase">
+                        <i class="fa-brands fa-line text-2xl"></i>
+                        Login with LINE
+                    </a>
+                    
+                    <div class="mt-8 flex items-center justify-center gap-2">
+                        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                        <span class="text-slate-300 text-[10px] font-black uppercase tracking-[0.3em]">Secure Connection</span>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="mt-10 text-slate-300 text-[10px] font-black uppercase tracking-widest">Powered by RSU Healthcare Services</p>
+        </div>
+    </body>
+    </html>
+    <?php
     exit;
 }
 
