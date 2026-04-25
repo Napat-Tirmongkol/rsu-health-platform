@@ -68,9 +68,26 @@ if (isset($_FILES['site_logo']) && $_FILES['site_logo']['error'] === UPLOAD_ERR_
 }
 
 // Save to JSON
-if (file_put_contents($siteSettingsFile, json_encode($settings, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
+$savedJson = file_put_contents($siteSettingsFile, json_encode($settings, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+// Save to Database (Persistence Layer)
+try {
+    $pdo = db();
+    $stmt = $pdo->prepare("INSERT INTO sys_site_settings (setting_key, setting_value) VALUES (:key, :val) ON DUPLICATE KEY UPDATE setting_value = :val2");
+    foreach ($settings as $key => $val) {
+        // Convert boolean/numeric to string for storage if needed
+        $saveVal = is_bool($val) ? ($val ? '1' : '0') : (string)$val;
+        $stmt->execute([':key' => $key, ':val' => $saveVal, ':val2' => $saveVal]);
+    }
+    $savedDb = true;
+} catch (Exception $e) {
+    $savedDb = false;
+    error_log("Settings DB Save Error: " . $e->getMessage());
+}
+
+if ($savedJson || $savedDb) {
     log_activity('update_site_settings', "อัปเดตการตั้งค่าเว็บไซต์: {$settings['site_name']}");
     echo json_encode(['status' => 'success', 'message' => 'บันทึกการตั้งค่าสำเร็จ!', 'data' => $settings]);
 } else {
-    echo json_encode(['status' => 'error', 'message' => 'ไม่สามารถบันทึกข้อมูลได้ (Permission Error)']);
+    echo json_encode(['status' => 'error', 'message' => 'ไม่สามารถบันทึกข้อมูลได้ (Storage Error)']);
 }

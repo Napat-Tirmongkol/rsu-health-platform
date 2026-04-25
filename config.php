@@ -23,13 +23,34 @@ defined('FINE_RATE_PER_DAY') || define('FINE_RATE_PER_DAY', 10); // ค่าป
 defined('APP_VERSION') || define('APP_VERSION', '2.2.0'); // เวอร์ชันหลัก
 defined('APP_BUILD')   || define('APP_BUILD',   '20260423.01'); // วันที่และลำดับการอัปเดต
 
-// ── Site Settings ─────────────────────────────────────────────────────────────
+// ── Site Settings (Persistent Storage) ────────────────────────────────────────
 $__siteSettingsFile = __DIR__ . '/config/site_settings.json';
 $__siteSettings = file_exists($__siteSettingsFile) ? json_decode(file_get_contents($__siteSettingsFile), true) : [];
+if (!is_array($__siteSettings)) $__siteSettings = [];
+
+// พยายามโหลดจาก Database เพื่อกันค่าหายเวลา Git Pull
+try {
+    $__pdo = db();
+    // สร้างตารางเก็บตั้งค่าหากยังไม่มี
+    $__pdo->exec("CREATE TABLE IF NOT EXISTS sys_site_settings (
+        setting_key   VARCHAR(100) PRIMARY KEY,
+        setting_value TEXT,
+        updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    $__dbSettingsStmt = $__pdo->query("SELECT setting_key, setting_value FROM sys_site_settings");
+    $__dbSettings = $__dbSettingsStmt->fetchAll(PDO::FETCH_KEY_PAIR);
+    
+    // รวมค่า (DB ทับ JSON เพราะ DB คือค่าที่ User ตั้งค่าจริงๆ และไม่โดน Git ทับ)
+    $__siteSettings = array_merge($__siteSettings, $__dbSettings);
+} catch (Exception $e) {
+    // Fail silently if DB is not ready
+}
+
 defined('SITE_NAME') || define('SITE_NAME', $__siteSettings['site_name'] ?? 'e-Campaign V2');
-defined('SITE_LOGO') || define('SITE_LOGO', $__siteSettings['site_logo'] ?? ''); // Empty means use default icon
+defined('SITE_LOGO') || define('SITE_LOGO', $__siteSettings['site_logo'] ?? ''); 
 defined('GEMINI_API_KEY') || define('GEMINI_API_KEY', $__siteSettings['gemini_api_key'] ?? '');
-defined('SITE_SHOW_INSURANCE') || define('SITE_SHOW_INSURANCE', $__siteSettings['show_insurance'] ?? true);
+defined('SITE_SHOW_INSURANCE') || define('SITE_SHOW_INSURANCE', ($__siteSettings['show_insurance'] ?? '1') == '1');
 
 
 /**
