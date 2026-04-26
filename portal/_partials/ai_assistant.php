@@ -188,10 +188,7 @@ async function aiSendMessage() {
 
     try {
         const formData = new FormData();
-        
-        // Encode to Base64 (with UTF-8 support) to bypass Firewall
-        const encodedMsg = btoa(unescape(encodeURIComponent(text)));
-        formData.append('m', encodedMsg);
+        formData.append('m', text);
         
         // Get CSRF token from global input
         const csrfToken = document.getElementById('global_csrf_token')?.value || '';
