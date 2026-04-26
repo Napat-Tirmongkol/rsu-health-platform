@@ -1,0 +1,17 @@
+<?php
+// logout.php
+// �������Ѻ�͡�ҡ�к��ͧ Admin / ��ѡ�ҹ
+
+// 1. ����� Session ��͹����
+session_start();
+
+// 2. ��ҧ������ Session ������ (�� $_SESSION['user_id'], $_SESSION['role'])
+session_unset();
+
+// 3. ����� Session ����ҧ����
+session_destroy();
+
+// 4. �觼�����Ѻ�˹�� Log in �ͧ��ѡ�ҹ (˹�ҡ�͡���ʼ�ҹ)
+header("Location: ../login.php");
+exit;
+?>

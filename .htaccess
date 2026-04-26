@@ -1,0 +1,69 @@
+# e-campaignv2/.htaccess
+
+Options -Indexes
+
+# ─── Security Headers ─────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+    # ป้องกัน Clickjacking
+    Header always set X-Frame-Options "SAMEORIGIN"
+
+    # ป้องกัน MIME sniffing
+    Header always set X-Content-Type-Options "nosniff"
+
+    # บังคับ HTTPS (HSTS) — 1 ปี
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+    # XSS Protection (browsers เก่า)
+    Header always set X-XSS-Protection "1; mode=block"
+
+    # Referrer Policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Content Security Policy — อนุญาต CDN ที่ระบบใช้อยู่
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.onesignal.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://onesignal.com; frame-src 'self';"
+</IfModule>
+
+# ─── Force HTTPS ──────────────────────────────────────────────────────────
+<IfModule mod_rewrite.c>
+    RewriteCond %{HTTPS} off
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# Enable Rewrite
+RewriteEngine On
+
+# ─── Redirects (Legacy Paths) ───────────────────────────────────────────
+RewriteRule ^archive/e_Borrow/login\.php$ e_Borrow/login.php [R=301,L,NC]
+RewriteRule ^archive/line_api/(.*)$ line_api/$1 [R=301,L,NC]
+
+# Suppress favicon.ico 404 — return empty 204 No Content
+RewriteRule ^favicon\.ico$ - [R=204,L]
+
+# ─── Session Security (PHP) ───────────────────────────────────
+<IfModule mod_php.c>
+    php_flag session.cookie_secure   On
+    php_flag session.cookie_httponly On
+    php_value session.cookie_samesite Lax
+</IfModule>
+
+# ─── Upload Limits (Insurance Sync Hub) ───────────────────────
+<IfModule mod_php.c>
+    php_value upload_max_filesize 30M
+    php_value post_max_size       64M
+</IfModule>
+<IfModule mod_php8.c>
+    php_value upload_max_filesize 30M
+    php_value post_max_size       64M
+</IfModule>
+
+# DirectoryIndex
+DirectoryIndex index.php index.html
+
+# ─── Custom Error Pages ───────────────────────────────────────
+ErrorDocument 400 /e-campaignv2/errors/404.php
+ErrorDocument 403 /e-campaignv2/errors/403.php
+ErrorDocument 404 /e-campaignv2/errors/404.php
+ErrorDocument 500 /e-campaignv2/errors/500.php
+ErrorDocument 502 /e-campaignv2/errors/500.php
+ErrorDocument 503 /e-campaignv2/errors/503.php
+ErrorDocument 504 /e-campaignv2/errors/503.php
