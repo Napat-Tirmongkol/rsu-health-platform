@@ -340,7 +340,9 @@ try {
     $pdo->exec("CREATE TABLE IF NOT EXISTS sys_announcements (
         id INT AUTO_INCREMENT PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
+        title_en VARCHAR(255) DEFAULT NULL,
         content TEXT NOT NULL,
+        content_en TEXT DEFAULT NULL,
         image_url VARCHAR(500) DEFAULT NULL,
         type ENUM('info', 'warning', 'success', 'urgent') DEFAULT 'info',
         target_audience ENUM('all', 'student', 'staff', 'other') DEFAULT 'all',
@@ -350,9 +352,16 @@ try {
         start_date DATE DEFAULT NULL,
         end_date DATE DEFAULT NULL,
         read_count INT DEFAULT 0,
+        created_by INT UNSIGNED DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+    // ตรวจสอบและเพิ่มคอลัมน์ถ้ายังไม่มี
+    $cols = $pdo->query("SHOW COLUMNS FROM sys_announcements")->fetchAll(PDO::FETCH_COLUMN);
+    if (!in_array('title_en', $cols)) $pdo->exec("ALTER TABLE sys_announcements ADD COLUMN title_en VARCHAR(255) AFTER title");
+    if (!in_array('content_en', $cols)) $pdo->exec("ALTER TABLE sys_announcements ADD COLUMN content_en TEXT AFTER content");
+    if (!in_array('created_by', $cols)) $pdo->exec("ALTER TABLE sys_announcements ADD COLUMN created_by INT UNSIGNED AFTER end_date");
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS sys_announcement_reads (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -372,7 +381,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ann_action'])) {
     if ($annAction === 'create' || $annAction === 'edit') {
         $annId        = (int)($_POST['ann_id'] ?? 0);
         $annTitle     = trim($_POST['ann_title'] ?? '');
+        $annTitleEn   = trim($_POST['ann_title_en'] ?? '');
         $annContent   = trim($_POST['ann_content'] ?? '');
+        $annContentEn = trim($_POST['ann_content_en'] ?? '');
         $annType      = in_array($_POST['ann_type'] ?? '', ['info','warning','success','urgent']) ? $_POST['ann_type'] : 'info';
         $annPriority  = max(0, min(255, (int)($_POST['ann_priority'] ?? 0)));
         $annAudience  = in_array($_POST['ann_audience'] ?? '', ['all','student','staff','other']) ? $_POST['ann_audience'] : 'all';
@@ -389,16 +400,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ann_action'])) {
                 if ($annAction === 'create') {
                     $pdo->prepare("
                         INSERT INTO sys_announcements
-                            (title, content, image_url, type, priority, target_audience, is_active, show_once, start_date, end_date, created_by)
-                        VALUES (?,?,?,?,?,?,?,?,?,?,?)
-                    ")->execute([$annTitle, $annContent, $annImageUrl ?: null, $annType, $annPriority, $annAudience, $annActive, $annShowOnce, $annStart, $annEnd, $_SESSION['admin_id'] ?? null]);
+                            (title, title_en, content, content_en, image_url, type, priority, target_audience, is_active, show_once, start_date, end_date, created_by)
+                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+                    ")->execute([$annTitle, $annTitleEn ?: null, $annContent, $annContentEn ?: null, $annImageUrl ?: null, $annType, $annPriority, $annAudience, $annActive, $annShowOnce, $annStart, $annEnd, $_SESSION['admin_id'] ?? null]);
                     log_activity('Announcement Created', "สร้างประกาศ: $annTitle");
                 } else {
                     $pdo->prepare("
                         UPDATE sys_announcements
-                        SET title=?, content=?, image_url=?, type=?, priority=?, target_audience=?, is_active=?, show_once=?, start_date=?, end_date=?
+                        SET title=?, title_en=?, content=?, content_en=?, image_url=?, type=?, priority=?, target_audience=?, is_active=?, show_once=?, start_date=?, end_date=?
                         WHERE id=?
-                    ")->execute([$annTitle, $annContent, $annImageUrl ?: null, $annType, $annPriority, $annAudience, $annActive, $annShowOnce, $annStart, $annEnd, $annId]);
+                    ")->execute([$annTitle, $annTitleEn ?: null, $annContent, $annContentEn ?: null, $annImageUrl ?: null, $annType, $annPriority, $annAudience, $annActive, $annShowOnce, $annStart, $annEnd, $annId]);
                     log_activity('Announcement Updated', "แก้ไขประกาศ: $annTitle");
                 }
                 $ann_saved = true;
@@ -1193,6 +1204,9 @@ try {
                                     <?php if ($ann['target_audience'] !== 'all'): ?>
                                     <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:#f1f5f9;color:#64748b"><?= htmlspecialchars($ann['target_audience']) ?></span>
                                     <?php endif; ?>
+                                    <?php if (!empty($ann['title_en'])): ?>
+                                    <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:#eff6ff;color:#1d4ed8;border:1px solid #dbeafe">EN</span>
+                                    <?php endif; ?>
                                     <?php if (!$ann['is_active']): ?>
                                     <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:#fef2f2;color:#dc2626">ปิดอยู่</span>
                                     <?php endif; ?>
@@ -1253,14 +1267,26 @@ try {
                         <input type="hidden" id="ann-form-action" name="ann_action" value="create">
                         <input type="hidden" id="ann-form-id" name="ann_id" value="0">
 
-                        <div>
-                            <label style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px">หัวข้อประกาศ <span style="color:red">*</span></label>
-                            <input type="text" id="ann-f-title" name="ann_title" required class="premium-input" placeholder="เช่น แจ้งวันหยุดให้บริการ">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                            <div>
+                                <label style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px">หัวข้อประกาศ (TH) <span style="color:red">*</span></label>
+                                <input type="text" id="ann-f-title" name="ann_title" required class="premium-input" placeholder="เช่น แจ้งวันหยุดให้บริการ">
+                            </div>
+                            <div>
+                                <label style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px">Announcement Title (EN)</label>
+                                <input type="text" id="ann-f-title-en" name="ann_title_en" class="premium-input" placeholder="e.g. Holiday Announcement">
+                            </div>
                         </div>
 
-                        <div>
-                            <label style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px">เนื้อหา <span style="color:red">*</span></label>
-                            <textarea id="ann-f-content" name="ann_content" required rows="4" class="premium-input" style="resize:vertical" placeholder="รายละเอียดของประกาศ..."></textarea>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                            <div>
+                                <label style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px">เนื้อหา (TH) <span style="color:red">*</span></label>
+                                <textarea id="ann-f-content" name="ann_content" required rows="4" class="premium-input" style="resize:vertical" placeholder="รายละเอียดของประกาศ..."></textarea>
+                            </div>
+                            <div>
+                                <label style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px">Content (EN)</label>
+                                <textarea id="ann-f-content-en" name="ann_content_en" rows="4" class="premium-input" style="resize:vertical" placeholder="Announcement details in English..."></textarea>
+                            </div>
                         </div>
 
                         <div>
@@ -3340,7 +3366,9 @@ try {
             document.getElementById('ann-form-action').value      = mode;
             document.getElementById('ann-form-id').value          = data ? data.id : 0;
             document.getElementById('ann-f-title').value          = data ? (data.title    || '') : '';
+            document.getElementById('ann-f-title-en').value       = data ? (data.title_en || '') : '';
             document.getElementById('ann-f-content').value        = data ? (data.content  || '') : '';
+            document.getElementById('ann-f-content-en').value      = data ? (data.content_en|| '') : '';
             document.getElementById('ann-f-image').value          = data ? (data.image_url|| '') : '';
             document.getElementById('ann-f-type').value           = data ? (data.type || 'info') : 'info';
             document.getElementById('ann-f-audience').value       = data ? (data.target_audience || 'all') : 'all';

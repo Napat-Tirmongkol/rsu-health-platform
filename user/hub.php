@@ -1342,9 +1342,14 @@ document.getElementById('insDetailModal').addEventListener('click', function(e) 
                         <p id="ann-type-label" class="text-white text-[11px] font-black">ข้อมูลทั่วไป</p>
                     </div>
                 </div>
-                <button onclick="annClose()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors" aria-label="ปิด">
-                    <i class="fa-solid fa-xmark text-sm"></i>
-                </button>
+                <div class="flex items-center gap-2">
+                    <button id="ann-lang-toggle" onclick="toggleLang()" class="hidden px-2.5 py-1 rounded-lg bg-white/20 hover:bg-white/30 text-white text-[10px] font-black transition-all">
+                        EN
+                    </button>
+                    <button onclick="annClose()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors" aria-label="ปิด">
+                        <i class="fa-solid fa-xmark text-sm"></i>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -1389,13 +1394,13 @@ document.getElementById('insDetailModal').addEventListener('click', function(e) 
 
     let currentIndex = 0;
     let isDismissing = false;
+    let currentLang  = 'th';
 
-    // ── สี + ไอคอน ตามประเภท ─────────────────────────────────────────────────
     const typeConfig = {
-        info:    { cls: 'ann-header-info',    icon: 'fa-bullhorn',         label: 'ข้อมูลทั่วไป',    btn: '#0052CC', btnShadow: 'shadow-blue-200'   },
-        warning: { cls: 'ann-header-warning',  icon: 'fa-triangle-exclamation', label: 'แจ้งเตือน',  btn: '#d97706', btnShadow: 'shadow-amber-200'  },
-        success: { cls: 'ann-header-success',  icon: 'fa-circle-check',    label: 'ข่าวดี',           btn: '#059669', btnShadow: 'shadow-green-200'  },
-        urgent:  { cls: 'ann-header-urgent',   icon: 'fa-siren-on',        label: 'ด่วน!',            btn: '#dc2626', btnShadow: 'shadow-red-200'    },
+        info:    { cls: 'ann-header-info',    icon: 'fa-bullhorn',         label: 'ข้อมูลทั่วไป',    btn: '#0052CC' },
+        warning: { cls: 'ann-header-warning',  icon: 'fa-triangle-exclamation', label: 'แจ้งเตือน',  btn: '#d97706' },
+        success: { cls: 'ann-header-success',  icon: 'fa-circle-check',    label: 'ข่าวดี',           btn: '#059669' },
+        urgent:  { cls: 'ann-header-urgent',   icon: 'fa-siren-on',        label: 'ด่วน!',            btn: '#dc2626' },
     };
 
     // ── render ประกาศ ─────────────────────────────────────────────────────────
@@ -1411,6 +1416,16 @@ document.getElementById('insDetailModal').addEventListener('click', function(e) 
         document.getElementById('ann-icon').className = 'fa-solid ' + cfg.icon + ' text-white text-xl';
         document.getElementById('ann-type-label').textContent = cfg.label;
 
+        // Language Toggle
+        const langToggle = document.getElementById('ann-lang-toggle');
+        if (ann.title_en || ann.content_en) {
+            langToggle.classList.remove('hidden');
+            langToggle.textContent = currentLang === 'th' ? 'EN' : 'TH';
+        } else {
+            langToggle.classList.add('hidden');
+            currentLang = 'th';
+        }
+
         // Image
         const imgWrap = document.getElementById('ann-img-wrap');
         const img     = document.getElementById('ann-img');
@@ -1422,8 +1437,13 @@ document.getElementById('insDetailModal').addEventListener('click', function(e) 
         }
 
         // Body
-        document.getElementById('ann-title').textContent   = ann.title;
-        document.getElementById('ann-content').textContent = ann.content;
+        if (currentLang === 'en' && (ann.title_en || ann.content_en)) {
+            document.getElementById('ann-title').textContent   = ann.title_en || ann.title;
+            document.getElementById('ann-content').textContent = ann.content_en || ann.content;
+        } else {
+            document.getElementById('ann-title').textContent   = ann.title;
+            document.getElementById('ann-content').textContent = ann.content;
+        }
 
         // Dismiss button color
         const btn = document.getElementById('ann-btn-dismiss');
@@ -1435,6 +1455,11 @@ document.getElementById('insDetailModal').addEventListener('click', function(e) 
         document.getElementById('ann-counter').textContent =
             announcements.length > 1 ? (idx + 1) + ' / ' + announcements.length : '';
     }
+
+    window.toggleLang = function() {
+        currentLang = currentLang === 'th' ? 'en' : 'th';
+        render(currentIndex);
+    };
 
     function updateDots(activeIdx) {
         const container = document.getElementById('ann-dots');
