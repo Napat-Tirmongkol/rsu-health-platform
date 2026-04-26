@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(&\"C:\\\\xampp\\\\php\\\\php.exe\" -m 2>&1 | Where-Object { $_ -match \"openssl|pdo_mysql|mbstring|gd|intl|zip|bcmath|sodium|curl\" })"
+    ]
+  }
+}
