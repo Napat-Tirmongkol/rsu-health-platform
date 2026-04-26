@@ -38,7 +38,7 @@ try {
 
     try {
         $todayErrors = (int)$pdo->query(
-            "SELECT COUNT(*) FROM sys_error_logs WHERE level='error' AND DATE(created_at)=CURDATE()"
+            "SELECT COUNT(*) FROM sys_error_logs WHERE level='error' AND DATE(created_at)=CURDATE() AND status != 'Resolved'"
         )->fetchColumn();
         $totalErrors = (int)$pdo->query(
             "SELECT COUNT(*) FROM sys_error_logs"

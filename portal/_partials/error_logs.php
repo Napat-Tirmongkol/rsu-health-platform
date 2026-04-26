@@ -87,7 +87,7 @@ $_el_totalPages = 0;
 $_el_todayErrors = 0;
 try {
     $_el_summary     = $pdo->query("SELECT level, COUNT(*) FROM sys_error_logs GROUP BY level")->fetchAll(PDO::FETCH_KEY_PAIR);
-    $_el_todayErrors = (int)$pdo->query("SELECT COUNT(*) FROM sys_error_logs WHERE level='error' AND DATE(created_at)=CURDATE()")->fetchColumn();
+    $_el_todayErrors = (int)$pdo->query("SELECT COUNT(*) FROM sys_error_logs WHERE level='error' AND DATE(created_at)=CURDATE() AND status != 'Resolved'")->fetchColumn();
 
     $sc = $pdo->prepare("SELECT COUNT(*) FROM sys_error_logs $_el_where");
     $sc->execute($_el_params);
@@ -223,13 +223,15 @@ $_el_filterQs = http_build_query(array_filter([
             ['label'=>'Warnings',     'val'=>$_el_summary['warning']??0,      'icon'=>'fa-circle-exclamation',   'bg'=>'#fffbeb','ic'=>'#d97706'],
             ['label'=>'Info',         'val'=>$_el_summary['info']??0,         'icon'=>'fa-circle-info',          'bg'=>'#eff6ff','ic'=>'#3b82f6'],
         ];
-        foreach ($cards as $c): ?>
+        foreach ($cards as $idx => $c): 
+            $cardId = ($idx === 0) ? 'id="el-card-today"' : '';
+        ?>
         <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center gap-4">
             <div class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style="background:<?= $c['bg'] ?>">
                 <i class="fa-solid <?= $c['icon'] ?> text-lg" style="color:<?= $c['ic'] ?>"></i>
             </div>
             <div>
-                <p class="text-2xl font-black text-gray-900"><?= number_format((int)$c['val']) ?></p>
+                <p class="text-2xl font-black text-gray-900" <?= $cardId ?>><?= number_format((int)$c['val']) ?></p>
                 <p class="text-xs text-gray-400 font-semibold mt-0.5"><?= $c['label'] ?></p>
             </div>
         </div>
@@ -378,7 +380,10 @@ $_el_filterQs = http_build_query(array_filter([
                 </thead>
                 <tbody class="divide-y divide-gray-50">
                     <?php foreach ($_el_logs as $log): ?>
-                    <tr class="hover:bg-gray-50/60 transition-colors group">
+                    <tr class="hover:bg-gray-50/60 transition-colors group" 
+                        data-created-today="<?= (date('Y-m-d', strtotime($log['created_at'])) === date('Y-m-d')) ? '1' : '0' ?>"
+                        data-level="<?= $log['level'] ?>"
+                        data-old-status="<?= $log['status'] ?>">
                         <td class="px-5 py-3.5">
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase" style="<?= _el_badge($log['level']) ?>">
                                 <i class="fa-solid <?= _el_icon($log['level']) ?> text-[9px]" style="color:<?= _el_iconColor($log['level']) ?>"></i>
@@ -597,6 +602,26 @@ async function handleStatusUpdate(e) {
 
 function updateStatusUI(id, status, comment) {
     const btn = document.getElementById('status-btn-' + id);
+    const row = btn.closest('tr');
+    const isToday = row.dataset.createdToday === '1';
+    const level   = row.dataset.level;
+    const oldStatus = row.dataset.oldStatus;
+
+    // Update KPI Card "Error วันนี้" if applicable
+    if (isToday && level === 'error') {
+        const kpi = document.getElementById('el-card-today');
+        if (kpi) {
+            let val = parseInt(kpi.textContent.replace(/,/g, '')) || 0;
+            if (status === 'Resolved' && oldStatus !== 'Resolved') {
+                val = Math.max(0, val - 1);
+            } else if (status !== 'Resolved' && oldStatus === 'Resolved') {
+                val = val + 1;
+            }
+            kpi.textContent = val.toLocaleString();
+        }
+    }
+    row.dataset.oldStatus = status;
+
     const label = btn.querySelector('.status-label');
     const icon = btn.querySelector('i');
     

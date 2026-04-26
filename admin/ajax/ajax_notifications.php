@@ -11,7 +11,7 @@ try {
     $pdo = db();
 
     $errors_today = (int)$pdo->query(
-        "SELECT COUNT(*) FROM sys_error_logs WHERE DATE(created_at) = CURDATE()"
+        "SELECT COUNT(*) FROM sys_error_logs WHERE DATE(created_at) = CURDATE() AND status != 'Resolved'"
     )->fetchColumn();
 
     $pending_bookings = (int)$pdo->query(
