@@ -1,11 +1,11 @@
 <?php
-// portal/api/ai/ajax_ai.php — AI Service Endpoint
+// portal/ajax_ai.php — AI Service Endpoint (Root Level)
 declare(strict_types=1);
 
-require_once __DIR__ . '/../../../config.php';
-require_once __DIR__ . '/../../includes/auth.php'; // Reuse existing portal auth
-require_once __DIR__ . '/GeminiService.php';
-require_once __DIR__ . '/DataAssistant.php';
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/includes/auth.php'; 
+require_once __DIR__ . '/api/ai/GeminiService.php';
+require_once __DIR__ . '/api/ai/DataAssistant.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -14,13 +14,19 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit(json_encode(['ok' => false, 'error' => 'Method not allowed']));
 }
 
-// Simple CSRF check if the function exists
-if (function_exists('validate_csrf_or_die')) {
-    try {
-        validate_csrf_or_die();
-    } catch (Exception $e) {
-        exit(json_encode(['ok' => false, 'error' => 'Invalid security token']));
-    }
+// ── CSRF Check ───────────────────────────────────────────────────────────
+$token = $_POST['csrf_token'] ?? '';
+if (empty($token) || !verify_csrf_token($token)) {
+    http_response_code(403);
+    echo json_encode([
+        'ok' => false, 
+        'error' => 'Security token mismatch (CSRF)',
+        'debug' => [
+            'sent' => $token,
+            'session' => $_SESSION['csrf_token'] ?? 'missing'
+        ]
+    ]);
+    exit;
 }
 
 $query = trim($_POST['query'] ?? '');
@@ -39,7 +45,6 @@ try {
     $pdo = db();
     $assistant = new DataAssistant($pdo);
     
-    // Pick model (cached in session for performance)
     if (empty($_SESSION['_gemini_model'])) {
         $_SESSION['_gemini_model'] = GeminiService::autoPickModel($apiKey);
     }
@@ -60,7 +65,6 @@ try {
         $parts = $candidate['content']['parts'] ?? [];
         $role  = $candidate['content']['role'] ?? 'model';
         
-        // Normalize parts for potential tool calls (Gemini expects objects for args)
         $normalizedParts = array_map(function($p) {
             if (isset($p['functionCall'])) {
                 $p['functionCall']['args'] = (object)($p['functionCall']['args'] ?? []);
@@ -69,7 +73,6 @@ try {
         }, $parts);
         
         $contents[] = ['role' => $role, 'parts' => $normalizedParts];
-        
         $funcCalls = array_filter($normalizedParts, fn($p) => isset($p['functionCall']));
         $textParts = array_filter($normalizedParts, fn($p) => isset($p['text']));
         
@@ -78,15 +81,12 @@ try {
             break;
         }
         
-        // Execute tool calls
         $funcResponses = [];
         foreach ($funcCalls as $p) {
             $fc = $p['functionCall'];
             $name = $fc['name'];
             $args = (array)($fc['args'] ?? []);
-            
             $data = $assistant->executeTool($name, $args);
-            
             $funcResponses[] = [
                 'functionResponse' => [
                     'name' => $name,
@@ -94,18 +94,14 @@ try {
                 ]
             ];
         }
-        
         $contents[] = ['role' => 'user', 'parts' => $funcResponses];
     }
 
     if (!$finalText) {
-        throw new Exception("AI ไม่สามารถส่งคำตอบได้ในขณะนี้");
+        throw new Exception("AI ไม่สามารถส่งคำตอบได้ในขณะนี้ (อาจถูก Safety Filter บล็อก)");
     }
 
-    echo json_encode([
-        'ok' => true,
-        'reply' => $finalText
-    ]);
+    echo json_encode(['ok' => true, 'reply' => $finalText]);
 
 } catch (Exception $e) {
     error_log("AI Service Error: " . $e->getMessage());
