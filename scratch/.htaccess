@@ -1,2 +1,0 @@
-# Block all web access to scratch/ — dev utilities only, run via CLI/SSH
-Require all denied

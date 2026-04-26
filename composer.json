@@ -10,8 +10,13 @@
         "laravel/framework": "^12.0",
         "laravel/jetstream": "^5.5",
         "laravel/sanctum": "^4.0",
+        "laravel/socialite": "^5.26",
         "laravel/tinker": "^2.10.1",
-        "livewire/livewire": "^3.6.4"
+        "livewire/livewire": "^3.6.4",
+        "maatwebsite/excel": "^3.1",
+        "sentry/sentry-laravel": "*",
+        "socialiteproviders/line": "^4.1",
+        "spatie/laravel-permission": "^6.25"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
