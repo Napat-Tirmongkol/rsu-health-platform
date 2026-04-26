@@ -30,13 +30,20 @@ try {
     $total_records = $stmt_count->fetchColumn();
     $total_pages = ceil($total_records / $limit);
 
-    // 3. ดึงข้อมูล Log (JOIN ทั้ง sys_admins และ sys_staff เพื่อความครอบคลุม)
+    // 3. ดึงข้อมูล Log (JOIN sys_admins, sys_staff และ sys_users เพื่อความครอบคลุม)
     $sql = "SELECT l.*, 
-                   COALESCE(a.full_name, s.full_name, 'System Activity') as actor_name,
-                   COALESCE(a.username, s.username, 'system') as actor_username
+                   COALESCE(a.full_name, s.full_name, u.full_name, 'System Activity') as actor_name,
+                   COALESCE(a.username, s.username, u.student_personnel_id, 'system') as actor_username,
+                   CASE 
+                       WHEN a.id IS NOT NULL THEN 'ADMIN'
+                       WHEN s.id IS NOT NULL THEN 'STAFF'
+                       WHEN u.id IS NOT NULL THEN 'USER'
+                       ELSE 'SYSTEM'
+                   END as actor_role
             FROM sys_activity_logs l
             LEFT JOIN sys_admins a ON l.user_id = a.id
-            LEFT JOIN sys_staff s ON l.user_id = s.id
+            LEFT JOIN sys_staff s  ON l.user_id = s.id
+            LEFT JOIN sys_users u  ON l.user_id = u.id
             $where
             ORDER BY l.timestamp DESC 
             LIMIT $limit OFFSET $offset";
@@ -120,37 +127,66 @@ renderPageHeader("บันทึกกิจกรรมระบบ (Activity 
                     <?php else: ?>
                         <?php foreach ($logs as $log): 
                             // สีของ Badge ตามประเภทกิจกรรม
-                            $actionColor = "bg-gray-100 text-gray-600";
-                            if (strpos($log['action'], 'login') !== false) $actionColor = "bg-green-100 text-green-700";
-                            if (strpos($log['action'], 'delete') !== false) $actionColor = "bg-red-100 text-red-700";
-                            if (strpos($log['action'], 'update') !== false) $actionColor = "bg-blue-100 text-blue-700";
-                            if (strpos($log['action'], 'campaign') !== false) $actionColor = "bg-purple-100 text-purple-700";
+                            $actionColor = "bg-gray-50 text-gray-400 border-gray-100";
+                            if (strpos(strtolower($log['action']), 'login') !== false) $actionColor = "bg-emerald-50 text-emerald-600 border-emerald-100";
+                            if (strpos(strtolower($log['action']), 'delete') !== false) $actionColor = "bg-rose-50 text-rose-600 border-rose-100";
+                            if (strpos(strtolower($log['action']), 'update') !== false) $actionColor = "bg-sky-50 text-sky-600 border-sky-100";
+                            if (strpos(strtolower($log['action']), 'campaign') !== false) $actionColor = "bg-indigo-50 text-indigo-600 border-indigo-100";
+                            
+                            $roleColors = [
+                                'ADMIN'  => 'bg-rose-600 text-white',
+                                'STAFF'  => 'bg-amber-500 text-white',
+                                'USER'   => 'bg-[#0052CC] text-white',
+                                'SYSTEM' => 'bg-gray-400 text-white'
+                            ];
+                            $roleClass = $roleColors[$log['actor_role']] ?? 'bg-gray-400 text-white';
                         ?>
-                            <tr class="hover:bg-gray-50/50 transition-colors group">
-                                <td class="px-6 py-4 text-xs text-gray-500 whitespace-nowrap">
-                                    <i class="fa-regular fa-clock mr-1 opacity-60"></i> <?= date('d/m/Y H:i:s', strtotime($log['timestamp'])) ?>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-7 h-7 bg-blue-50 rounded-full flex items-center justify-center text-[#0052CC] text-[10px] font-bold">
-                                            <?= strtoupper(substr($log['actor_name'], 0, 1)) ?>
+                            <tr class="hover:bg-gray-50/60 transition-colors group border-b border-gray-50 last:border-0">
+                                <td class="px-6 py-5">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center text-gray-300 shrink-0">
+                                            <i class="fa-regular fa-calendar-check text-sm"></i>
                                         </div>
                                         <div class="flex flex-col">
-                                            <span class="text-sm font-semibold text-gray-900"><?= htmlspecialchars($log['actor_name']) ?></span>
-                                            <span class="text-[10px] text-gray-400 lowercase italic">@<?= htmlspecialchars($log['actor_username']) ?></span>
+                                            <span class="text-[13px] font-bold text-gray-800 leading-tight"><?= date('d M Y', strtotime($log['timestamp'])) ?></span>
+                                            <span class="text-[11px] font-medium text-gray-400 mt-0.5"><?= date('H:i:s', strtotime($log['timestamp'])) ?></span>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight shadow-sm <?= $actionColor ?>">
+                                <td class="px-6 py-5">
+                                    <div class="flex items-center gap-3">
+                                        <div class="relative shrink-0">
+                                            <div class="w-10 h-10 bg-white border border-gray-100 rounded-full flex items-center justify-center text-gray-400 text-sm font-bold shadow-sm overflow-hidden">
+                                                <i class="fa-solid fa-user-astronaut"></i>
+                                            </div>
+                                            <!-- Online Indicator Dot -->
+                                            <div class="absolute -bottom-0.5 -left-0.5 w-3.5 h-3.5 bg-white rounded-full flex items-center justify-center shadow-sm">
+                                                <div class="w-2.5 h-2.5 bg-emerald-500 rounded-full"></div>
+                                            </div>
+                                        </div>
+                                        <div class="flex flex-col min-w-0">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-[14px] font-bold text-gray-900 truncate"><?= htmlspecialchars($log['actor_name']) ?></span>
+                                                <span class="px-1.5 py-0.5 rounded-[4px] text-[9px] font-black uppercase tracking-wider <?= $roleClass ?>">
+                                                    <?= $log['actor_role'] ?>
+                                                </span>
+                                            </div>
+                                            <span class="text-[11px] text-gray-400 font-mono mt-0.5">@<?= htmlspecialchars($log['actor_username']) ?></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-5">
+                                    <span class="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-[0.05em] border shadow-sm <?= $actionColor ?>">
                                         <?= htmlspecialchars($log['action']) ?>
                                     </span>
                                 </td>
-                                <td class="px-6 py-4">
-                                    <p class="text-sm text-gray-600 line-clamp-2 max-w-xl"><?= htmlspecialchars($log['description']) ?></p>
+                                <td class="px-6 py-5">
+                                    <p class="text-[13px] text-gray-600 font-medium leading-relaxed"><?= htmlspecialchars($log['description']) ?></p>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <code class="text-[10px] bg-gray-100 px-2 py-1 rounded text-gray-500 border border-gray-200"><?= htmlspecialchars($log['ip_address'] ?? 'unknown') ?></code>
+                                <td class="px-6 py-5">
+                                    <div class="bg-white border border-gray-100 rounded-2xl px-3 py-1.5 shadow-sm inline-flex items-center">
+                                        <code class="text-[10px] font-bold text-gray-500 tracking-tight"><?= htmlspecialchars($log['ip_address'] ?? 'unknown') ?></code>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
