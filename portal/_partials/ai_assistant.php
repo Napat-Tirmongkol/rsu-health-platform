@@ -24,21 +24,21 @@ $apiKeySet = defined('GEMINI_API_KEY') && !empty(GEMINI_API_KEY);
         </div>
     </div>
     <?php endif; ?>
-    <!-- Header -->
-    <div class="px-6 py-4 border-b border-slate-200 bg-white flex items-center justify-between sticky top-0 z-10">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-purple-600 flex items-center justify-center text-white shadow-lg shadow-purple-200">
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
+    <!-- Standardized Section Header -->
+    <div class="px-5 md:px-8 py-5 border-b border-slate-100 bg-white/80 backdrop-blur-md flex items-center justify-between shrink-0 au">
+        <div>
+            <div class="sec-title" style="margin-bottom:2px">
+                <div class="w-8 h-8 rounded-lg bg-purple-600 flex items-center justify-center text-white shadow-lg shadow-purple-200 mr-1" style="font-size:12px">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                AI Data Assistant
             </div>
-            <div>
-                <h2 class="text-base font-black text-slate-800 leading-tight">AI Data Assistant</h2>
-                <p class="text-[11px] text-slate-500 font-bold uppercase tracking-wider">Powered by Gemini AI</p>
-            </div>
+            <p class="text-[11px] text-slate-500 font-bold uppercase tracking-wider ml-11">Powered by Gemini AI</p>
         </div>
         <div class="flex items-center gap-2">
-            <div class="flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full border border-emerald-100">
+            <div class="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-[10px] font-black uppercase tracking-widest">Active</span>
+                <span class="text-[10px] font-black uppercase tracking-widest">System Active</span>
             </div>
         </div>
     </div>
