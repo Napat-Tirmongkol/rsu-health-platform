@@ -8,7 +8,7 @@ error_reporting(0);
 if (session_status() === PHP_SESSION_NONE) session_start();
 require_once __DIR__ . '/../config.php';
 
-if (empty($_SESSION['evax_student_id']) && empty($_SESSION['line_user_id'])) {
+if (empty($_SESSION['student_id']) && empty($_SESSION['line_user_id'])) {
     http_response_code(401);
     exit;
 }

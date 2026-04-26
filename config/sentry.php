@@ -70,7 +70,7 @@ if ($_dsn === '') {
         // User ID จาก Session (ไม่ส่ง ชื่อ / เบอร์ — แค่ตัวเลข ID)
         if (session_status() === PHP_SESSION_ACTIVE) {
             $uid = $_SESSION['admin_id']
-                ?? $_SESSION['evax_student_id']
+                ?? $_SESSION['student_id']
                 ?? $_SESSION['student_id']
                 ?? null;
             if ($uid !== null) {

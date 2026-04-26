@@ -16,7 +16,7 @@ if (!is_array($booking)) {
   exit;
 }
 
-$fullName = (string)($_SESSION['evax_full_name'] ?? 'E-Vax Patient');
+$fullName = (string)($_SESSION['student_full_name'] ?? 'E-Vax Patient');
 $appointmentId = isset($booking['appointment_id']) ? (int)$booking['appointment_id'] : 0;
 $slotDate = (string)($booking['slot_date'] ?? '');
 $startTime = (string)($booking['start_time'] ?? '');

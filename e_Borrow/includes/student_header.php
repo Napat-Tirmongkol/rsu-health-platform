@@ -53,7 +53,7 @@
 
     <header class="header">
         <div style="display:flex;flex-direction:column;gap:4px;">
-            <?php if (!empty($_SESSION['evax_student_id'])): ?>
+            <?php if (!empty($_SESSION['student_id'])): ?>
             <a href="../user/hub.php" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:rgba(255,255,255,.75);text-decoration:none;background:rgba(255,255,255,.15);padding:3px 10px;border-radius:20px;width:fit-content;margin-bottom:2px;">
                 <i class="fas fa-arrow-left" style="font-size:10px;"></i> RSU Medical Hub
             </a>

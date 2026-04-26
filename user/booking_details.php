@@ -5,7 +5,7 @@ require_once __DIR__ . '/../includes/header.php';
 require_once __DIR__ . '/../includes/footer.php';
 session_start();
 
-$studentId = $_SESSION['evax_student_id'] ?? 0;
+$studentId = $_SESSION['student_id'] ?? 0;
 $appId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if ($studentId <= 0 || $appId <= 0) {

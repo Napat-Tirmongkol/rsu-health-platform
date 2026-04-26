@@ -133,8 +133,8 @@ try {
 
     if ($user) {
         $studentPkId = (int) $user['id'];
-        $_SESSION['evax_student_id'] = $studentPkId;
-        $_SESSION['evax_full_name'] = $fullName;
+        $_SESSION['student_id'] = $studentPkId;
+        $_SESSION['student_full_name'] = $fullName;
         // sync session สำหรับ e_Borrow ด้วย
         $_SESSION['student_id']        = $studentPkId;
         $_SESSION['student_full_name'] = $fullName;

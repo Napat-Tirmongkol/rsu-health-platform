@@ -14,7 +14,7 @@ function render_footer(): void {
   $jsApiEndpoint = str_repeat('../', $depth) . 'api/log_js_error.php';
 
   // Bottom nav — แสดงเฉพาะหน้า user ที่ login แล้ว
-  $showNav = !empty($_SESSION['evax_student_id'])
+  $showNav = !empty($_SESSION['student_id'])
     && strpos($_SERVER['SCRIPT_NAME'] ?? '', '/user/') !== false;
 
   $currentPage = basename($_SERVER['PHP_SELF'] ?? '');

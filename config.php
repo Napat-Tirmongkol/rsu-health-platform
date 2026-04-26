@@ -155,7 +155,7 @@ if (!function_exists('check_maintenance')) {
             // ตรวจสอบ Whitelist (LINE ID หรือ Student ID)
             $whitelist = $mData['whitelist'] ?? [];
             if (!empty($_SESSION['line_user_id']) && in_array($_SESSION['line_user_id'], $whitelist)) return;
-            if (!empty($_SESSION['evax_student_id']) && in_array($_SESSION['evax_student_id'], $whitelist)) return;
+            if (!empty($_SESSION['student_id']) && in_array($_SESSION['student_id'], $whitelist)) return;
             
             $isActive = $mData[$project_key] ?? true;
             

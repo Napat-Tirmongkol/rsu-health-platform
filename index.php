@@ -14,12 +14,12 @@ session_start();
 define('USER_BASE', 'user/');
 
 // ถ้า login อยู่แล้ว → ตรวจสอบสถานะและ redirect
-if (!empty($_SESSION['line_user_id']) || !empty($_SESSION['evax_student_id'])) {
+if (!empty($_SESSION['line_user_id']) || !empty($_SESSION['student_id'])) {
     require_once __DIR__ . '/config.php';
 
     try {
         $pdo = db();
-        $sid = $_SESSION['evax_student_id'] ?? null;
+        $sid = $_SESSION['student_id'] ?? null;
 
         if ($sid) {
             $stmtCheck = $pdo->prepare("

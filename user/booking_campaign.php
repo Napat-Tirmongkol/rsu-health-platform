@@ -6,7 +6,7 @@ require_once __DIR__ . '/../includes/header.php';
 require_once __DIR__ . '/../includes/footer.php';
 
 session_start();
-check_user_profile((int)($_SESSION['evax_student_id'] ?? 0));
+check_user_profile((int)($_SESSION['student_id'] ?? 0));
 
 $camp_list = [];
 $camp_error = null;

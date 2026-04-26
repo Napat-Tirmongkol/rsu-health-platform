@@ -101,8 +101,8 @@ try {
         $_SESSION['line_picture']      = $profile['pictureUrl'] ?? '';
 
         // Session สำหรับ e-campaign
-        $_SESSION['evax_student_id']   = (int)$user['id'];
-        $_SESSION['evax_full_name']    = $user['full_name'];
+        $_SESSION['student_id']   = (int)$user['id'];
+        $_SESSION['student_full_name']    = $user['full_name'];
 
         // Session สำหรับ e_Borrow (ใช้ชื่อ key เดิมที่ e_Borrow คาดหวัง)
         $_SESSION['student_id']        = (int)$user['id'];

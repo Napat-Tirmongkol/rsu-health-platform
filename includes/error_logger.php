@@ -72,7 +72,7 @@ function log_error_to_db(
         $userId = null;
         if (session_status() === PHP_SESSION_ACTIVE) {
             $userId = $_SESSION['admin_id']        ??
-                      $_SESSION['evax_student_id']  ??
+                      $_SESSION['student_id']  ??
                       $_SESSION['user_id']           ??
                       $_SESSION['student_id']        ?? null;
         }
