@@ -100,4 +100,33 @@ class AuthGuardsTest extends TestCase
         $response->assertSessionHasErrors('email');
         $this->assertGuest('staff');
     }
+
+    public function test_user_hub_requires_user_guard(): void
+    {
+        $response = $this->get(route('user.hub'));
+
+        $response->assertRedirect(route('login'));
+    }
+
+    public function test_user_guard_can_access_user_hub(): void
+    {
+        $clinic = Clinic::create([
+            'name' => 'RSU Medical Clinic',
+            'slug' => 'medical',
+            'code' => 'RSU-MED',
+            'status' => 'active',
+        ]);
+
+        $user = User::create([
+            'clinic_id' => $clinic->id,
+            'name' => 'LINE User',
+            'email' => 'line@example.com',
+            'line_user_id' => 'line-user-1',
+            'password' => Hash::make('password'),
+        ]);
+
+        $response = $this->actingAs($user, 'user')->get(route('user.hub'));
+
+        $response->assertOk();
+    }
 }

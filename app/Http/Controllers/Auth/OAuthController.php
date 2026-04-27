@@ -47,7 +47,7 @@ class OAuthController extends Controller
                 'clinic_id' => $user->clinic_id,
             ]);
 
-            return redirect()->intended('/dashboard');
+            return redirect()->intended('/user/hub');
         } catch (Throwable) {
             return redirect()->route('login')->withErrors([
                 'email' => 'LINE login failed. Please try again.',

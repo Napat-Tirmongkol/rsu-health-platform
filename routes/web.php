@@ -31,10 +31,15 @@ Route::middleware('guest:portal')->group(function () {
 Route::post('/staff/logout', [GuardLoginController::class, 'destroy'])->defaults('guard', 'staff')->middleware('auth:staff')->name('staff.logout');
 Route::post('/portal/logout', [GuardLoginController::class, 'destroy'])->defaults('guard', 'portal')->middleware('auth:portal')->name('portal.logout');
 Route::post('/admin/logout', [GuardLoginController::class, 'destroy'])->defaults('guard', 'admin')->middleware('auth:admin')->name('admin.logout');
+Route::post('/user/logout', [GuardLoginController::class, 'destroy'])->defaults('guard', 'user')->middleware('auth:user')->name('user.logout');
 
 Route::get('/admin/dashboard', fn () => view('dashboard'))->middleware('auth:admin')->name('admin.dashboard');
 Route::get('/staff/dashboard', fn () => view('dashboard'))->middleware('auth:staff')->name('staff.dashboard');
 Route::get('/portal/dashboard', fn () => view('dashboard'))->middleware('auth:portal')->name('portal.dashboard');
+
+Route::middleware('auth:user')->group(function () {
+    Route::get('/user/hub', fn () => view('user.hub'))->name('user.hub');
+});
 
 Route::middleware([
     'auth:sanctum',

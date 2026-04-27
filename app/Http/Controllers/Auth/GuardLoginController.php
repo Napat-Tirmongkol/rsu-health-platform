@@ -25,6 +25,12 @@ class GuardLoginController extends Controller
             'redirect' => '/portal/dashboard',
             'session_key' => 'portal_id',
         ],
+        'user' => [
+            'view' => 'auth.login',
+            'redirect' => '/user/hub',
+            'session_key' => 'line_user_id',
+            'logout_route' => 'login',
+        ],
     ];
 
     public function show(string $guard)
@@ -73,6 +79,6 @@ class GuardLoginController extends Controller
         $request->session()->forget(self::GUARDS[$guard]['session_key']);
         $request->session()->regenerateToken();
 
-        return redirect()->route($guard.'.login');
+        return redirect()->route(self::GUARDS[$guard]['logout_route'] ?? $guard.'.login');
     }
 }
