@@ -3,8 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
 use App\Models\Traits\BelongsToClinic;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -32,8 +32,11 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'clinic_id',
         'name',
         'email',
+        'line_user_id',
+        'line_avatar_url',
         'password',
     ];
 

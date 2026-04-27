@@ -6,78 +6,88 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
+use Throwable;
 
 class OAuthController extends Controller
 {
-    /**
-     * Redirect the user to the LINE authentication page.
-     */
     public function redirectToLine()
     {
         return Socialite::driver('line')->redirect();
     }
 
-    /**
-     * Obtain the user information from LINE.
-     */
     public function handleLineCallback()
     {
         try {
             $lineUser = Socialite::driver('line')->user();
-            
-            // ค้นหาหรือสร้าง User ใหม่
-            $user = User::where('email', $lineUser->getEmail())->first();
-            
-            if (!$user) {
-                // ถ้าไม่มีในระบบ ให้สร้างใหม่ (หรือจัดการตาม Business Logic)
-                // หมายเหตุ: ในระบบเดิมอาจจะมีฟิลด์ line_id เฉพาะ
-                $user = User::create([
-                    'name' => $lineUser->getName(),
-                    'email' => $lineUser->getEmail(),
-                    'password' => bcrypt(\Illuminate\Support\Str::random(16)), // Dummy password
-                ]);
+            $clinicId = currentClinicId();
+            $email = $lineUser->getEmail() ?: $clinicId.'.'.$lineUser->getId().'@line.local';
+
+            $user = User::firstOrNew([
+                'clinic_id' => $clinicId,
+                'line_user_id' => $lineUser->getId(),
+            ]);
+
+            $user->fill([
+                'name' => $lineUser->getName() ?: $user->name ?: 'LINE User',
+                'email' => $email,
+                'line_avatar_url' => $lineUser->getAvatar(),
+            ]);
+
+            if (! $user->exists) {
+                $user->password = Str::password(32);
             }
 
+            $user->save();
+
             Auth::guard('user')->login($user);
+            session([
+                'line_user_id' => $lineUser->getId(),
+                'clinic_id' => $user->clinic_id,
+            ]);
 
             return redirect()->intended('/dashboard');
-        } catch (\Exception $e) {
-            return redirect('/login')->with('error', 'LINE Login Failed: ' . $e->getMessage());
+        } catch (Throwable) {
+            return redirect()->route('login')->withErrors([
+                'email' => 'LINE login failed. Please try again.',
+            ]);
         }
     }
 
-    /**
-     * Redirect the user to the Google authentication page (Admin Only).
-     */
     public function redirectToGoogle()
     {
         return Socialite::driver('google')->redirect();
     }
 
-    /**
-     * Obtain the user information from Google for Admin login.
-     */
     public function handleGoogleCallback()
     {
         try {
             $googleUser = Socialite::driver('google')->user();
-            
-            // ค้นหา Admin จาก Email
             $admin = Admin::where('email', $googleUser->getEmail())->first();
-            
-            if (!$admin) {
-                return redirect('/login')->with('error', 'คุณไม่ได้รับอนุญาตให้เข้าใช้งานในฐานะ Admin');
+
+            if (! $admin) {
+                return redirect()->route('admin.login')->withErrors([
+                    'email' => 'This Google account is not allowed to access the admin area.',
+                ]);
             }
 
-            // อัปเดต Google ID
-            $admin->update(['google_id' => $googleUser->getId()]);
+            $admin->update([
+                'google_id' => $googleUser->getId(),
+                'profile_photo_path' => $googleUser->getAvatar(),
+            ]);
 
             Auth::guard('admin')->login($admin);
+            session([
+                'admin_id' => $admin->id,
+                'clinic_id' => $admin->clinic_id,
+            ]);
 
             return redirect()->intended('/admin/dashboard');
-        } catch (\Exception $e) {
-            return redirect('/login')->with('error', 'Google Login Failed');
+        } catch (Throwable) {
+            return redirect()->route('admin.login')->withErrors([
+                'email' => 'Google login failed. Please try again.',
+            ]);
         }
     }
 }
