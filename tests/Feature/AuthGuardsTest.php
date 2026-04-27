@@ -49,6 +49,13 @@ class AuthGuardsTest extends TestCase
         $this->assertSame($clinic->id, session('clinic_id'));
     }
 
+    public function test_guard_login_pages_render(): void
+    {
+        $this->get(route('staff.login'))->assertOk();
+        $this->get(route('portal.login'))->assertOk();
+        $this->get(route('admin.login'))->assertOk();
+    }
+
     public function test_portal_can_login_with_portal_guard(): void
     {
         $portal = Portal::create([
