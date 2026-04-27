@@ -136,4 +136,28 @@ class AuthGuardsTest extends TestCase
 
         $response->assertOk();
     }
+
+    public function test_user_portal_pages_render_for_user_guard(): void
+    {
+        $clinic = Clinic::create([
+            'name' => 'RSU Medical Clinic',
+            'slug' => 'medical',
+            'code' => 'RSU-MED',
+            'status' => 'active',
+        ]);
+
+        $user = User::create([
+            'clinic_id' => $clinic->id,
+            'name' => 'LINE User',
+            'email' => 'line-portal@example.com',
+            'line_user_id' => 'line-user-portal',
+            'password' => Hash::make('password'),
+        ]);
+
+        foreach (['user.hub', 'user.booking', 'user.history', 'user.chat', 'user.profile'] as $route) {
+            $this->actingAs($user, 'user')
+                ->get(route($route))
+                ->assertOk();
+        }
+    }
 }

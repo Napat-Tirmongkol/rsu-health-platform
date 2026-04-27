@@ -45,6 +45,17 @@ class Slot extends Model
      */
     public function isFull(): bool
     {
-        return $this->bookings()->count() >= $this->max_slots;
+        return $this->bookings()
+            ->whereNotIn('status', ['cancelled'])
+            ->count() >= $this->max_slots;
+    }
+
+    public function remainingCapacity(): int
+    {
+        $booked = $this->bookings()
+            ->whereNotIn('status', ['cancelled'])
+            ->count();
+
+        return max(0, $this->max_slots - $booked);
     }
 }

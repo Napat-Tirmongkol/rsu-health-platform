@@ -16,12 +16,23 @@ class Campaign extends Model
         'clinic_id',
         'title',
         'description',
+        'total_capacity',
         'image_path',
         'type',
         'status',
+        'is_auto_approve',
+        'share_token',
         'starts_at',
         'ends_at',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($campaign) {
+            $campaign->share_token ??= bin2hex(random_bytes(8));
+        });
+    }
 
     protected $casts = [
         'starts_at' => 'datetime',

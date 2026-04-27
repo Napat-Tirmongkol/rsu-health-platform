@@ -16,6 +16,8 @@ class Staff extends Authenticatable
     protected $fillable = [
         'clinic_id',
         'user_id',
+        'username',
+        'full_name',
         'email',
         'password',
         'role',

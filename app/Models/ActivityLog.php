@@ -14,7 +14,8 @@ class ActivityLog extends Model
 
     protected $fillable = [
         'clinic_id',
-        'user_id',
+        'actor_id',
+        'actor_type',
         'action',
         'description',
         'properties',
@@ -35,10 +36,10 @@ class ActivityLog extends Model
     }
 
     /**
-     * Get the user who performed the action.
+     * Get the actor who performed the action.
      */
-    public function user()
+    public function actor()
     {
-        return $this->belongsTo(User::class);
+        return $this->morphTo();
     }
 }

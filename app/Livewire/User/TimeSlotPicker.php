@@ -1,0 +1,84 @@
+<?php
+
+namespace App\Livewire\User;
+
+use App\Models\Booking;
+use App\Models\Slot;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\On;
+use Livewire\Component;
+
+class TimeSlotPicker extends Component
+{
+    public $campaignId;
+
+    public $date;
+
+    public $slots = [];
+
+    public $selectedSlotId = null;
+
+    #[On('dateSelected')]
+    public function updateSlots($campaignId, $date)
+    {
+        $this->campaignId = $campaignId;
+        $this->date = $date;
+        $this->selectedSlotId = null;
+
+        $this->slots = Slot::where('camp_id', $campaignId)
+            ->where('date', $date)
+            ->where('status', 'available')
+            ->orderBy('start_time')
+            ->get();
+    }
+
+    public function selectSlot($slotId)
+    {
+        $this->selectedSlotId = $slotId;
+    }
+
+    public function confirmBooking()
+    {
+        $this->validate([
+            'selectedSlotId' => 'required|exists:camp_slots,id',
+        ]);
+
+        $created = DB::transaction(function () {
+            $slot = Slot::whereKey($this->selectedSlotId)
+                ->where('camp_id', $this->campaignId)
+                ->where('date', $this->date)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($slot->isFull()) {
+                return false;
+            }
+
+            Booking::create([
+                'clinic_id' => currentClinicId(),
+                'user_id' => Auth::guard('user')->id(),
+                'camp_id' => $this->campaignId,
+                'slot_id' => $this->selectedSlotId,
+                'status' => 'pending',
+            ]);
+
+            return true;
+        });
+
+        if (! $created) {
+            session()->flash('error', 'ช่วงเวลานี้เต็มแล้ว กรุณาเลือกเวลาอื่น');
+
+            return;
+        }
+
+        session()->flash('message', 'จองคิวสำเร็จแล้ว ระบบบันทึกข้อมูลเรียบร้อย');
+
+        return redirect()->route('user.hub');
+    }
+
+    public function render()
+    {
+        return view('livewire.user.time-slot-picker');
+    }
+}
