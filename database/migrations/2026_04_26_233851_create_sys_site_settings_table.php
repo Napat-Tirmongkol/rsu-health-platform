@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('site_settings', function (Blueprint $table) {
+        Schema::create('sys_site_settings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('clinic_id')->nullable()->constrained('clinics')->cascadeOnDelete();
+            $table->foreignId('clinic_id')->nullable()->constrained('sys_clinics')->cascadeOnDelete();
             $table->string('key');
             $table->text('value')->nullable();
             $table->string('type')->default('string'); // string, boolean, json, etc.
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('site_settings');
+        Schema::dropIfExists('sys_site_settings');
     }
 };

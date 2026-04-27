@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('announcements', function (Blueprint $table) {
+        Schema::create('camp_list', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('clinic_id')->nullable()->constrained('clinics')->cascadeOnDelete(); // null = global
+            $table->foreignId('clinic_id')->constrained('sys_clinics')->cascadeOnDelete();
             $table->string('title');
-            $table->text('content');
-            $table->string('type')->default('info'); // info, warning, danger
-            $table->boolean('is_active')->default(true);
+            $table->text('description')->nullable();
+            $table->string('image_path')->nullable();
+            $table->string('type')->default('vaccine');
+            $table->string('status')->default('active'); // active, inactive, draft
             $table->timestamp('starts_at')->nullable();
             $table->timestamp('ends_at')->nullable();
             $table->timestamps();
@@ -29,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('announcements');
+        Schema::dropIfExists('camp_list');
     }
 };
