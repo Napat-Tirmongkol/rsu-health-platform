@@ -57,6 +57,12 @@
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider {{ $camp->type === 'vaccine' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600' }}">
                                             {{ $camp->type }}
                                         </span>
+                                        <div class="mt-2">
+                                            <a href="{{ route('staff.scan.campaign', $camp->id) }}" target="_blank" class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-emerald-600 hover:text-emerald-700 transition-colors">
+                                                <i class="fa-solid fa-qrcode"></i>
+                                                <span>Open Scanner</span>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </td>

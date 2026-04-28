@@ -24,7 +24,7 @@
                         type="button"
                         wire:click="selectSlot({{ $slot->id }})"
                         @if($isFull) disabled @endif
-                        class="flex flex-col items-center gap-1 rounded-2xl border-2 p-4 transition-all {{ $selectedSlotId == $slot->id ? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-md shadow-emerald-100' : 'border-slate-100 bg-white text-slate-600' }} {{ $isFull ? 'cursor-not-allowed opacity-50 grayscale' : '' }}"
+                        class="flex flex-col items-center gap-1 rounded-2xl border-2 p-4 transition-all {{ $selectedSlotId === $slot->id ? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-md shadow-emerald-100' : 'border-slate-100 bg-white text-slate-600' }} {{ $isFull ? 'cursor-not-allowed opacity-50 grayscale' : '' }}"
                     >
                         <span class="text-sm font-black">{{ \Carbon\Carbon::parse($slot->start_time)->format('H:i') }}</span>
                         <span class="text-[9px] font-bold opacity-60">ถึง {{ \Carbon\Carbon::parse($slot->end_time)->format('H:i') }} น.</span>

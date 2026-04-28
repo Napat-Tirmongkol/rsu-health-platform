@@ -88,11 +88,15 @@
                             </td>
                             <td class="px-8 py-6 cursor-pointer" wire:click="openDetails({{ $b->id }})">
                                 <div class="font-black text-slate-800 group-hover:text-[#2e9e63] transition-colors tracking-tight">{{ $b->user->full_name }}</div>
-                                <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{{ $b->user->student_personnel_id }}</div>
+                                <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{{ $b->user->identity_label }}: {{ $b->user->identity_value }}</div>
                             </td>
                             <td class="px-8 py-6">
                                 <div class="text-sm font-bold text-slate-600 max-w-[200px] truncate">{{ $b->campaign->title }}</div>
                                 <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">CODE: {{ $b->booking_code }}</div>
+                                <a href="{{ route('staff.scan.campaign', $b->campaign->id) }}" target="_blank" class="mt-2 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-emerald-600 hover:text-emerald-700 transition-colors">
+                                    <i class="fa-solid fa-qrcode"></i>
+                                    <span>Open Scanner</span>
+                                </a>
                             </td>
                             <td class="px-8 py-6 text-center">
                                 <span class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest {{ $b->status === 'pending' ? 'bg-amber-50 text-amber-600 border border-amber-100 animate-pulse' : ($b->status === 'confirmed' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-slate-100 text-slate-400') }}">
@@ -178,7 +182,7 @@
                             </div>
                             <div>
                                 <h4 class="text-3xl font-black text-slate-800 leading-tight mb-1">{{ $selectedBookingDetails->user->full_name }}</h4>
-                                <p class="text-slate-400 font-bold tracking-widest text-sm">ID: {{ $selectedBookingDetails->user->student_personnel_id }}</p>
+                                <p class="text-slate-400 font-bold tracking-widest text-sm">{{ $selectedBookingDetails->user->identity_label }}: {{ $selectedBookingDetails->user->identity_value }}</p>
                             </div>
                         </div>
                     </div>
@@ -224,6 +228,10 @@
 
                 <!-- Footer Actions -->
                 <div class="p-10 bg-slate-50 border-t border-slate-100 flex gap-4">
+                    <a href="{{ route('staff.scan.campaign', $selectedBookingDetails->campaign->id) }}" target="_blank" class="h-16 bg-white text-emerald-600 rounded-2xl font-black uppercase tracking-widest text-xs border border-emerald-100 flex items-center justify-center gap-2 active:scale-95 transition-all px-6">
+                        <i class="fa-solid fa-qrcode"></i>
+                        <span>Open Scanner</span>
+                    </a>
                     @if($selectedBookingDetails->status === 'pending')
                         <button wire:click="approve({{ $selectedBookingDetails->id }})" class="flex-1 h-16 bg-[#2e9e63] text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-green-100 active:scale-95 transition-all">ยืนยันการจองคิว</button>
                         <button wire:click="cancel({{ $selectedBookingDetails->id }})" class="flex-1 h-16 bg-white text-rose-500 rounded-2xl font-black uppercase tracking-widest text-xs border border-slate-200 active:scale-95 transition-all">ยกเลิก</button>

@@ -100,7 +100,7 @@
                                     </div>
                                     <div class="flex flex-col">
                                         <span class="text-sm font-black text-slate-700 leading-tight">{{ $booking->user->full_name ?? 'N/A' }}</span>
-                                        <span class="text-[11px] font-bold text-blue-500 mt-1 uppercase tracking-wider">{{ $booking->user->student_personnel_id ?? 'No ID' }}</span>
+                                        <span class="text-[11px] font-bold text-blue-500 mt-1 uppercase tracking-wider">{{ $booking->user->identity_label }}: {{ $booking->user->identity_value ?? 'No ID' }}</span>
                                     </div>
                                 </div>
                             </td>

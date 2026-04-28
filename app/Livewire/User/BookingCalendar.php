@@ -24,23 +24,17 @@ class BookingCalendar extends Component
                     ->orWhere('ends_at', '>=', now());
             })
             ->get();
+
+        if ($this->campaigns->count() === 1) {
+            $this->selectCampaign($this->campaigns->first()->id);
+        }
     }
 
     public function selectCampaign($campaignId)
     {
         $this->selectedCampaign = Campaign::findOrFail($campaignId);
         $this->selectedDate = null;
-
-        $this->availableDates = Slot::where('camp_id', $campaignId)
-            ->where('date', '>=', now()->format('Y-m-d'))
-            ->where('status', 'available')
-            ->select('date')
-            ->distinct()
-            ->orderBy('date')
-            ->get()
-            ->pluck('date')
-            ->map(fn ($date) => $date->format('Y-m-d'))
-            ->toArray();
+        $this->availableDates = $this->loadAvailableDates($campaignId);
     }
 
     public function selectDate($date)
@@ -53,5 +47,19 @@ class BookingCalendar extends Component
     public function render()
     {
         return view('livewire.user.booking-calendar');
+    }
+
+    protected function loadAvailableDates(int $campaignId): array
+    {
+        return Slot::where('camp_id', $campaignId)
+            ->whereDate('date', '>=', now()->format('Y-m-d'))
+            ->where('status', 'available')
+            ->select('date')
+            ->distinct()
+            ->orderBy('date')
+            ->get()
+            ->pluck('date')
+            ->map(fn ($date) => $date->format('Y-m-d'))
+            ->toArray();
     }
 }

@@ -35,4 +35,9 @@ class Announcement extends Model
     {
         return $this->belongsTo(Clinic::class);
     }
+
+    public function reads()
+    {
+        return $this->hasMany(UserAnnouncementRead::class, 'announcement_id');
+    }
 }

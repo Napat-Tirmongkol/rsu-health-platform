@@ -20,14 +20,14 @@ class CampaignReportExport implements FromQuery, WithHeadings, WithMapping
     {
         return Booking::query()
             ->where('camp_id', $this->campaignId)
-            ->with(['user', 'slot']);
+            ->with(['user.primaryIdentity', 'slot']);
     }
 
     public function headings(): array
     {
         return [
             'ID การจอง',
-            'รหัสนักศึกษา/บุคลากร',
+            'รหัสระบุตัวตน',
             'ชื่อ-นามสกุล',
             'เบอร์โทรศัพท์',
             'แคมเปญ',
@@ -41,7 +41,7 @@ class CampaignReportExport implements FromQuery, WithHeadings, WithMapping
     {
         return [
             $booking->id,
-            $booking->user ? $booking->user->student_personnel_id : '-',
+            $booking->user ? $booking->user->identity_value : '-',
             $booking->user ? $booking->user->full_name : '-',
             $booking->user ? ($booking->user->phone_number ?: $booking->user->phone ?: '-') : '-',
             $booking->campaign ? $booking->campaign->title : '-',

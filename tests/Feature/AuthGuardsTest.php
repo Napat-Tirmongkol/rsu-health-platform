@@ -3,11 +3,15 @@
 namespace Tests\Feature;
 
 use App\Models\Clinic;
+use App\Models\Campaign;
 use App\Models\Portal;
+use App\Models\Booking;
+use App\Models\Slot;
 use App\Models\Staff;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class AuthGuardsTest extends TestCase
@@ -159,5 +163,142 @@ class AuthGuardsTest extends TestCase
                 ->get(route($route))
                 ->assertOk();
         }
+    }
+
+    public function test_user_booking_page_auto_selects_single_campaign(): void
+    {
+        $clinic = Clinic::create([
+            'name' => 'RSU Medical Clinic',
+            'slug' => 'medical',
+            'code' => 'RSU-MED',
+            'status' => 'active',
+        ]);
+
+        $user = User::create([
+            'clinic_id' => $clinic->id,
+            'name' => 'LINE User',
+            'email' => 'line-booking@example.com',
+            'line_user_id' => 'line-user-booking',
+            'password' => Hash::make('password'),
+        ]);
+
+        $campaign = Campaign::create([
+            'clinic_id' => $clinic->id,
+            'title' => 'Flu Vaccine 2026',
+            'description' => 'Seasonal campaign',
+            'total_capacity' => 20,
+            'status' => 'active',
+        ]);
+
+        Slot::create([
+            'camp_id' => $campaign->id,
+            'date' => now()->addDay()->toDateString(),
+            'start_time' => '09:00',
+            'end_time' => '10:00',
+            'max_slots' => 20,
+            'status' => 'available',
+        ]);
+
+        $this->actingAs($user, 'user')
+            ->withSession(['clinic_id' => $clinic->id])
+            ->get(route('user.booking'))
+            ->assertOk()
+            ->assertSee('2. เลือกวันที่')
+            ->assertSee(now()->addDay()->format('d'));
+    }
+
+    public function test_time_slot_picker_loads_slots_for_sqlite_date_column(): void
+    {
+        $clinic = Clinic::create([
+            'name' => 'RSU Medical Clinic',
+            'slug' => 'medical',
+            'code' => 'RSU-MED',
+            'status' => 'active',
+        ]);
+
+        $campaign = Campaign::create([
+            'clinic_id' => $clinic->id,
+            'title' => 'Flu Vaccine 2026',
+            'description' => 'Seasonal campaign',
+            'total_capacity' => 20,
+            'status' => 'active',
+        ]);
+
+        Slot::create([
+            'camp_id' => $campaign->id,
+            'date' => '2026-05-01',
+            'start_time' => '09:00',
+            'end_time' => '10:00',
+            'max_slots' => 20,
+            'status' => 'available',
+        ]);
+
+        Slot::create([
+            'camp_id' => $campaign->id,
+            'date' => '2026-05-01',
+            'start_time' => '13:00',
+            'end_time' => '14:00',
+            'max_slots' => 20,
+            'status' => 'available',
+        ]);
+
+        Livewire::test(\App\Livewire\User\TimeSlotPicker::class)
+            ->call('updateSlots', $campaign->id, '2026-05-01')
+            ->assertSet('campaignId', $campaign->id)
+            ->assertSet('date', '2026-05-01')
+            ->assertSee('09:00')
+            ->assertSee('13:00');
+    }
+
+    public function test_user_can_open_booking_details_from_history(): void
+    {
+        $clinic = Clinic::create([
+            'name' => 'RSU Medical Clinic',
+            'slug' => 'medical',
+            'code' => 'RSU-MED',
+            'status' => 'active',
+        ]);
+
+        $user = User::create([
+            'clinic_id' => $clinic->id,
+            'name' => 'LINE User',
+            'email' => 'line-history@example.com',
+            'line_user_id' => 'line-user-history',
+            'password' => Hash::make('password'),
+        ]);
+
+        $campaign = Campaign::create([
+            'clinic_id' => $clinic->id,
+            'title' => 'Flu Vaccine 2026',
+            'description' => 'Seasonal campaign',
+            'total_capacity' => 20,
+            'status' => 'active',
+        ]);
+
+        $slot = Slot::create([
+            'camp_id' => $campaign->id,
+            'date' => now()->addDay()->toDateString(),
+            'start_time' => '09:00',
+            'end_time' => '10:00',
+            'max_slots' => 20,
+            'status' => 'available',
+        ]);
+
+        $booking = Booking::create([
+            'clinic_id' => $clinic->id,
+            'user_id' => $user->id,
+            'camp_id' => $campaign->id,
+            'slot_id' => $slot->id,
+            'status' => 'confirmed',
+            'notes' => 'Bring student ID',
+        ]);
+
+        Livewire::actingAs($user, 'user')
+            ->test(\App\Livewire\User\MyBookings::class)
+            ->call('showDetails', $booking->id)
+            ->assertDispatched('open-modal')
+            ->assertSet('selectedBooking.id', $booking->id)
+            ->assertSee($booking->booking_code)
+            ->assertSee('Bring student ID');
     }
 }

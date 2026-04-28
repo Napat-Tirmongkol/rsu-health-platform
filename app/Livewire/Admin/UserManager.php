@@ -23,7 +23,7 @@ class UserManager extends Component
 
     public function viewHistory($userId)
     {
-        $this->selectedUser = User::findOrFail($userId);
+        $this->selectedUser = User::with('primaryIdentity')->findOrFail($userId);
         $this->userBookings = Booking::where('user_id', $userId)
             ->with(['campaign', 'slot'])
             ->latest()
@@ -36,9 +36,14 @@ class UserManager extends Component
         $users = User::where(function($q) {
                 $q->where('full_name', 'like', '%' . $this->search . '%')
                   ->orWhere('student_personnel_id', 'like', '%' . $this->search . '%')
+                  ->orWhere('citizen_id', 'like', '%' . $this->search . '%')
+                  ->orWhereHas('identities', function($iq) {
+                      $iq->where('identity_value', 'like', '%' . $this->search . '%');
+                  })
                   ->orWhere('email', 'like', '%' . $this->search . '%')
                   ->orWhere('phone_number', 'like', '%' . $this->search . '%');
             })
+            ->with('primaryIdentity')
             ->latest()
             ->paginate(20);
 

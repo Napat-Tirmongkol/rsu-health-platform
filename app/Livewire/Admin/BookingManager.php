@@ -30,7 +30,7 @@ class BookingManager extends Component
 
     public function openDetails($id)
     {
-        $this->selectedBookingDetails = Booking::with(['user', 'campaign', 'slot'])->findOrFail($id);
+        $this->selectedBookingDetails = Booking::with(['user.primaryIdentity', 'campaign', 'slot'])->findOrFail($id);
         $this->showDrawer = true;
     }
 
@@ -72,7 +72,7 @@ class BookingManager extends Component
 
     public function render()
     {
-        $query = Booking::with(['user', 'campaign', 'slot'])
+        $query = Booking::with(['user.primaryIdentity', 'campaign', 'slot'])
             ->when($this->statusFilter !== 'all', function($q) {
                 return $q->where('status', $this->statusFilter);
             })
@@ -80,6 +80,8 @@ class BookingManager extends Component
                 return $q->whereHas('user', function($uq) {
                     $uq->where('full_name', 'like', '%' . $this->search . '%')
                        ->orWhere('student_personnel_id', 'like', '%' . $this->search . '%');
+                })->orWhereHas('user.identities', function($iq) {
+                    $iq->where('identity_value', 'like', '%' . $this->search . '%');
                 })->orWhereHas('campaign', function($cq) {
                     $cq->where('title', 'like', '%' . $this->search . '%');
                 });

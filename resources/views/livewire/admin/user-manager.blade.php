@@ -40,7 +40,10 @@
                             </div>
                         </td>
                         <td class="px-8 py-6">
-                            <span class="text-sm font-black text-blue-500 tracking-wider">{{ $user->student_personnel_id ?: '—' }}</span>
+                            <div class="flex flex-col">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ $user->identity_label }}</span>
+                                <span class="text-sm font-black text-blue-500 tracking-wider">{{ $user->identity_value ?: '—' }}</span>
+                            </div>
                         </td>
                         <td class="px-8 py-6">
                             <span class="text-sm font-bold text-slate-600">{{ $user->department ?: '—' }}</span>
@@ -98,8 +101,8 @@
                 <div class="p-10 overflow-y-auto h-[calc(100vh-160px)] custom-scrollbar">
                     <div class="grid grid-cols-2 gap-4 mb-10">
                         <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100">
-                            <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest block mb-2">รหัสนักศึกษา</span>
-                            <span class="text-sm font-black text-slate-700">{{ $selectedUser->student_personnel_id ?: '—' }}</span>
+                            <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest block mb-2">{{ $selectedUser->identity_label }}</span>
+                            <span class="text-sm font-black text-slate-700">{{ $selectedUser->identity_value ?: '—' }}</span>
                         </div>
                         <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100">
                             <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest block mb-2">คณะ/หน่วยงาน</span>

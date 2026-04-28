@@ -27,7 +27,7 @@ class TimeSlotPicker extends Component
         $this->selectedSlotId = null;
 
         $this->slots = Slot::where('camp_id', $campaignId)
-            ->where('date', $date)
+            ->whereDate('date', $date)
             ->where('status', 'available')
             ->orderBy('start_time')
             ->get();
@@ -47,7 +47,7 @@ class TimeSlotPicker extends Component
         $created = DB::transaction(function () {
             $slot = Slot::whereKey($this->selectedSlotId)
                 ->where('camp_id', $this->campaignId)
-                ->where('date', $this->date)
+                ->whereDate('date', $this->date)
                 ->lockForUpdate()
                 ->firstOrFail();
 
@@ -67,7 +67,7 @@ class TimeSlotPicker extends Component
         });
 
         if (! $created) {
-            session()->flash('error', 'ช่วงเวลานี้เต็มแล้ว กรุณาเลือกเวลาอื่น');
+            session()->flash('error', 'ช่วงเวลานี้เต็มแล้ว กรุณาเลือกช่วงเวลาอื่น');
 
             return;
         }

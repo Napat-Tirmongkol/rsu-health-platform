@@ -68,7 +68,7 @@ class ReportManager extends Component
         $bookings = [];
         if ($this->selectedCampaignId) {
             $bookings = Booking::where('camp_id', $this->selectedCampaignId)
-                ->with(['user', 'slot'])
+                ->with(['user.primaryIdentity', 'slot'])
                 ->latest()
                 ->paginate(20);
         }

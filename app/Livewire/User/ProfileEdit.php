@@ -3,6 +3,7 @@
 namespace App\Livewire\User;
 
 use App\Models\User;
+use App\Models\UserIdentity;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -108,11 +109,45 @@ class ProfileEdit extends Component
             'email' => $this->email,
         ]);
 
+        $this->syncIdentities($user);
+
         $this->dispatch('swal:success', message: 'บันทึกข้อมูลส่วนตัวเรียบร้อยแล้ว');
     }
 
     public function render()
     {
         return view('livewire.user.profile-edit');
+    }
+
+    private function syncIdentities(User $user): void
+    {
+        $studentPersonnelId = trim((string) $this->student_id);
+        $citizenId = trim((string) $this->citizen_id);
+        $isPassport = $this->id_type === 'passport';
+        $personType = $this->status === 'other' ? 'general' : $this->status;
+
+        UserIdentity::where('user_id', $user->id)->delete();
+
+        $identities = [];
+
+        if ($studentPersonnelId !== '') {
+            $identities[] = [
+                'identity_type' => $personType === 'staff' ? 'staff_id' : 'student_id',
+                'identity_value' => $studentPersonnelId,
+                'is_primary' => in_array($personType, ['student', 'staff'], true),
+            ];
+        }
+
+        if ($citizenId !== '') {
+            $identities[] = [
+                'identity_type' => $isPassport ? 'passport' : 'citizen_id',
+                'identity_value' => $citizenId,
+                'is_primary' => ! in_array($personType, ['student', 'staff'], true),
+            ];
+        }
+
+        foreach ($identities as $identity) {
+            $user->identities()->create($identity);
+        }
     }
 }
