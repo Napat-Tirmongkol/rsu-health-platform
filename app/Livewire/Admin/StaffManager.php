@@ -14,8 +14,6 @@ class StaffManager extends Component
     public $search = '';
     public $showModal = false;
     public $editingId = null;
-
-    // Form fields
     public $username, $full_name, $email, $password, $role = 'staff', $status = 'active';
 
     protected function rules()
@@ -41,11 +39,12 @@ class StaffManager extends Component
     public function edit($id)
     {
         $staff = Staff::findOrFail($id);
+
         $this->editingId = $id;
         $this->username = $staff->username;
         $this->full_name = $staff->full_name;
         $this->email = $staff->email;
-        $this->password = ''; // Clear password field
+        $this->password = '';
         $this->role = $staff->role;
         $this->status = $staff->status;
         $this->showModal = true;
@@ -82,16 +81,18 @@ class StaffManager extends Component
     public function toggleStatus($id)
     {
         $staff = Staff::findOrFail($id);
+
         $staff->update([
-            'status' => $staff->status === 'active' ? 'disabled' : 'active'
+            'status' => $staff->status === 'active' ? 'disabled' : 'active',
         ]);
+
         session()->flash('message', 'อัปเดตสถานะเจ้าหน้าที่เรียบร้อยแล้ว');
     }
 
     public function delete($id)
     {
         if (auth('admin')->id() == $id) {
-            session()->flash('error', 'ไม่สามารถลบบัญชีตัวเองได้');
+            session()->flash('error', 'ไม่สามารถลบบัญชีของตัวเองได้');
             return;
         }
 
@@ -101,16 +102,16 @@ class StaffManager extends Component
 
     public function render()
     {
-        $staffs = Staff::where(function($q) {
-                $q->where('full_name', 'like', '%' . $this->search . '%')
-                  ->orWhere('username', 'like', '%' . $this->search . '%')
-                  ->orWhere('email', 'like', '%' . $this->search . '%');
-            })
+        $staffs = Staff::where(function ($q) {
+            $q->where('full_name', 'like', '%' . $this->search . '%')
+                ->orWhere('username', 'like', '%' . $this->search . '%')
+                ->orWhere('email', 'like', '%' . $this->search . '%');
+        })
             ->latest()
             ->paginate(20);
 
         return view('livewire.admin.staff-manager', [
-            'staffs' => $staffs
+            'staffs' => $staffs,
         ]);
     }
 }

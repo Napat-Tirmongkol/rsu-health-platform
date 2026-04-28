@@ -5,10 +5,13 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Announcement;
 use App\Models\Booking;
+use App\Models\BorrowRecord;
 use App\Models\Campaign;
 use App\Models\InsuranceMember;
-use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class HubController extends Controller
 {
@@ -17,7 +20,6 @@ class HubController extends Controller
         $user = Auth::guard('user')->user();
         $today = Carbon::today();
 
-        // 1. แคมเปญที่กำลังเปิดอยู่
         $campaigns = Campaign::where('status', 'active')
             ->where(function ($query) use ($today) {
                 $query->whereNull('ends_at')
@@ -27,40 +29,32 @@ class HubController extends Controller
             ->take(5)
             ->get();
 
-        // 2. ประกาศล่าสุด (ที่ยังไม่ได้อ่าน)
         $announcements = Announcement::where('is_active', true)
             ->latest()
             ->take(5)
             ->get();
 
-        // 3. รายการจองทั้งหมด (สำหรับสถิติ)
         $bookingList = Booking::where('user_id', $user->id)
             ->with(['campaign', 'slot'])
-            ->orderBy('created_at', 'desc')
+            ->orderByDesc('created_at')
             ->get();
 
-        // 4. นัดหมายที่กำลังจะมาถึง (Upcoming)
         $upcomingBookings = $bookingList->whereIn('status', ['pending', 'confirmed'])
-            ->filter(function($b) use ($today) {
-                return $b->slot && $b->slot->date >= $today->format('Y-m-d');
+            ->filter(function ($booking) use ($today) {
+                return $booking->slot && $booking->slot->date >= $today->format('Y-m-d');
             });
 
         $latestBooking = $upcomingBookings->first();
         $upcomingCount = $upcomingBookings->count();
 
-        // 5. ข้อมูลประกัน (Insurance)
-        $insurance = InsuranceMember::where('member_id', $user->username) // ใช้ username/student_id เป็น member_id
-            ->first();
-
-        // 6. ข้อมูลอื่นๆ (จำลองค่าสำหรับดีไซน์)
-        $borrowCount = 0; // ใน Phase ถัดไปจะดึงจากตาราง borrow_records
-        
+        $insurance = InsuranceMember::where('member_id', $user->username)->first();
+        $borrowCount = $this->resolveBorrowCount($user->id);
         $thaiDate = $this->formatThaiDate($today);
 
         return view('user.hub', compact(
-            'user', 
-            'campaigns', 
-            'announcements', 
+            'user',
+            'campaigns',
+            'announcements',
             'bookingList',
             'latestBooking',
             'upcomingCount',
@@ -70,11 +64,26 @@ class HubController extends Controller
         ));
     }
 
-    private function formatThaiDate($date)
+    private function resolveBorrowCount(int $userId): int
     {
-        $days = ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"];
-        $months = ["", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-        
-        return $days[$date->dayOfWeek] . ", " . $date->day . " " . $months[$date->month] . " " . ($date->year + 543);
+        if (! Schema::hasTable('borrow_records')) {
+            return 0;
+        }
+
+        try {
+            return BorrowRecord::where('borrower_user_id', $userId)
+                ->where('status', 'borrowed')
+                ->count();
+        } catch (QueryException) {
+            return 0;
+        }
+    }
+
+    private function formatThaiDate(Carbon $date): string
+    {
+        $days = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+        $months = ['', 'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+
+        return $days[$date->dayOfWeek].', '.$date->day.' '.$months[$date->month].' '.($date->year + 543);
     }
 }

@@ -13,6 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->append(\App\Http\Middleware\SetTenantFromSubdomain::class);
+        $middleware->alias([
+            'admin.module' => \App\Http\Middleware\EnsureAdminModuleAccess::class,
+            'admin.platform' => \App\Http\Middleware\EnsureFullPlatformAccess::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

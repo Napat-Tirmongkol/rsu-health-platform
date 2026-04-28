@@ -83,7 +83,7 @@ class OAuthController extends Controller
                 'clinic_id' => $admin->clinic_id,
             ]);
 
-            return redirect()->intended('/admin/dashboard');
+            return redirect()->intended(route($admin->landingRouteName()));
         } catch (Throwable) {
             return redirect()->route('admin.login')->withErrors([
                 'email' => 'Google login failed. Please try again.',

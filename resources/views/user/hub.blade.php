@@ -7,15 +7,12 @@
         .custom-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 
-    <!-- Modal Scripts (Specific to Hub) -->
     <script>
         function showInsurance() { document.getElementById('insDetailModal').classList.remove('hidden'); }
         function hideInsurance() { document.getElementById('insDetailModal').classList.add('hidden'); }
     </script>
 
     <main class="px-6 pt-8 space-y-8">
-
-        <!-- ── Title Section ── -->
         <div class="px-1">
             <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] mb-2 opacity-70">
                 {{ $thaiDate }}
@@ -25,10 +22,8 @@
             </div>
         </div>
 
-        <!-- ── Premium Identity Card (Wallet Style) ── -->
         <div onclick="window.location.href='{{ route('user.profile') }}'"
             class="relative overflow-hidden bg-gradient-to-br from-[#2e9e63] via-[#10b981] to-[#2e9e63] rounded-[3rem] p-8 shadow-[0_25px_50px_-12px_rgba(46,158,99,0.3)] group active:scale-[0.97] transition-all cursor-pointer">
-            <!-- Abstract Decorations -->
             <div class="absolute -right-6 -top-6 w-48 h-48 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
             <div class="absolute -left-12 -bottom-12 w-56 h-56 bg-emerald-400/20 rounded-full blur-3xl"></div>
 
@@ -45,7 +40,7 @@
                         <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-400 rounded-full border-4 border-[#237a4c] animate-pulse"></div>
                     </div>
                     <div class="flex-1 min-w-0 text-left">
-                        <p class="text-emerald-50 text-sm font-bold mb-1">สวัสดี 👋</p>
+                        <p class="text-emerald-50 text-sm font-bold mb-1">สวัสดีครับ</p>
                         <h3 class="text-white text-2xl font-black tracking-tight leading-tight mb-1 truncate">
                             {{ $user->name }}
                         </h3>
@@ -71,7 +66,6 @@
             </div>
         </div>
 
-        <!-- ── Health Stats ── -->
         <div class="grid grid-cols-2 gap-4">
             <button onclick="window.location.href='{{ route('user.history') }}'"
                 class="bg-white rounded-[2.5rem] p-6 border border-slate-100 shadow-[0_15px_30px_rgba(0,0,0,0.03)] flex flex-col items-center text-center active:scale-95 transition-all group">
@@ -79,9 +73,10 @@
                     <i class="fa-solid fa-calendar-check text-green-600 text-lg"></i>
                 </div>
                 <p class="font-black text-xl text-slate-900 mb-0.5">{{ $bookingList->count() }}</p>
-                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">การเข้าใช้บริการ</p>
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">การเข้ารับบริการ</p>
             </button>
-            <button class="bg-white rounded-[2.5rem] p-6 border border-slate-100 shadow-[0_15px_30px_rgba(0,0,0,0.03)] flex flex-col items-center text-center active:scale-95 transition-all group">
+            <button onclick="window.location.href='{{ route('user.borrow.history') }}'"
+                class="bg-white rounded-[2.5rem] p-6 border border-slate-100 shadow-[0_15px_30px_rgba(0,0,0,0.03)] flex flex-col items-center text-center active:scale-95 transition-all group">
                 <div class="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-boxes-stacked text-orange-600 text-lg"></i>
                 </div>
@@ -90,7 +85,6 @@
             </button>
         </div>
 
-        <!-- ── Quick Services Menu ── -->
         <div class="space-y-4">
             <div class="flex items-center justify-between px-1">
                 <h3 class="text-slate-900 font-black text-sm uppercase tracking-widest">Main Menu</h3>
@@ -108,51 +102,50 @@
                         <p class="text-[13px] font-black leading-tight tracking-wide">จองคิว /<br>แคมเปญ</p>
                     </a>
 
-                    <a href="{{ route('user.history') }}"
+                    <a href="{{ route('user.borrow.index') }}"
                         class="relative flex flex-col items-start p-6 rounded-[2.2rem] bg-indigo-50 border border-indigo-100 shadow-sm active:scale-95 transition-all text-indigo-600 group">
-                        @if($upcomingCount > 0)
-                            <span class="absolute top-4 right-4 w-6 h-6 bg-red-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-lg animate-bounce">{{ $upcomingCount }}</span>
+                        @if($borrowCount > 0)
+                            <span class="absolute top-4 right-4 w-6 h-6 bg-red-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-lg animate-bounce">{{ $borrowCount }}</span>
                         @endif
                         <div class="w-11 h-11 rounded-2xl bg-white flex items-center justify-center mb-4 shadow-sm border border-indigo-50 group-hover:scale-110 transition-transform">
-                            <i class="fa-solid fa-clipboard-list text-indigo-500 text-base"></i>
+                            <i class="fa-solid fa-box-open text-indigo-500 text-base"></i>
                         </div>
-                        <p class="text-[13px] font-black leading-tight tracking-wide text-slate-800">ประวัติ<br>การรักษา</p>
+                        <p class="text-[13px] font-black leading-tight tracking-wide text-slate-800">ยืมอุปกรณ์<br>และติดตามรายการ</p>
                     </a>
                 </div>
 
                 <div class="pt-6 border-t border-slate-50">
                     <p class="text-slate-400 text-[9px] font-black uppercase tracking-[0.3em] mb-5 text-center">External Services</p>
                     <div class="grid grid-cols-4 gap-4">
-                        <a href="{{ route('user.chat') }}" class="flex flex-col items-center gap-2 active:scale-90 transition-all">
+                        <a href="https://page.line.me/641mrzwm?oat_content=url&openQrModal=true" target="_blank" rel="noopener noreferrer" class="flex flex-col items-center gap-2 active:scale-90 transition-all">
                             <div class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 shadow-sm">
                                 <i class="fa-solid fa-comment-dots text-lg"></i>
                             </div>
                             <span class="text-slate-500 text-[8px] font-black text-center leading-tight uppercase tracking-widest">Counseling</span>
                         </a>
-                        <a href="#" class="flex flex-col items-center gap-2 active:scale-90 transition-all">
+                        <a href="{{ route('user.services.ncd-clinic') }}" class="flex flex-col items-center gap-2 active:scale-90 transition-all">
                             <div class="w-12 h-12 bg-cyan-50 rounded-2xl flex items-center justify-center text-cyan-600 shadow-sm">
                                 <i class="fa-solid fa-heart-pulse text-lg"></i>
                             </div>
                             <span class="text-slate-500 text-[8px] font-black text-center leading-tight uppercase tracking-widest">NCD Clinic</span>
                         </a>
-                        <button class="flex flex-col items-center gap-2 active:scale-90 transition-all">
+                        <a href="{{ route('user.services.contact') }}" class="flex flex-col items-center gap-2 active:scale-90 transition-all">
                             <div class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 shadow-sm">
                                 <i class="fa-solid fa-phone-flip text-base"></i>
                             </div>
                             <span class="text-slate-500 text-[8px] font-black text-center leading-tight uppercase tracking-widest">Contact</span>
-                        </button>
-                        <button class="flex flex-col items-center gap-2 active:scale-90 transition-all">
+                        </a>
+                        <a href="{{ route('user.services.help') }}" class="flex flex-col items-center gap-2 active:scale-90 transition-all">
                             <div class="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 shadow-sm">
                                 <i class="fa-solid fa-circle-question text-lg"></i>
                             </div>
                             <span class="text-slate-500 text-[8px] font-black text-center leading-tight uppercase tracking-widest">Help</span>
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ── Active Appointments ── -->
         <div class="space-y-4">
             <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] px-1 text-left">Upcoming Appointments</p>
             <div class="bg-white rounded-[3rem] border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.04)] overflow-hidden">
@@ -195,16 +188,15 @@
                             </div>
                         </div>
                     @empty
-                        <div class="py-12 text-center text-slate-300 font-bold text-sm italic">ไม่มีนัดหมายในเร็วๆ นี้</div>
+                        <div class="py-12 text-center text-slate-300 font-bold text-sm italic">ยังไม่มีนัดหมายที่กำลังจะมาถึง</div>
                     @endforelse
                 </div>
             </div>
         </div>
 
-        <!-- ── Insurance Card ── -->
         <div class="space-y-4">
             <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] px-1 text-left">Medical Coverage</p>
-            
+
             @if($insurance)
                 <div class="bg-slate-900 rounded-[3rem] p-8 shadow-2xl relative overflow-hidden premium-shadow text-left">
                     <div class="absolute -right-8 -bottom-8 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
@@ -244,7 +236,6 @@
                 </div>
             @endif
 
-            <!-- Info Banner -->
             <button onclick="showInsurance()" class="w-full bg-[#2e9e63] rounded-[2.2rem] p-6 shadow-xl shadow-green-100 relative overflow-hidden group cursor-pointer text-left">
                 <div class="absolute -right-4 -top-4 w-20 h-20 bg-white/10 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
                 <div class="flex items-center gap-4 relative z-10">
@@ -260,7 +251,6 @@
             </button>
         </div>
 
-        <!-- ── Footer ── -->
         <footer class="pt-10 pb-16 text-center space-y-2 opacity-30">
             <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">© 2568 RSU Medical Services</p>
             <div class="flex items-center justify-center gap-3">
@@ -269,26 +259,21 @@
                 <span class="w-1 h-1 bg-slate-400 rounded-full"></span>
             </div>
         </footer>
-
     </main>
 
-    <!-- Insurance Detail Modal -->
     <div id="insDetailModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="hideInsurance()"></div>
         <div class="relative bg-white w-full max-w-[340px] rounded-[3rem] p-8 shadow-2xl overflow-y-auto max-h-[80vh]">
             <h3 class="text-xl font-black mb-4">รายละเอียดความคุ้มครอง</h3>
             <div class="space-y-4 text-left text-sm text-slate-600">
-                <p>• คุ้มครองอุบัติเหตุ 24 ชั่วโมง</p>
-                <p>• วงเงินค่ารักษาพยาบาลตามสิทธิ</p>
-                <p>• แสดงบัตรนี้พร้อมบัตรประชาชนเพื่อใช้สิทธิ</p>
+                <p>- คุ้มครองอุบัติเหตุ 24 ชั่วโมง</p>
+                <p>- วงเงินค่ารักษาพยาบาลตามสิทธิ์</p>
+                <p>- แสดงบัตรนี้พร้อมบัตรประชาชนเพื่อใช้สิทธิ์</p>
             </div>
             <button onclick="hideInsurance()" class="w-full mt-8 py-4 bg-slate-900 text-white font-black rounded-2xl">รับทราบ</button>
         </div>
     </div>
 
-    <!-- Announcement Popup Placeholder (Phase G logic) -->
     @if($announcements->count() > 0)
-        <!-- Logic for announcements will be integrated here -->
     @endif
-
 </x-user-layout>

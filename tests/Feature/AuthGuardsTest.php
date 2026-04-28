@@ -158,7 +158,16 @@ class AuthGuardsTest extends TestCase
             'password' => Hash::make('password'),
         ]);
 
-        foreach (['user.hub', 'user.booking', 'user.history', 'user.chat', 'user.profile'] as $route) {
+        foreach ([
+            'user.hub',
+            'user.booking',
+            'user.history',
+            'user.chat',
+            'user.profile',
+            'user.services.ncd-clinic',
+            'user.services.contact',
+            'user.services.help',
+        ] as $route) {
             $this->actingAs($user, 'user')
                 ->get(route($route))
                 ->assertOk();

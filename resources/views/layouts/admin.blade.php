@@ -15,7 +15,7 @@
         }
 
         .glass-sidebar {
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.82);
             backdrop-filter: blur(20px);
             border-right: 1px solid rgba(226, 232, 240, 0.8);
         }
@@ -51,71 +51,97 @@
     </style>
     @livewireStyles
 </head>
+@php
+    $moduleRegistry = config('admin_modules.modules', []);
+    $adminUser = Auth::guard('admin')->user();
+    $currentModule = 'platform';
+
+    foreach ($moduleRegistry as $moduleKey => $module) {
+        if (collect($module['patterns'] ?? [])->contains(fn ($pattern) => request()->routeIs($pattern))) {
+            $currentModule = $moduleKey;
+            break;
+        }
+    }
+
+    $navigationSections = config("admin_modules.sections.{$currentModule}", config('admin_modules.sections.platform', []));
+    $moduleCards = collect($moduleRegistry)
+        ->filter(fn ($module, $key) => ! $adminUser || $adminUser->hasModuleAccess($key))
+        ->map(function ($module, $key) use ($currentModule) {
+            return array_merge($module, [
+                'key' => $key,
+                'active' => $currentModule === $key,
+            ]);
+        });
+@endphp
 <body class="overflow-hidden">
     <div class="flex h-screen overflow-hidden">
-        <aside class="w-72 glass-sidebar flex-shrink-0 flex flex-col z-50">
-            <div class="p-8">
-                <div class="flex items-center gap-3 mb-10">
-                    <div class="w-10 h-10 bg-[#2e9e63] rounded-xl flex items-center justify-center text-white shadow-lg shadow-green-200">
+        <aside class="glass-sidebar z-50 flex w-72 flex-shrink-0 flex-col">
+            <div class="custom-scrollbar overflow-y-auto p-8">
+                <div class="mb-10 flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2e9e63] text-white shadow-lg shadow-green-200">
                         <i class="fa-solid fa-clinic-medical"></i>
                     </div>
                     <div>
-                        <h2 class="font-black text-slate-800 tracking-tight leading-none mb-1">RSU Medical</h2>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none">Admin Console</p>
+                        <h2 class="mb-1 font-black leading-none text-slate-800">RSU Medical</h2>
+                        <p class="text-[10px] font-bold uppercase leading-none tracking-widest text-slate-400">Platform Admin</p>
                     </div>
                 </div>
 
-                <nav class="space-y-2">
-                    <p class="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mb-4 ml-4">Management</p>
+                <div class="mb-8 space-y-3 rounded-[1.75rem] border border-slate-100 bg-white/70 p-3 shadow-sm shadow-slate-100/80">
+                    <div class="px-3 pt-1">
+                        <p class="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">Workspace Switcher</p>
+                        <p class="mt-2 text-xs font-bold leading-relaxed text-slate-500">เลือกโมดูลให้ตรงกับงานที่กำลังทำอยู่ แล้วระบบจะจัดเมนูให้เหมาะกับบริบทนั้นทันที</p>
+                    </div>
 
-                    <a href="{{ route('admin.dashboard') }}" class="nav-link flex items-center gap-3 px-5 py-3.5 text-sm font-bold {{ request()->routeIs('admin.dashboard') ? 'active' : 'text-slate-500' }}">
-                        <i class="fa-solid fa-chart-pie w-5"></i>
-                        <span>Dashboard (KPI)</span>
-                    </a>
+                    @foreach ($moduleCards as $module)
+                        <a href="{{ route($module['route']) }}" class="block rounded-2xl border px-4 py-3 transition-all {{ $module['active'] ? 'border-emerald-200 bg-emerald-50 shadow-sm shadow-emerald-100/70' : 'border-transparent bg-slate-50/80 hover:border-slate-200 hover:bg-white' }}">
+                            <div class="flex items-start gap-3">
+                                <div class="flex h-10 w-10 items-center justify-center rounded-2xl {{ $module['active'] ? 'bg-emerald-500 text-white' : 'bg-white text-slate-500 shadow-sm' }}">
+                                    <i class="fa-solid {{ $module['icon'] }}"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-xs font-black uppercase tracking-[0.18em] {{ $module['active'] ? 'text-emerald-600' : 'text-slate-400' }}">{{ $module['name'] }}</p>
+                                    <h4 class="mt-1 text-sm font-black text-slate-800">{{ $module['label'] }}</h4>
+                                    <p class="mt-1 text-xs font-bold leading-relaxed text-slate-500">{{ $module['description'] }}</p>
+                                </div>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
 
-                    <a href="{{ route('admin.campaigns') }}" class="nav-link flex items-center gap-3 px-5 py-3.5 text-sm font-bold {{ request()->routeIs('admin.campaigns') ? 'active' : 'text-slate-500' }}">
-                        <i class="fa-solid fa-calendar-check w-5"></i>
-                        <span>จัดการแคมเปญ</span>
-                    </a>
+                <nav class="space-y-8">
+                    @foreach ($navigationSections as $section)
+                        <div class="space-y-2">
+                            <p class="mb-4 ml-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{{ $section['title'] }}</p>
 
-                    <a href="{{ route('admin.bookings') }}" class="nav-link flex items-center gap-3 px-5 py-3.5 text-sm font-bold {{ request()->routeIs('admin.bookings') ? 'active' : 'text-slate-500' }}">
-                        <i class="fa-solid fa-users-viewfinder w-5"></i>
-                        <span>รายการจองคิว</span>
-                    </a>
+                            @foreach ($section['items'] as $item)
+                                @php
+                                    $linkedModule = null;
+                                    if (in_array($item['route'], ['admin.workspace.campaign', 'admin.campaigns', 'admin.bookings', 'admin.time_slots', 'admin.users', 'admin.reports'], true)) {
+                                        $linkedModule = 'campaign';
+                                    } elseif (in_array($item['route'], ['admin.workspace.borrow', 'admin.borrow_requests', 'admin.inventory', 'admin.borrow_returns', 'admin.borrow_fines', 'admin.walk_in_borrow', 'admin.borrow_payments.receipt'], true)) {
+                                        $linkedModule = 'borrow';
+                                    }
 
-                    <a href="{{ route('admin.users') }}" class="nav-link flex items-center gap-3 px-5 py-3.5 text-sm font-bold {{ request()->routeIs('admin.users') ? 'active' : 'text-slate-500' }}">
-                        <i class="fa-solid fa-id-card w-5"></i>
-                        <span>รายชื่อนักศึกษา</span>
-                    </a>
+                                    $requiresPlatformAccess = in_array($item['route'], ['admin.system_admins', 'admin.system_settings'], true);
+                                @endphp
 
-                    <a href="{{ route('admin.time_slots') }}" class="nav-link flex items-center gap-3 px-5 py-3.5 text-sm font-bold {{ request()->routeIs('admin.time_slots') ? 'active' : 'text-slate-500' }}">
-                        <i class="fa-solid fa-clock-rotate-left w-5"></i>
-                        <span>จัดการรอบเวลา</span>
-                    </a>
-
-                    <p class="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-8 mb-4 ml-4">Organization</p>
-
-                    <a href="{{ route('admin.manage_staff') }}" class="nav-link flex items-center gap-3 px-5 py-3.5 text-sm font-bold {{ request()->routeIs('admin.manage_staff') ? 'active' : 'text-slate-500' }}">
-                        <i class="fa-solid fa-user-gear w-5"></i>
-                        <span>จัดการเจ้าหน้าที่</span>
-                    </a>
-
-                    <a href="{{ route('admin.activity_logs') }}" class="nav-link flex items-center gap-3 px-5 py-3.5 text-sm font-bold {{ request()->routeIs('admin.activity_logs') ? 'active' : 'text-slate-500' }}">
-                        <i class="fa-solid fa-list-check w-5"></i>
-                        <span>บันทึกกิจกรรม</span>
-                    </a>
-
-                    <a href="{{ route('admin.reports') }}" class="nav-link flex items-center gap-3 px-5 py-3.5 text-sm font-bold {{ request()->routeIs('admin.reports') ? 'active' : 'text-slate-500' }}">
-                        <i class="fa-solid fa-chart-line w-5"></i>
-                        <span>รายงานและสถิติ</span>
-                    </a>
+                                @if ((! $requiresPlatformAccess || ! $adminUser || $adminUser->hasFullPlatformAccess()) && (! $linkedModule || ! $adminUser || $adminUser->hasModuleAccess($linkedModule)))
+                                    <a href="{{ route($item['route']) }}" class="nav-link flex items-center gap-3 px-5 py-3.5 text-sm font-bold {{ request()->routeIs($item['route']) ? 'active' : 'text-slate-500' }}">
+                                        <i class="fa-solid {{ $item['icon'] }} w-5"></i>
+                                        <span>{{ $item['label'] }}</span>
+                                    </a>
+                                @endif
+                            @endforeach
+                        </div>
+                    @endforeach
                 </nav>
             </div>
 
-            <div class="mt-auto p-8 border-t border-slate-50">
+            <div class="border-t border-slate-50 p-8">
                 <form method="POST" action="{{ route('admin.logout') }}">
                     @csrf
-                    <button type="submit" class="w-full py-4 bg-rose-50 text-rose-500 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-rose-500 hover:text-white transition-all shadow-sm">
+                    <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-2xl bg-rose-50 py-4 text-sm font-bold text-rose-500 shadow-sm transition-all hover:bg-rose-500 hover:text-white">
                         <i class="fa-solid fa-power-off"></i>
                         <span>ออกจากระบบ</span>
                     </button>
@@ -123,23 +149,25 @@
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
-            <header class="h-20 bg-white/50 backdrop-blur-md flex items-center justify-between px-10 flex-shrink-0 border-b border-slate-100/50">
-                <div class="flex items-center gap-4">
-                    <h3 class="text-slate-800 font-black text-lg tracking-tight">{{ $title ?? 'Dashboard' }}</h3>
+        <main class="flex min-w-0 flex-1 flex-col overflow-hidden">
+            <header class="flex h-20 flex-shrink-0 items-center justify-between border-b border-slate-100/50 bg-white/50 px-10 backdrop-blur-md">
+                <div>
+                    <p class="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">{{ $currentModule === 'platform' ? 'Platform Home' : ($moduleRegistry[$currentModule]['name'] ?? 'Admin Workspace') }}</p>
+                    <h3 class="mt-1 text-lg font-black tracking-tight text-slate-800">{{ $title ?? 'Dashboard' }}</h3>
                 </div>
+
                 <div class="flex items-center gap-6">
                     <div class="flex flex-col text-right">
-                        <p class="text-sm font-black text-slate-800 leading-none mb-1">{{ Auth::guard('admin')->user()->name ?? 'Administrator' }}</p>
-                        <p class="text-[10px] text-emerald-500 font-bold uppercase tracking-widest leading-none">Admin</p>
+                        <p class="mb-1 text-sm font-black leading-none text-slate-800">{{ Auth::guard('admin')->user()->name ?? 'Administrator' }}</p>
+                        <p class="text-[10px] font-bold uppercase leading-none tracking-widest text-emerald-500">Admin</p>
                     </div>
-                    <div class="w-12 h-12 rounded-2xl bg-slate-100 overflow-hidden border-2 border-white shadow-sm">
-                        <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('admin')->user()->name ?? 'A') }}&background=2e9e63&color=fff" class="w-full h-full object-cover" alt="Admin avatar">
+                    <div class="h-12 w-12 overflow-hidden rounded-2xl border-2 border-white bg-slate-100 shadow-sm">
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('admin')->user()->name ?? 'A') }}&background=2e9e63&color=fff" class="h-full w-full object-cover" alt="Admin avatar">
                     </div>
                 </div>
             </header>
 
-            <div class="flex-1 overflow-y-auto p-10 custom-scrollbar">
+            <div class="custom-scrollbar flex-1 overflow-y-auto p-10">
                 {{ $slot }}
             </div>
         </main>
