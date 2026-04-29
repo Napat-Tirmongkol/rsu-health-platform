@@ -21,16 +21,15 @@ class Admin extends Authenticatable
         'google_id',
         'profile_photo_path',
         'module_permissions',
+        'action_permissions',
         'default_workspace',
     ];
 
     protected $casts = [
         'module_permissions' => 'array',
+        'action_permissions' => 'array',
     ];
 
-    /**
-     * Get the clinic that owns the admin.
-     */
     public function clinic()
     {
         return $this->belongsTo(Clinic::class);
@@ -51,6 +50,25 @@ class Admin extends Authenticatable
         return in_array('*', $permissions, true) || in_array($module, $permissions, true);
     }
 
+    public function hasActionAccess(string $action): bool
+    {
+        if (! Schema::hasTable($this->getTable()) || ! Schema::hasColumn($this->getTable(), 'action_permissions')) {
+            return true;
+        }
+
+        if ($this->hasFullPlatformAccess()) {
+            return true;
+        }
+
+        $permissions = $this->action_permissions;
+
+        if (! is_array($permissions) || $permissions === []) {
+            return true;
+        }
+
+        return in_array('*', $permissions, true) || in_array($action, $permissions, true);
+    }
+
     public function hasFullPlatformAccess(): bool
     {
         if (! Schema::hasTable($this->getTable()) || ! Schema::hasColumn($this->getTable(), 'module_permissions')) {
@@ -65,6 +83,11 @@ class Admin extends Authenticatable
     public function assignModulePermissions(array $modules): void
     {
         $this->module_permissions = array_values(array_unique($modules));
+    }
+
+    public function assignActionPermissions(array $actions): void
+    {
+        $this->action_permissions = array_values(array_unique($actions));
     }
 
     public function preferredWorkspace(): ?string

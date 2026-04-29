@@ -1,3 +1,7 @@
+@php
+    $adminUser = Auth::guard('admin')->user();
+    $canApproveBorrowRequests = ! $adminUser || $adminUser->hasActionAccess('borrow.request.approve');
+@endphp
 <div class="space-y-8 animate-in fade-in duration-700">
     @if (session()->has('message'))
         <div class="rounded-[2rem] border border-emerald-100 bg-emerald-50 px-6 py-4 text-sm font-bold text-emerald-700 shadow-sm">
@@ -120,7 +124,7 @@
                             </td>
                             <td class="px-8 py-6 text-right">
                                 <div class="flex items-center justify-end gap-2 opacity-0 transition-opacity group-hover:opacity-100">
-                                    @if($record->approval_status === 'pending')
+                                    @if($canApproveBorrowRequests && $record->approval_status === 'pending')
                                         <button wire:click="approve({{ $record->id }})" class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2e9e63] text-white shadow-lg shadow-green-100 transition-all hover:scale-110 active:scale-95">
                                             <i class="fa-solid fa-check"></i>
                                         </button>
@@ -232,7 +236,7 @@
                 </div>
 
                 <div class="flex gap-4 border-t border-slate-100 bg-slate-50 p-10">
-                    @if($selectedRecordDetails->approval_status === 'pending')
+                    @if($canApproveBorrowRequests && $selectedRecordDetails->approval_status === 'pending')
                         <button wire:click="approve({{ $selectedRecordDetails->id }})" class="flex-1 rounded-2xl bg-[#2e9e63] px-6 py-4 text-xs font-black uppercase tracking-widest text-white shadow-xl shadow-green-100 transition-all active:scale-95">
                             อนุมัติคำขอยืม
                         </button>

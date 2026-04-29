@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(\App\Http\Middleware\SetTenantFromSubdomain::class);
         $middleware->alias([
             'admin.module' => \App\Http\Middleware\EnsureAdminModuleAccess::class,
+            'admin.action' => \App\Http\Middleware\EnsureAdminActionAccess::class,
             'admin.platform' => \App\Http\Middleware\EnsureFullPlatformAccess::class,
         ]);
     })

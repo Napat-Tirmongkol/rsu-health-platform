@@ -1,119 +1,164 @@
-<div class="space-y-8 animate-in fade-in duration-700">
-    <!-- KPI Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div wire:click="$set('statusFilter', 'pending')" class="cursor-pointer bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center gap-5 group hover:shadow-md transition-all {{ $statusFilter === 'pending' ? 'ring-2 ring-amber-500 bg-amber-50/30' : '' }}">
-            <div class="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 group-hover:scale-110 transition-transform shadow-inner">
-                <i class="fa-solid fa-clock-rotate-left text-2xl"></i>
+@php
+    $adminUser = Auth::guard('admin')->user();
+    $canManageBookings = ! $adminUser || $adminUser->hasActionAccess('campaign.booking.manage');
+    $statusMeta = [
+        'pending' => ['label' => 'รออนุมัติ', 'badge' => 'bg-amber-50 text-amber-700 border border-amber-200', 'icon' => 'fa-clock'],
+        'confirmed' => ['label' => 'ยืนยันแล้ว', 'badge' => 'bg-emerald-50 text-emerald-700 border border-emerald-200', 'icon' => 'fa-circle-check'],
+        'cancelled' => ['label' => 'ยกเลิกแล้ว', 'badge' => 'bg-rose-50 text-rose-700 border border-rose-200', 'icon' => 'fa-circle-xmark'],
+    ];
+@endphp
+
+<div class="space-y-8">
+    @if (session()->has('message'))
+        <div class="rounded-[2rem] border border-emerald-200 bg-emerald-50 px-6 py-4 text-sm font-bold text-emerald-700 shadow-sm">
+            {{ session('message') }}
+        </div>
+    @endif
+
+    <section class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <button wire:click="$set('statusFilter', 'pending')" class="rounded-[2rem] border p-6 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md {{ $statusFilter === 'pending' ? 'border-amber-300 bg-amber-50/80' : 'border-slate-200 bg-white' }}">
+            <div class="flex items-center justify-between">
+                <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100 text-amber-700">
+                    <i class="fa-solid fa-clock text-xl"></i>
+                </div>
+                <span class="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-slate-400 shadow-sm">Queue</span>
             </div>
+            <p class="mt-6 text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">รออนุมัติ</p>
+            <h3 class="mt-2 text-3xl font-black tracking-tight text-slate-950">{{ number_format($stats['pending']) }}</h3>
+            <p class="mt-3 text-sm font-bold leading-relaxed text-slate-500">รายการที่ยังต้องตัดสินใจจากทีมคลินิก</p>
+        </button>
+
+        <button wire:click="$set('statusFilter', 'confirmed')" class="rounded-[2rem] border p-6 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md {{ $statusFilter === 'confirmed' ? 'border-emerald-300 bg-emerald-50/80' : 'border-slate-200 bg-white' }}">
+            <div class="flex items-center justify-between">
+                <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
+                    <i class="fa-solid fa-circle-check text-xl"></i>
+                </div>
+                <span class="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-slate-400 shadow-sm">Live</span>
+            </div>
+            <p class="mt-6 text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">ยืนยันแล้ว</p>
+            <h3 class="mt-2 text-3xl font-black tracking-tight text-slate-950">{{ number_format($stats['confirmed']) }}</h3>
+            <p class="mt-3 text-sm font-bold leading-relaxed text-slate-500">คิวที่พร้อมรับบริการตามแคมเปญและรอบเวลา</p>
+        </button>
+
+        <button wire:click="$set('statusFilter', 'cancelled')" class="rounded-[2rem] border p-6 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md {{ $statusFilter === 'cancelled' ? 'border-rose-300 bg-rose-50/80' : 'border-slate-200 bg-white' }}">
+            <div class="flex items-center justify-between">
+                <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-100 text-rose-700">
+                    <i class="fa-solid fa-circle-xmark text-xl"></i>
+                </div>
+                <span class="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-slate-400 shadow-sm">Alert</span>
+            </div>
+            <p class="mt-6 text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">ยกเลิกแล้ว</p>
+            <h3 class="mt-2 text-3xl font-black tracking-tight text-slate-950">{{ number_format($stats['cancelled']) }}</h3>
+            <p class="mt-3 text-sm font-bold leading-relaxed text-slate-500">รายการที่ถูกปิดหรือแจ้งยกเลิกจากฝั่งงานบริการ</p>
+        </button>
+
+        <div class="overflow-hidden rounded-[2rem] border border-slate-900 bg-slate-950 text-white shadow-[0_24px_80px_rgba(15,23,42,0.22)]">
+            <div class="bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.22),transparent_40%)] p-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 text-white">
+                        <i class="fa-solid fa-calendar-day text-xl"></i>
+                    </div>
+                    <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-white/55">Today</span>
+                </div>
+                <p class="mt-6 text-[10px] font-black uppercase tracking-[0.28em] text-white/45">นัดหมายวันนี้</p>
+                <h3 class="mt-2 text-3xl font-black tracking-tight text-white">{{ number_format($stats['today']) }}</h3>
+                <p class="mt-3 text-sm font-bold leading-relaxed text-white/72">ภาพรวมคิวที่ผูกกับรอบเวลาของวันนี้ทั้งหมด</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="rounded-[2.5rem] border border-slate-200 bg-white p-6 shadow-sm xl:p-7">
+        <div class="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
             <div>
-                <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">รอนุมัติ</p>
-                <h4 class="text-2xl font-black text-slate-800">{{ number_format($stats['pending']) }}</h4>
+                <p class="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Filters & Search</p>
+                <h2 class="mt-3 text-2xl font-black tracking-tight text-slate-950">Booking Command Center</h2>
+                <p class="mt-2 max-w-2xl text-sm font-bold leading-relaxed text-slate-500">กรองสถานะ ค้นหาผู้จอง หรือเปิดรายละเอียดแบบ side drawer เพื่อจัดการคิวได้ต่อเนื่องโดยไม่ต้องเปลี่ยนหน้า</p>
+            </div>
+
+            <div class="flex w-full flex-col gap-4 xl:max-w-2xl">
+                <div class="flex flex-wrap gap-2">
+                    @foreach (['all' => 'ทั้งหมด', 'pending' => 'รออนุมัติ', 'confirmed' => 'ยืนยันแล้ว', 'cancelled' => 'ยกเลิกแล้ว'] as $key => $label)
+                        <button wire:click="$set('statusFilter', '{{ $key }}')" class="rounded-2xl px-5 py-3 text-[11px] font-black uppercase tracking-[0.2em] transition-all {{ $statusFilter === $key ? 'bg-slate-950 text-white shadow-lg shadow-slate-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200' }}">
+                            {{ $label }}
+                        </button>
+                    @endforeach
+                </div>
+
+                <div class="relative">
+                    <i class="fa-solid fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                    <input wire:model.live="search" type="text" placeholder="ค้นหาจากชื่อ รหัสผู้ใช้ เลขระบุตัวตน หรือชื่อแคมเปญ" class="w-full rounded-2xl border border-slate-200 bg-slate-50 py-4 pl-14 pr-6 text-sm font-bold text-slate-700 outline-none transition-all focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-50">
+                </div>
             </div>
         </div>
+    </section>
 
-        <div wire:click="$set('statusFilter', 'confirmed')" class="cursor-pointer bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center gap-5 group hover:shadow-md transition-all {{ $statusFilter === 'confirmed' ? 'ring-2 ring-emerald-500 bg-emerald-50/30' : '' }}">
-            <div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform shadow-inner">
-                <i class="fa-solid fa-circle-check text-2xl"></i>
-            </div>
+    <section class="overflow-hidden rounded-[2.75rem] border border-slate-200 bg-white shadow-sm">
+        <div class="flex flex-col gap-4 border-b border-slate-100 px-6 py-6 xl:flex-row xl:items-center xl:justify-between xl:px-8">
             <div>
-                <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">ยืนยันแล้ว</p>
-                <h4 class="text-2xl font-black text-slate-800">{{ number_format($stats['confirmed']) }}</h4>
+                <p class="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">Booking Queue</p>
+                <h3 class="mt-2 text-xl font-black text-slate-950">รายการจองทั้งหมด</h3>
             </div>
+            <p class="text-sm font-bold text-slate-500">หน้า {{ $bookings->lastPage() > 0 ? $bookings->currentPage() : 0 }} / {{ $bookings->lastPage() }} · รวม {{ number_format($bookings->total()) }} รายการ</p>
         </div>
 
-        <div wire:click="$set('statusFilter', 'cancelled')" class="cursor-pointer bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center gap-5 group hover:shadow-md transition-all {{ $statusFilter === 'cancelled' ? 'ring-2 ring-rose-500 bg-rose-50/30' : '' }}">
-            <div class="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-500 group-hover:scale-110 transition-transform shadow-inner">
-                <i class="fa-solid fa-circle-xmark text-2xl"></i>
-            </div>
-            <div>
-                <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">ยกเลิกแล้ว</p>
-                <h4 class="text-2xl font-black text-slate-800">{{ number_format($stats['cancelled']) }}</h4>
-            </div>
-        </div>
-
-        <div class="bg-slate-900 p-6 rounded-[2rem] shadow-xl flex items-center gap-5 group relative overflow-hidden">
-            <div class="absolute -right-4 -top-4 w-20 h-20 bg-white/5 rounded-full blur-2xl"></div>
-            <div class="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center text-white group-hover:scale-110 transition-transform shadow-inner relative z-10">
-                <i class="fa-solid fa-calendar-day text-2xl"></i>
-            </div>
-            <div class="relative z-10">
-                <p class="text-[10px] text-white/40 font-black uppercase tracking-widest mb-1">นัดหมายวันนี้</p>
-                <h4 class="text-2xl font-black text-white">{{ number_format($stats['today']) }}</h4>
-            </div>
-        </div>
-    </div>
-
-    <!-- Filters & Search -->
-    <div class="bg-white border border-slate-100 p-6 rounded-[2.5rem] shadow-sm flex flex-col lg:flex-row justify-between items-center gap-6">
-        <div class="flex items-center gap-2 p-1.5 bg-slate-50 rounded-[1.5rem] overflow-x-auto no-scrollbar w-full lg:w-auto">
-            <button wire:click="$set('statusFilter', 'all')" class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all {{ $statusFilter === 'all' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400' }}">ทั้งหมด</button>
-            <button wire:click="$set('statusFilter', 'pending')" class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all {{ $statusFilter === 'pending' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400' }}">รอนุมัติ</button>
-            <button wire:click="$set('statusFilter', 'confirmed')" class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all {{ $statusFilter === 'confirmed' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400' }}">ยืนยันแล้ว</button>
-            <button wire:click="$set('statusFilter', 'cancelled')" class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all {{ $statusFilter === 'cancelled' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400' }}">ยกเลิก</button>
-        </div>
-
-        <div class="flex-1 w-full lg:max-w-md relative">
-            <i class="fa-solid fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
-            <input wire:model.live="search" type="text" placeholder="ค้นหาตามชื่อ, รหัส, หรือกิจกรรม..." class="w-full pl-14 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-green-50 focus:bg-white focus:border-[#2e9e63] transition-all">
-        </div>
-    </div>
-
-    <!-- Data Table -->
-    <div class="bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden relative">
-        <div class="overflow-x-auto custom-scrollbar">
-            <table class="w-full text-left border-collapse whitespace-nowrap">
+        <div class="overflow-x-auto">
+            <table class="min-w-full whitespace-nowrap text-left">
                 <thead>
-                    <tr class="bg-slate-50/50 text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] border-b border-slate-100">
-                        <td class="p-8 w-12 text-center">
-                            <input type="checkbox" class="w-5 h-5 rounded-lg border-slate-300 text-[#2e9e63] focus:ring-[#2e9e63]">
-                        </td>
-                        <td class="p-8">วันและเวลานัดหมาย</td>
-                        <td class="p-8">ข้อมูลผู้จอง</td>
-                        <td class="p-8">รายละเอียดแคมเปญ</td>
-                        <td class="p-8 text-center">สถานะ</td>
-                        <td class="p-8 text-right">การจัดการ</td>
+                    <tr class="border-b border-slate-100 bg-slate-50 text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
+                        <th class="px-6 py-5 text-center xl:px-8">
+                            <input type="checkbox" class="h-5 w-5 rounded-lg border-slate-300 text-emerald-600 focus:ring-emerald-500">
+                        </th>
+                        <th class="px-6 py-5 xl:px-8">วันและเวลา</th>
+                        <th class="px-6 py-5 xl:px-8">ผู้จอง</th>
+                        <th class="px-6 py-5 xl:px-8">แคมเปญ</th>
+                        <th class="px-6 py-5 text-center xl:px-8">สถานะ</th>
+                        <th class="px-6 py-5 text-right xl:px-8">การจัดการ</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-50">
+                <tbody class="divide-y divide-slate-100">
                     @forelse($bookings as $b)
-                        <tr class="group hover:bg-slate-50/50 transition-all">
-                            <td class="px-8 py-6 text-center">
-                                <input type="checkbox" wire:model.live="selectedBookings" value="{{ $b->id }}" class="w-5 h-5 rounded-lg border-slate-300 text-[#2e9e63] focus:ring-[#2e9e63] cursor-pointer">
+                        @php($meta = $statusMeta[$b->status] ?? ['label' => strtoupper($b->status), 'badge' => 'bg-slate-100 text-slate-600 border border-slate-200', 'icon' => 'fa-circle'])
+                        <tr class="group transition-colors hover:bg-slate-50/80">
+                            <td class="px-6 py-5 text-center xl:px-8">
+                                <input type="checkbox" wire:model.live="selectedBookings" value="{{ $b->id }}" class="h-5 w-5 rounded-lg border-slate-300 text-emerald-600 focus:ring-emerald-500">
                             </td>
-                            <td class="px-8 py-6">
-                                <div class="font-black text-slate-800 text-sm mb-1">{{ $b->slot ? $b->slot->date->format('d M Y') : 'N/A' }}</div>
-                                <div class="text-[10px] text-emerald-600 font-black uppercase tracking-widest">
+                            <td class="px-6 py-5 xl:px-8">
+                                <div class="font-black text-slate-900">{{ $b->slot ? $b->slot->date->format('d M Y') : 'N/A' }}</div>
+                                <div class="mt-1 text-[11px] font-black uppercase tracking-[0.2em] text-emerald-600">
                                     {{ $b->slot ? substr($b->slot->start_time, 0, 5) . ' - ' . substr($b->slot->end_time, 0, 5) : '-' }}
                                 </div>
                             </td>
-                            <td class="px-8 py-6 cursor-pointer" wire:click="openDetails({{ $b->id }})">
-                                <div class="font-black text-slate-800 group-hover:text-[#2e9e63] transition-colors tracking-tight">{{ $b->user->full_name }}</div>
-                                <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{{ $b->user->identity_label }}: {{ $b->user->identity_value }}</div>
+                            <td class="cursor-pointer px-6 py-5 xl:px-8" wire:click="openDetails({{ $b->id }})">
+                                <div class="font-black text-slate-900 transition-colors group-hover:text-emerald-700">{{ $b->user->full_name }}</div>
+                                <div class="mt-1 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">{{ $b->user->identity_label }} · {{ $b->user->identity_value }}</div>
                             </td>
-                            <td class="px-8 py-6">
-                                <div class="text-sm font-bold text-slate-600 max-w-[200px] truncate">{{ $b->campaign->title }}</div>
-                                <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">CODE: {{ $b->booking_code }}</div>
-                                <a href="{{ route('staff.scan.campaign', $b->campaign->id) }}" target="_blank" class="mt-2 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-emerald-600 hover:text-emerald-700 transition-colors">
-                                    <i class="fa-solid fa-qrcode"></i>
-                                    <span>Open Scanner</span>
-                                </a>
+                            <td class="px-6 py-5 xl:px-8">
+                                <div class="max-w-[16rem] truncate text-sm font-black text-slate-800">{{ $b->campaign->title }}</div>
+                                <div class="mt-1 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Code · {{ $b->booking_code }}</div>
+                                @if($canManageBookings)
+                                    <a href="{{ route('staff.scan.campaign', $b->campaign->id) }}" target="_blank" class="mt-3 inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.18em] text-emerald-600 transition-colors hover:text-emerald-700">
+                                        <i class="fa-solid fa-qrcode"></i>
+                                        <span>Open Scanner</span>
+                                    </a>
+                                @endif
                             </td>
-                            <td class="px-8 py-6 text-center">
-                                <span class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest {{ $b->status === 'pending' ? 'bg-amber-50 text-amber-600 border border-amber-100 animate-pulse' : ($b->status === 'confirmed' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-slate-100 text-slate-400') }}">
-                                    {{ $b->status }}
+                            <td class="px-6 py-5 text-center xl:px-8">
+                                <span class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] {{ $meta['badge'] }}">
+                                    <i class="fa-solid {{ $meta['icon'] }}"></i>
+                                    <span>{{ $meta['label'] }}</span>
                                 </span>
                             </td>
-                            <td class="px-8 py-6 text-right">
-                                <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    @if($b->status === 'pending')
-                                        <button wire:click="approve({{ $b->id }})" class="w-10 h-10 bg-[#2e9e63] text-white rounded-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-lg shadow-green-100">
+                            <td class="px-6 py-5 text-right xl:px-8">
+                                <div class="inline-flex items-center gap-2">
+                                    @if($canManageBookings && $b->status === 'pending')
+                                        <button wire:click="approve({{ $b->id }})" class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-emerald-700">
                                             <i class="fa-solid fa-check"></i>
                                         </button>
-                                        <button wire:click="cancel({{ $b->id }})" class="w-10 h-10 bg-white border border-slate-100 text-rose-500 rounded-xl flex items-center justify-center hover:bg-rose-50 hover:text-rose-600 hover:scale-110 active:scale-95 transition-all shadow-sm">
+                                        <button wire:click="cancel({{ $b->id }})" class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-rose-200 bg-rose-50 text-rose-600 transition-all hover:-translate-y-0.5 hover:bg-rose-100">
                                             <i class="fa-solid fa-xmark"></i>
                                         </button>
                                     @endif
-                                    <button wire:click="openDetails({{ $b->id }})" class="w-10 h-10 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center hover:bg-slate-100 hover:text-slate-600 transition-all">
+                                    <button wire:click="openDetails({{ $b->id }})" class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-slate-500 transition-all hover:-translate-y-0.5 hover:bg-slate-100 hover:text-slate-700">
                                         <i class="fa-solid fa-circle-info"></i>
                                     </button>
                                 </div>
@@ -121,123 +166,131 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-8 py-32 text-center opacity-40">
-                                <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center text-slate-300 mx-auto mb-4 shadow-inner">
+                            <td colspan="6" class="px-6 py-24 text-center xl:px-8">
+                                <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 text-slate-300 shadow-inner">
                                     <i class="fa-solid fa-calendar-xmark text-3xl"></i>
                                 </div>
-                                <p class="text-sm font-bold text-slate-400 tracking-wide uppercase tracking-[0.2em]">ไม่พบรายการจองในขณะนี้</p>
+                                <p class="mt-5 text-sm font-bold uppercase tracking-[0.22em] text-slate-400">ไม่พบรายการจองในเงื่อนไขนี้</p>
                             </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-        
+
         @if($bookings->hasPages())
-            <div class="px-8 py-6 border-t border-slate-50 bg-slate-50/30">
+            <div class="border-t border-slate-100 bg-slate-50/60 px-6 py-5 xl:px-8">
                 {{ $bookings->links() }}
             </div>
         @endif
-    </div>
+    </section>
 
-    <!-- Floating Action Bar (Bulk Operations) -->
-    @if(count($selectedBookings) > 0)
-        <div class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[110] bg-slate-900 px-8 py-5 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex items-center gap-10 border border-white/10 animate-in slide-in-from-bottom-10 duration-500">
-            <div class="flex flex-col">
-                <span class="text-[10px] font-black uppercase tracking-widest text-emerald-400">รายการที่เลือก</span>
-                <span class="text-sm font-black text-white">{{ count($selectedBookings) }} รายการ</span>
+    @if($canManageBookings && count($selectedBookings) > 0)
+        <div class="fixed bottom-10 left-1/2 z-[110] flex -translate-x-1/2 items-center gap-8 rounded-[2.5rem] border border-slate-800 bg-slate-950 px-8 py-5 text-white shadow-[0_24px_80px_rgba(15,23,42,0.34)]">
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-400">Selected Rows</p>
+                <p class="mt-1 text-sm font-black">{{ count($selectedBookings) }} รายการ</p>
             </div>
-            <div class="w-px h-10 bg-white/10"></div>
-            <div class="flex items-center gap-4">
-                <button wire:click="bulkApprove" class="bg-[#2e9e63] text-white px-8 py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-green-900/20">อนุมัติทั้งหมด</button>
-                <button wire:click="bulkCancel" class="bg-rose-600 text-white px-8 py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-rose-900/20">ยกเลิกทั้งหมด</button>
-                <button wire:click="$set('selectedBookings', [])" class="text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-times"></i></button>
+            <div class="h-10 w-px bg-white/10"></div>
+            <div class="flex items-center gap-3">
+                <button wire:click="bulkApprove" class="rounded-2xl bg-emerald-600 px-6 py-3 text-[11px] font-black uppercase tracking-[0.18em] text-white transition-all hover:bg-emerald-700">อนุมัติทั้งหมด</button>
+                <button wire:click="bulkCancel" class="rounded-2xl bg-rose-600 px-6 py-3 text-[11px] font-black uppercase tracking-[0.18em] text-white transition-all hover:bg-rose-700">ยกเลิกทั้งหมด</button>
+                <button wire:click="$set('selectedBookings', [])" class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-slate-300 transition-all hover:bg-white/10 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
         </div>
     @endif
 
-    <!-- Side Drawer (Details) -->
     @if($showDrawer && $selectedBookingDetails)
         <div class="fixed inset-0 z-[120] flex items-center justify-end overflow-hidden">
-            <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300" wire:click="closeDrawer"></div>
-            
-            <aside class="relative bg-white w-full max-w-xl h-full shadow-2xl animate-in slide-in-from-right duration-500 flex flex-col">
-                <div class="p-10 border-b border-slate-50 flex justify-between items-center">
-                    <div>
-                        <h3 class="text-2xl font-black text-slate-800 tracking-tight">Booking Details</h3>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">รหัสการจอง: {{ $selectedBookingDetails->booking_code }}</p>
-                    </div>
-                    <button wire:click="closeDrawer" class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-all shadow-sm">
-                        <i class="fa-solid fa-xmark text-lg"></i>
-                    </button>
-                </div>
+            <div class="absolute inset-0 bg-slate-950/45 backdrop-blur-sm" wire:click="closeDrawer"></div>
 
-                <div class="flex-1 overflow-y-auto p-10 space-y-10 custom-scrollbar">
-                    <!-- User Profile -->
-                    <div class="space-y-4">
-                        <span class="px-3 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-black rounded-lg uppercase tracking-widest">ข้อมูลผู้จอง</span>
-                        <div class="flex items-center gap-6">
-                            <div class="w-20 h-20 rounded-3xl bg-slate-50 flex items-center justify-center text-slate-300 text-3xl border border-slate-100 shadow-inner">
-                                <i class="fa-solid fa-user"></i>
-                            </div>
-                            <div>
-                                <h4 class="text-3xl font-black text-slate-800 leading-tight mb-1">{{ $selectedBookingDetails->user->full_name }}</h4>
-                                <p class="text-slate-400 font-bold tracking-widest text-sm">{{ $selectedBookingDetails->user->identity_label }}: {{ $selectedBookingDetails->user->identity_value }}</p>
-                            </div>
+            <aside class="relative flex h-full w-full max-w-2xl flex-col overflow-hidden border-l border-slate-200 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.22)]">
+                <div class="border-b border-slate-100 px-8 py-7">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">Booking Detail</p>
+                            <h3 class="mt-2 text-2xl font-black tracking-tight text-slate-950">รายละเอียดการจอง</h3>
+                            <p class="mt-2 text-sm font-bold text-slate-500">รหัสการจอง · {{ $selectedBookingDetails->booking_code }}</p>
                         </div>
-                    </div>
-
-                    <!-- Contact & Meta -->
-                    <div class="grid grid-cols-2 gap-8">
-                        <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">เบอร์โทรศัพท์</label>
-                            <p class="text-lg font-black text-slate-800">{{ $selectedBookingDetails->user->phone_number ?? '-' }}</p>
-                        </div>
-                        <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">คณะ/หน่วยงาน</label>
-                            <p class="text-lg font-black text-slate-800">{{ $selectedBookingDetails->user->department ?? '-' }}</p>
-                        </div>
-                    </div>
-
-                    <!-- Schedule Info -->
-                    <div class="p-10 bg-[#2e9e63] rounded-[3rem] text-white shadow-xl shadow-green-100 relative overflow-hidden">
-                        <div class="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-                        <label class="text-[10px] font-black uppercase tracking-widest text-white/50 block mb-6 relative z-10">กำหนดเวลานัดหมาย</label>
-                        <div class="flex items-center gap-6 relative z-10">
-                            <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-3xl shadow-inner border border-white/10">
-                                <i class="fa-regular fa-calendar-check"></i>
-                            </div>
-                            <div>
-                                <p class="text-2xl font-black leading-none mb-2">{{ $selectedBookingDetails->slot ? $selectedBookingDetails->slot->date->format('d F Y') : 'N/A' }}</p>
-                                <p class="text-sm font-bold text-white/80">{{ $selectedBookingDetails->slot ? substr($selectedBookingDetails->slot->start_time, 0, 5) . ' - ' . substr($selectedBookingDetails->slot->end_time, 0, 5) : '-' }} น.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Campaign Info -->
-                    <div class="space-y-4">
-                        <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 block ml-2">แคมเปญที่เข้าร่วม</label>
-                        <div class="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100 flex items-center gap-5">
-                            <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-400 shadow-sm border border-slate-100">
-                                <i class="fa-solid fa-bullhorn text-sm"></i>
-                            </div>
-                            <p class="text-base font-black text-slate-700 leading-tight">{{ $selectedBookingDetails->campaign->title }}</p>
-                        </div>
+                        <button wire:click="closeDrawer" class="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-slate-500 transition-all hover:bg-rose-50 hover:text-rose-600">
+                            <i class="fa-solid fa-xmark text-lg"></i>
+                        </button>
                     </div>
                 </div>
 
-                <!-- Footer Actions -->
-                <div class="p-10 bg-slate-50 border-t border-slate-100 flex gap-4">
-                    <a href="{{ route('staff.scan.campaign', $selectedBookingDetails->campaign->id) }}" target="_blank" class="h-16 bg-white text-emerald-600 rounded-2xl font-black uppercase tracking-widest text-xs border border-emerald-100 flex items-center justify-center gap-2 active:scale-95 transition-all px-6">
-                        <i class="fa-solid fa-qrcode"></i>
-                        <span>Open Scanner</span>
-                    </a>
-                    @if($selectedBookingDetails->status === 'pending')
-                        <button wire:click="approve({{ $selectedBookingDetails->id }})" class="flex-1 h-16 bg-[#2e9e63] text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-green-100 active:scale-95 transition-all">ยืนยันการจองคิว</button>
-                        <button wire:click="cancel({{ $selectedBookingDetails->id }})" class="flex-1 h-16 bg-white text-rose-500 rounded-2xl font-black uppercase tracking-widest text-xs border border-slate-200 active:scale-95 transition-all">ยกเลิก</button>
-                    @else
-                        <button wire:click="closeDrawer" class="w-full h-16 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-slate-200 active:scale-95 transition-all">ปิดหน้าต่าง</button>
-                    @endif
+                <div class="flex-1 overflow-y-auto px-8 py-8">
+                    <div class="space-y-8">
+                        <section class="rounded-[2rem] border border-slate-200 bg-slate-50 p-6">
+                            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">ผู้จอง</p>
+                            <div class="mt-5 flex items-center gap-5">
+                                <div class="flex h-20 w-20 items-center justify-center rounded-[1.75rem] bg-white text-3xl text-slate-300 shadow-inner">
+                                    <i class="fa-solid fa-user"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-3xl font-black tracking-tight text-slate-950">{{ $selectedBookingDetails->user->full_name }}</h4>
+                                    <p class="mt-2 text-sm font-bold text-slate-500">{{ $selectedBookingDetails->user->identity_label }} · {{ $selectedBookingDetails->user->identity_value }}</p>
+                                </div>
+                            </div>
+                        </section>
+
+                        <div class="grid gap-5 md:grid-cols-2">
+                            <div class="rounded-[1.75rem] border border-slate-200 bg-white p-5">
+                                <p class="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">เบอร์โทรศัพท์</p>
+                                <p class="mt-3 text-lg font-black text-slate-900">{{ $selectedBookingDetails->user->phone_number ?? '-' }}</p>
+                            </div>
+                            <div class="rounded-[1.75rem] border border-slate-200 bg-white p-5">
+                                <p class="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">คณะ / หน่วยงาน</p>
+                                <p class="mt-3 text-lg font-black text-slate-900">{{ $selectedBookingDetails->user->department ?? '-' }}</p>
+                            </div>
+                        </div>
+
+                        <section class="overflow-hidden rounded-[2.25rem] border border-emerald-200 bg-slate-950 text-white shadow-[0_24px_80px_rgba(15,23,42,0.16)]">
+                            <div class="bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.28),transparent_44%)] p-7">
+                                <p class="text-[10px] font-black uppercase tracking-[0.22em] text-white/45">วันและเวลา</p>
+                                <div class="mt-5 flex items-center gap-5">
+                                    <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 text-2xl text-white">
+                                        <i class="fa-regular fa-calendar-check"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-2xl font-black">{{ $selectedBookingDetails->slot ? $selectedBookingDetails->slot->date->format('d F Y') : 'N/A' }}</p>
+                                        <p class="mt-1 text-sm font-bold text-white/72">{{ $selectedBookingDetails->slot ? substr($selectedBookingDetails->slot->start_time, 0, 5) . ' - ' . substr($selectedBookingDetails->slot->end_time, 0, 5) : '-' }} น.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="rounded-[2rem] border border-slate-200 bg-white p-6">
+                            <p class="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">แคมเปญ</p>
+                            <div class="mt-4 flex items-center gap-4 rounded-[1.75rem] bg-slate-50 p-5">
+                                <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-slate-400 shadow-sm">
+                                    <i class="fa-solid fa-bullhorn"></i>
+                                </div>
+                                <div>
+                                    <p class="text-base font-black text-slate-900">{{ $selectedBookingDetails->campaign->title }}</p>
+                                    <p class="mt-1 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Status · {{ $statusMeta[$selectedBookingDetails->status]['label'] ?? $selectedBookingDetails->status }}</p>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-100 bg-slate-50 px-8 py-6">
+                    <div class="flex flex-wrap gap-3">
+                        @if($canManageBookings)
+                            <a href="{{ route('staff.scan.campaign', $selectedBookingDetails->campaign->id) }}" target="_blank" class="inline-flex h-14 items-center justify-center gap-2 rounded-2xl border border-emerald-200 bg-white px-5 text-xs font-black uppercase tracking-[0.18em] text-emerald-700 transition-all hover:bg-emerald-50">
+                                <i class="fa-solid fa-qrcode"></i>
+                                <span>Open Scanner</span>
+                            </a>
+                        @endif
+                        @if($canManageBookings && $selectedBookingDetails->status === 'pending')
+                            <button wire:click="approve({{ $selectedBookingDetails->id }})" class="flex-1 rounded-2xl bg-emerald-600 px-6 py-4 text-xs font-black uppercase tracking-[0.18em] text-white transition-all hover:bg-emerald-700">ยืนยันการจอง</button>
+                            <button wire:click="cancel({{ $selectedBookingDetails->id }})" class="flex-1 rounded-2xl border border-rose-200 bg-white px-6 py-4 text-xs font-black uppercase tracking-[0.18em] text-rose-600 transition-all hover:bg-rose-50">ยกเลิก</button>
+                        @else
+                            <button wire:click="closeDrawer" class="w-full rounded-2xl bg-slate-950 px-6 py-4 text-xs font-black uppercase tracking-[0.18em] text-white transition-all hover:bg-slate-800">ปิดหน้าต่าง</button>
+                        @endif
+                    </div>
                 </div>
             </aside>
         </div>

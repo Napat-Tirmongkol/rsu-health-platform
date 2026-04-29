@@ -1,3 +1,7 @@
+@php
+    $adminUser = Auth::guard('admin')->user();
+    $canCollectFines = ! $adminUser || $adminUser->hasActionAccess('borrow.fine.collect');
+@endphp
 <div class="space-y-8 animate-in fade-in duration-700">
     @if (session()->has('message'))
         <div class="rounded-[2rem] border border-emerald-100 bg-emerald-50 px-6 py-4 text-sm font-bold text-emerald-700 shadow-sm">
@@ -103,10 +107,12 @@
                                 <span class="rounded-full bg-amber-50 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-amber-600">{{ $fine->status }}</span>
                             </td>
                             <td class="px-6 py-5 text-right">
-                                <button wire:click="openPaymentModal({{ $fine->id }})" class="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-emerald-100 transition-all hover:bg-emerald-700">
-                                    <i class="fa-solid fa-hand-holding-dollar"></i>
-                                    <span>Record Payment</span>
-                                </button>
+                                @if($canCollectFines)
+                                    <button wire:click="openPaymentModal({{ $fine->id }})" class="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-emerald-100 transition-all hover:bg-emerald-700">
+                                        <i class="fa-solid fa-hand-holding-dollar"></i>
+                                        <span>Record Payment</span>
+                                    </button>
+                                @endif
                             </td>
                         </tr>
                     @empty
@@ -176,10 +182,12 @@
                                 <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400">{{ optional($payment->payment_date)->format('H:i') ?: '-' }}</div>
                             </td>
                             <td class="px-6 py-5 text-right">
-                                <a href="{{ route('admin.borrow_payments.receipt', $payment) }}" target="_blank" class="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-slate-800">
-                                    <i class="fa-solid fa-print"></i>
-                                    <span>Receipt</span>
-                                </a>
+                                @if($canCollectFines)
+                                    <a href="{{ route('admin.borrow_payments.receipt', $payment) }}" target="_blank" class="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-slate-800">
+                                        <i class="fa-solid fa-print"></i>
+                                        <span>Receipt</span>
+                                    </a>
+                                @endif
                             </td>
                         </tr>
                     @empty
@@ -201,7 +209,7 @@
         </div>
     </div>
 
-    @if($showPaymentModal && $selectedFine)
+    @if($canCollectFines && $showPaymentModal && $selectedFine)
         <div class="fixed inset-0 z-[120] flex items-center justify-center p-6">
             <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" wire:click="closePaymentModal"></div>
             <div class="relative w-full max-w-2xl rounded-[3rem] bg-white p-8 shadow-2xl">

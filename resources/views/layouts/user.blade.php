@@ -21,11 +21,6 @@
         .custom-scrollbar::-webkit-scrollbar {
             display: none;
         }
-
-        .nav-active {
-            color: #2e9e63 !important;
-            transform: scale(1.1);
-        }
     </style>
     @livewireStyles
 </head>
@@ -42,7 +37,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <button onclick="showQR()" class="flex h-10 w-10 items-center justify-center text-slate-600 transition-colors transition-transform hover:text-green-600 active:scale-90">
+                <button onclick="showQR()" class="flex h-10 w-10 items-center justify-center text-slate-600 transition-transform hover:text-green-600 active:scale-90">
                     <i class="fa-solid fa-qrcode text-lg"></i>
                 </button>
                 <livewire:user.notification-bell />
@@ -109,7 +104,7 @@
                 <span class="text-[8px] font-black uppercase tracking-[0.1em]">Chat</span>
             </a>
             <a href="{{ route('user.profile') }}" class="flex flex-col items-center gap-1.5 transition-all {{ request()->routeIs('user.profile') ? 'text-green-600' : 'text-slate-300' }}">
-                <i class="fa-solid fa-user-ninja text-xl"></i>
+                <i class="fa-solid fa-user text-xl"></i>
                 <span class="text-[8px] font-black uppercase tracking-[0.1em]">Account</span>
             </a>
         </nav>

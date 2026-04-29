@@ -1,3 +1,7 @@
+@php
+    $adminUser = Auth::guard('admin')->user();
+    $canManageInventory = ! $adminUser || $adminUser->hasActionAccess('borrow.inventory.manage');
+@endphp
 <div class="space-y-8 animate-in fade-in duration-700">
     @if (session()->has('message'))
         <div class="rounded-[2rem] border border-emerald-100 bg-emerald-50 px-6 py-4 text-sm font-bold text-emerald-700 shadow-sm">
@@ -39,7 +43,7 @@
 
                 <div class="mt-5 space-y-3">
                     @forelse($matchedUsers as $user)
-                        <button wire:click="selectUser({{ $user->id }})" class="flex w-full items-start justify-between rounded-[1.75rem] border border-slate-100 bg-slate-50 p-5 text-left transition-all hover:border-emerald-200 hover:bg-emerald-50/40">
+                        <button wire:click="selectUser({{ $user->id }})" class="flex w-full items-start justify-between rounded-[1.75rem] border border-slate-100 bg-slate-50 p-5 text-left transition-all hover:border-emerald-200 hover:bg-emerald-50/40 {{ $canManageInventory ? '' : 'cursor-not-allowed opacity-60' }}" @if(! $canManageInventory) disabled @endif>
                             <div>
                                 <h4 class="text-base font-black text-slate-900">{{ $user->full_name ?: $user->name }}</h4>
                                 <p class="mt-1 text-xs font-bold uppercase tracking-widest text-slate-400">{{ $user->identity_label }}: {{ $user->identity_value }}</p>
@@ -98,7 +102,7 @@
 
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     @forelse($availableItems as $item)
-                        <button wire:click="addItem({{ $item->id }})" class="rounded-[1.75rem] border border-slate-100 bg-slate-50 p-5 text-left transition-all hover:border-indigo-200 hover:bg-indigo-50/30">
+                        <button wire:click="addItem({{ $item->id }})" class="rounded-[1.75rem] border border-slate-100 bg-slate-50 p-5 text-left transition-all hover:border-indigo-200 hover:bg-indigo-50/30 {{ $canManageInventory ? '' : 'cursor-not-allowed opacity-60' }}" @if(! $canManageInventory) disabled @endif>
                             <div class="flex items-start justify-between gap-3">
                                 <div>
                                     <h4 class="text-base font-black text-slate-900">{{ $item->name }}</h4>
@@ -137,9 +141,11 @@
                                 <p class="mt-1 text-xs font-bold uppercase tracking-widest text-slate-400">{{ $item->category?->name ?? '-' }}</p>
                                 <p class="mt-2 text-sm font-bold text-slate-500">S/N: {{ $item->serial_number ?: '-' }}</p>
                             </div>
-                            <button wire:click="removeItem({{ $item->id }})" class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-500 transition-all hover:bg-rose-100 hover:text-rose-600">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
+                            @if($canManageInventory)
+                                <button wire:click="removeItem({{ $item->id }})" class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-500 transition-all hover:bg-rose-100 hover:text-rose-600">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            @endif
                         </div>
                     @empty
                         <div class="rounded-[1.75rem] border border-dashed border-slate-200 bg-slate-50 px-5 py-10 text-center text-sm font-bold text-slate-400">
@@ -152,9 +158,11 @@
                 @error('selectedUserId') <p class="mt-4 text-sm font-bold text-rose-500">{{ $message }}</p> @enderror
 
                 <div class="mt-8">
-                    <button wire:click="submitWalkInBorrow" class="w-full rounded-2xl bg-indigo-600 px-6 py-4 text-sm font-black uppercase tracking-widest text-white shadow-xl shadow-indigo-100 transition-all active:scale-95">
-                        Confirm Walk-In Borrow
-                    </button>
+                    @if($canManageInventory)
+                        <button wire:click="submitWalkInBorrow" class="w-full rounded-2xl bg-indigo-600 px-6 py-4 text-sm font-black uppercase tracking-widest text-white shadow-xl shadow-indigo-100 transition-all active:scale-95">
+                            Confirm Walk-In Borrow
+                        </button>
+                    @endif
                 </div>
             </div>
         </div>

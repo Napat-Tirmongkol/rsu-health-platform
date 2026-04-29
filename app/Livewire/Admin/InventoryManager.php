@@ -7,6 +7,7 @@ use App\Models\BorrowItem;
 use Illuminate\Database\QueryException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -81,12 +82,14 @@ class InventoryManager extends Component
 
     public function openCreateCategory(): void
     {
+        $this->authorizeAction('borrow.inventory.manage');
         $this->resetCategoryForm();
         $this->showCategoryModal = true;
     }
 
     public function openEditCategory(int $categoryId): void
     {
+        $this->authorizeAction('borrow.inventory.manage');
         $category = BorrowCategory::findOrFail($categoryId);
 
         $this->editingCategoryId = $category->id;
@@ -98,6 +101,7 @@ class InventoryManager extends Component
 
     public function saveCategory(): void
     {
+        $this->authorizeAction('borrow.inventory.manage');
         $this->validateOnly('categoryName');
 
         if (! $this->tablesReady()) {
@@ -125,6 +129,7 @@ class InventoryManager extends Component
 
     public function openCreateItem(): void
     {
+        $this->authorizeAction('borrow.inventory.manage');
         $this->resetItemForm();
         $this->itemCategoryId = $this->defaultCategoryId();
         $this->showItemModal = true;
@@ -132,6 +137,7 @@ class InventoryManager extends Component
 
     public function openEditItem(int $itemId): void
     {
+        $this->authorizeAction('borrow.inventory.manage');
         $item = BorrowItem::findOrFail($itemId);
 
         $this->editingItemId = $item->id;
@@ -145,6 +151,7 @@ class InventoryManager extends Component
 
     public function saveItem(): void
     {
+        $this->authorizeAction('borrow.inventory.manage');
         if (! $this->tablesReady()) {
             session()->flash('message', 'ระบบ inventory ยังไม่พร้อมใช้งานเต็มรูปแบบ กรุณารัน migration ก่อน');
             return;
@@ -189,6 +196,7 @@ class InventoryManager extends Component
 
     public function deleteItem(int $itemId): void
     {
+        $this->authorizeAction('borrow.inventory.manage');
         if (! $this->tablesReady()) {
             session()->flash('message', 'ระบบ inventory ยังไม่พร้อมใช้งานเต็มรูปแบบ กรุณารัน migration ก่อน');
             return;
@@ -346,5 +354,10 @@ class InventoryManager extends Component
             'total_quantity' => $category->items()->count(),
             'available_quantity' => $category->items()->where('status', 'available')->count(),
         ]);
+    }
+
+    private function authorizeAction(string $action): void
+    {
+        abort_unless(Auth::guard('admin')->user()?->hasActionAccess($action), 403);
     }
 }

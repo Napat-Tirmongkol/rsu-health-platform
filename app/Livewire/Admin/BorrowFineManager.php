@@ -37,6 +37,8 @@ class BorrowFineManager extends Component
 
     public function openPaymentModal(int $fineId): void
     {
+        $this->authorizeAction('borrow.fine.collect');
+
         if (! $this->tablesReady()) {
             return;
         }
@@ -59,6 +61,8 @@ class BorrowFineManager extends Component
 
     public function recordPayment(): void
     {
+        $this->authorizeAction('borrow.fine.collect');
+
         if (! $this->selectedFine) {
             return;
         }
@@ -238,5 +242,10 @@ class BorrowFineManager extends Component
             LengthAwarePaginator::resolveCurrentPage($pageName),
             ['path' => request()->url(), 'pageName' => $pageName]
         );
+    }
+
+    private function authorizeAction(string $action): void
+    {
+        abort_unless(Auth::guard('admin')->user()?->hasActionAccess($action), 403);
     }
 }

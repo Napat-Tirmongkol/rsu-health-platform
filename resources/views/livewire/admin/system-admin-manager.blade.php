@@ -31,6 +31,7 @@
                         <th class="px-6 py-4 text-left text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">Admin</th>
                         <th class="px-6 py-4 text-left text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">Google ID</th>
                         <th class="px-6 py-4 text-left text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">Workspace Access</th>
+                        <th class="px-6 py-4 text-left text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">Action Access</th>
                         <th class="px-6 py-4 text-left text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">Default Workspace</th>
                         <th class="px-6 py-4 text-right text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">Action</th>
                     </tr>
@@ -51,6 +52,7 @@
                             </td>
                             <td class="px-6 py-5 text-sm font-bold text-slate-500">{{ $admin->google_id ?: 'Not linked yet' }}</td>
                             <td class="px-6 py-5 text-sm font-bold text-slate-700">{{ $this->moduleSummary($admin) }}</td>
+                            <td class="px-6 py-5 text-sm font-bold text-slate-700">{{ $this->actionSummary($admin) }}</td>
                             <td class="px-6 py-5 text-sm font-bold text-slate-700">{{ $this->workspaceLabel($admin->default_workspace) }}</td>
                             <td class="px-6 py-5 text-right">
                                 <button wire:click="openEditModal({{ $admin->id }})" class="inline-flex items-center gap-2 rounded-2xl bg-emerald-50 px-4 py-3 text-xs font-black uppercase tracking-[0.18em] text-emerald-700 transition-all hover:bg-emerald-100">
@@ -61,7 +63,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-20 text-center">
+                            <td colspan="6" class="px-6 py-20 text-center">
                                 <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-slate-50 text-slate-300">
                                     <i class="fa-solid fa-user-shield text-3xl"></i>
                                 </div>
@@ -85,7 +87,7 @@
 
     @if ($showModal)
         <div class="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/60 p-6 backdrop-blur-md">
-            <div class="w-full max-w-3xl overflow-hidden rounded-[2.5rem] bg-white shadow-2xl">
+            <div class="w-full max-w-5xl overflow-hidden rounded-[2.5rem] bg-white shadow-2xl">
                 <div class="border-b border-slate-100 px-8 py-7">
                     <p class="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">Platform Administration</p>
                     <h3 class="mt-2 text-xl font-black tracking-tight text-slate-900">{{ $editingId ? 'แก้ไข System Admin' : 'เพิ่ม System Admin' }}</h3>
@@ -116,7 +118,7 @@
                         <input wire:model.live="fullPlatformAccess" type="checkbox" class="mt-1 h-5 w-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
                         <div>
                             <p class="text-sm font-black text-slate-800">Full platform access</p>
-                            <p class="mt-1 text-sm font-bold leading-relaxed text-slate-500">มองเห็นและเข้าถึงทุก workspace รวมถึงโมดูลใหม่ในอนาคต</p>
+                            <p class="mt-1 text-sm font-bold leading-relaxed text-slate-500">มองเห็นและเข้าถึงทุก workspace รวมถึงสิทธิ์การทำงานทุกอย่างโดยอัตโนมัติ</p>
                         </div>
                     </label>
 
@@ -125,7 +127,7 @@
                         <div class="mt-4 grid gap-4 md:grid-cols-2">
                             @foreach ($availableModules as $moduleKey => $module)
                                 <label class="flex items-start gap-4 rounded-2xl border border-slate-100 bg-white px-5 py-4 shadow-sm">
-                                    <input wire:model="selectedModules" type="checkbox" value="{{ $moduleKey }}" class="mt-1 h-5 w-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" @disabled($fullPlatformAccess)>
+                                    <input wire:model.live="selectedModules" type="checkbox" value="{{ $moduleKey }}" class="mt-1 h-5 w-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" @disabled($fullPlatformAccess)>
                                     <div>
                                         <p class="text-sm font-black text-slate-800">{{ $module['label'] }}</p>
                                         <p class="mt-1 text-sm font-bold leading-relaxed text-slate-500">{{ $module['description'] }}</p>
@@ -136,11 +138,38 @@
                         @error('selectedModules') <p class="mt-3 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
                     </div>
 
+                    <div class="{{ $fullPlatformAccess ? 'opacity-50' : '' }}">
+                        <p class="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">Action Permissions</p>
+                        <div class="mt-4 space-y-4">
+                            @foreach ($availableActions as $moduleKey => $group)
+                                @if ($fullPlatformAccess || in_array($moduleKey, $selectedModules, true))
+                                    <div class="rounded-2xl border border-slate-100 bg-slate-50/70 p-5">
+                                        <p class="text-sm font-black text-slate-800">{{ $group['label'] }}</p>
+                                        <div class="mt-4 grid gap-4 md:grid-cols-2">
+                                            @foreach ($group['actions'] as $action)
+                                                <label class="flex items-start gap-4 rounded-2xl border border-slate-100 bg-white px-5 py-4 shadow-sm">
+                                                    <input wire:model="selectedActions" type="checkbox" value="{{ $action['key'] }}" class="mt-1 h-5 w-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" @disabled($fullPlatformAccess)>
+                                                    <div>
+                                                        <p class="text-sm font-black text-slate-800">{{ $action['label'] }}</p>
+                                                        <p class="mt-1 text-sm font-bold leading-relaxed text-slate-500">{{ $action['description'] }}</p>
+                                                    </div>
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+                        @error('selectedActions') <p class="mt-3 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror
+                    </div>
+
                     <div>
                         <label class="mb-2.5 ml-1 block text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">Default Workspace</label>
                         <select wire:model="defaultWorkspace" class="w-full rounded-2xl border border-slate-100 bg-slate-50 px-5 py-4 text-sm font-bold text-slate-700 transition-all focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-50">
                             @foreach ($availableModules as $moduleKey => $module)
-                                <option value="{{ $moduleKey }}">{{ $module['label'] }}</option>
+                                @if ($fullPlatformAccess || in_array($moduleKey, $selectedModules, true))
+                                    <option value="{{ $moduleKey }}">{{ $module['label'] }}</option>
+                                @endif
                             @endforeach
                         </select>
                         @error('defaultWorkspace') <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p> @enderror

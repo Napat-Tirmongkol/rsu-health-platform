@@ -72,7 +72,7 @@ class TimeSlotPicker extends Component
             return;
         }
 
-        session()->flash('message', 'จองคิวสำเร็จแล้ว ระบบบันทึกข้อมูลเรียบร้อย');
+        session()->flash('message', 'จองคิวนัดหมายเรียบร้อยแล้ว');
 
         return redirect()->route('user.hub');
     }

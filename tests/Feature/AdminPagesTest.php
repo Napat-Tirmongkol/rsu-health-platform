@@ -12,7 +12,14 @@ use App\Models\Campaign;
 use App\Models\Clinic;
 use App\Models\Slot;
 use App\Models\User;
+use App\Mail\BookingCancelledMail;
+use App\Mail\BookingConfirmedMail;
+use App\Mail\BorrowRequestApprovedMail;
+use App\Services\IntegrationSettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -875,6 +882,7 @@ class AdminPagesTest extends TestCase
             ->set('google_id', 'google-borrow-supervisor')
             ->set('fullPlatformAccess', false)
             ->set('selectedModules', ['borrow'])
+            ->set('selectedActions', ['borrow.request.approve', 'borrow.return.process'])
             ->set('defaultWorkspace', 'borrow')
             ->call('save');
 
@@ -882,6 +890,10 @@ class AdminPagesTest extends TestCase
             'email' => 'borrow-supervisor@example.com',
             'default_workspace' => 'borrow',
         ]);
+
+        $created = Admin::where('email', 'borrow-supervisor@example.com')->firstOrFail();
+        $this->assertSame(['borrow'], $created->module_permissions);
+        $this->assertSame(['borrow.request.approve', 'borrow.return.process'], $created->action_permissions);
     }
 
     public function test_non_platform_admin_cannot_access_system_admins_page(): void
@@ -905,6 +917,230 @@ class AdminPagesTest extends TestCase
         $this->actingAs($campaignAdmin, 'admin')
             ->withSession(['clinic_id' => $clinic->id])
             ->get(route('admin.system_admins'))
+            ->assertForbidden();
+    }
+
+    public function test_action_level_permissions_limit_sensitive_borrow_routes(): void
+    {
+        $clinic = Clinic::create([
+            'name' => 'RSU Medical Clinic',
+            'slug' => 'medical',
+            'code' => 'RSU-MED',
+            'status' => 'active',
+        ]);
+
+        $borrowAdmin = Admin::create([
+            'clinic_id' => $clinic->id,
+            'name' => 'Borrow Operations Admin',
+            'email' => 'borrow-ops-admin@example.com',
+            'google_id' => 'google-borrow-ops-admin',
+            'module_permissions' => ['borrow'],
+            'action_permissions' => ['borrow.request.approve', 'borrow.inventory.manage'],
+            'default_workspace' => 'borrow',
+        ]);
+
+        $this->actingAs($borrowAdmin, 'admin')
+            ->withSession(['clinic_id' => $clinic->id])
+            ->get(route('admin.borrow_requests'))
+            ->assertOk();
+
+        $this->actingAs($borrowAdmin, 'admin')
+            ->withSession(['clinic_id' => $clinic->id])
+            ->get(route('admin.inventory'))
+            ->assertOk();
+
+        $this->actingAs($borrowAdmin, 'admin')
+            ->withSession(['clinic_id' => $clinic->id])
+            ->get(route('admin.borrow_returns'))
+            ->assertForbidden();
+
+        $this->actingAs($borrowAdmin, 'admin')
+            ->withSession(['clinic_id' => $clinic->id])
+            ->get(route('admin.borrow_fines'))
+            ->assertForbidden();
+    }
+
+    public function test_borrow_workspace_hides_quick_links_without_matching_actions(): void
+    {
+        $clinic = Clinic::create([
+            'name' => 'RSU Medical Clinic',
+            'slug' => 'medical',
+            'code' => 'RSU-MED',
+            'status' => 'active',
+        ]);
+
+        $borrowAdmin = Admin::create([
+            'clinic_id' => $clinic->id,
+            'name' => 'Borrow Limited Admin',
+            'email' => 'borrow-limited-admin@example.com',
+            'google_id' => 'google-borrow-limited-admin',
+            'module_permissions' => ['borrow'],
+            'action_permissions' => ['borrow.request.approve'],
+            'default_workspace' => 'borrow',
+        ]);
+
+        $this->actingAs($borrowAdmin, 'admin')
+            ->withSession(['clinic_id' => $clinic->id])
+            ->get(route('admin.workspace.borrow'))
+            ->assertOk()
+            ->assertSee('Borrow Requests')
+            ->assertDontSee(route('admin.walk_in_borrow'), false)
+            ->assertDontSee(route('admin.inventory'), false)
+            ->assertDontSee(route('admin.borrow_returns'), false);
+    }
+
+    public function test_campaign_workspace_hides_quick_links_without_matching_actions(): void
+    {
+        $clinic = Clinic::create([
+            'name' => 'RSU Medical Clinic',
+            'slug' => 'medical',
+            'code' => 'RSU-MED',
+            'status' => 'active',
+        ]);
+
+        $campaignAdmin = Admin::create([
+            'clinic_id' => $clinic->id,
+            'name' => 'Campaign Limited Admin',
+            'email' => 'campaign-limited-admin@example.com',
+            'google_id' => 'google-campaign-limited-admin',
+            'module_permissions' => ['campaign'],
+            'action_permissions' => ['campaign.booking.manage'],
+            'default_workspace' => 'campaign',
+        ]);
+
+        $this->actingAs($campaignAdmin, 'admin')
+            ->withSession(['clinic_id' => $clinic->id])
+            ->get(route('admin.workspace.campaign'))
+            ->assertOk()
+            ->assertSee(route('admin.bookings'), false)
+            ->assertDontSee(route('admin.campaigns'), false)
+            ->assertDontSee(route('admin.time_slots'), false)
+            ->assertDontSee(route('admin.reports'), false);
+    }
+
+    public function test_livewire_booking_actions_require_booking_manage_permission(): void
+    {
+        $clinic = Clinic::create([
+            'name' => 'RSU Medical Clinic',
+            'slug' => 'medical',
+            'code' => 'RSU-MED',
+            'status' => 'active',
+        ]);
+
+        $admin = Admin::create([
+            'clinic_id' => $clinic->id,
+            'name' => 'Campaign Viewer',
+            'email' => 'campaign-viewer@example.com',
+            'google_id' => 'google-campaign-viewer',
+            'module_permissions' => ['campaign'],
+            'action_permissions' => ['campaign.manage'],
+        ]);
+
+        $user = User::create([
+            'clinic_id' => $clinic->id,
+            'name' => 'Test Patient',
+            'full_name' => 'Test Patient',
+            'student_personnel_id' => '6600111',
+            'phone_number' => '0811111111',
+            'department' => 'Medical',
+            'email' => 'booking-guard-user@example.com',
+            'password' => 'password',
+        ]);
+
+        $campaign = Campaign::create([
+            'clinic_id' => $clinic->id,
+            'title' => 'Guarded Campaign',
+            'description' => 'Campaign',
+            'total_capacity' => 20,
+            'status' => 'active',
+        ]);
+
+        $slot = Slot::create([
+            'camp_id' => $campaign->id,
+            'date' => now()->toDateString(),
+            'start_time' => '09:00',
+            'end_time' => '10:00',
+            'max_slots' => 20,
+            'status' => 'available',
+        ]);
+
+        $booking = Booking::create([
+            'clinic_id' => $clinic->id,
+            'user_id' => $user->id,
+            'camp_id' => $campaign->id,
+            'slot_id' => $slot->id,
+            'status' => 'pending',
+        ]);
+
+        Livewire::actingAs($admin, 'admin');
+
+        Livewire::test(\App\Livewire\Admin\BookingManager::class)
+            ->call('approve', $booking->id)
+            ->assertForbidden();
+    }
+
+    public function test_livewire_borrow_return_actions_require_return_permission(): void
+    {
+        $clinic = Clinic::create([
+            'name' => 'RSU Medical Clinic',
+            'slug' => 'medical',
+            'code' => 'RSU-MED',
+            'status' => 'active',
+        ]);
+
+        $admin = Admin::create([
+            'clinic_id' => $clinic->id,
+            'name' => 'Borrow Queue Admin',
+            'email' => 'borrow-queue-admin@example.com',
+            'google_id' => 'google-borrow-queue-admin',
+            'module_permissions' => ['borrow'],
+            'action_permissions' => ['borrow.request.approve'],
+        ]);
+
+        $user = User::create([
+            'clinic_id' => $clinic->id,
+            'name' => 'Late Borrower',
+            'full_name' => 'Late Borrower',
+            'student_personnel_id' => '6700999',
+            'phone_number' => '0891111111',
+            'department' => 'Science',
+            'email' => 'late-borrower-guard@example.com',
+            'password' => 'password',
+        ]);
+
+        $category = BorrowCategory::create([
+            'clinic_id' => $clinic->id,
+            'name' => 'Camera',
+            'description' => 'Recording tools',
+            'is_active' => true,
+        ]);
+
+        $item = BorrowItem::create([
+            'clinic_id' => $clinic->id,
+            'category_id' => $category->id,
+            'name' => 'Sony ZV-E10',
+            'serial_number' => 'CAM-GUARD-001',
+            'status' => 'borrowed',
+        ]);
+
+        $record = BorrowRecord::create([
+            'clinic_id' => $clinic->id,
+            'category_id' => $category->id,
+            'item_id' => $item->id,
+            'borrower_user_id' => $user->id,
+            'quantity' => 1,
+            'reason' => 'Media class',
+            'borrowed_at' => now()->subDays(7),
+            'due_date' => now()->subDays(3)->toDateString(),
+            'approval_status' => 'approved',
+            'status' => 'borrowed',
+            'fine_status' => 'none',
+        ]);
+
+        Livewire::actingAs($admin, 'admin');
+
+        Livewire::test(\App\Livewire\Admin\BorrowReturnManager::class)
+            ->call('openReturnModal', $record->id)
             ->assertForbidden();
     }
 
@@ -971,6 +1207,400 @@ class AdminPagesTest extends TestCase
 
         $this->get(route('dev.login'))
             ->assertRedirect(route('admin.workspace.borrow'));
+    }
+
+    public function test_admin_booking_cancel_sends_notifications_based_on_rules(): void
+    {
+        Mail::fake();
+        Http::fake([
+            'https://api.line.me/v2/bot/message/push' => Http::response(['ok' => true], 200),
+        ]);
+
+        $clinic = Clinic::create([
+            'name' => 'RSU Medical Clinic',
+            'slug' => 'medical',
+            'code' => 'RSU-MED',
+            'status' => 'active',
+        ]);
+
+        $admin = Admin::create([
+            'clinic_id' => $clinic->id,
+            'name' => 'Clinic Admin',
+            'email' => 'cancel-admin@example.com',
+            'google_id' => 'google-admin-cancel',
+            'module_permissions' => ['campaign'],
+        ]);
+
+        $user = User::create([
+            'clinic_id' => $clinic->id,
+            'name' => 'Cancel Target',
+            'full_name' => 'Cancel Target',
+            'student_personnel_id' => '6600999',
+            'phone_number' => '0899999999',
+            'department' => 'Medicine',
+            'email' => 'cancel-target@example.com',
+            'line_user_id' => 'U-cancel-target',
+            'password' => 'password',
+        ]);
+
+        $campaign = Campaign::create([
+            'clinic_id' => $clinic->id,
+            'title' => 'Flu Vaccine 2026',
+            'description' => 'Seasonal campaign',
+            'total_capacity' => 20,
+            'status' => 'active',
+        ]);
+
+        $slot = Slot::create([
+            'camp_id' => $campaign->id,
+            'date' => now()->addDay()->toDateString(),
+            'start_time' => '09:00',
+            'end_time' => '10:00',
+            'max_slots' => 20,
+            'status' => 'available',
+        ]);
+
+        $booking = Booking::create([
+            'clinic_id' => $clinic->id,
+            'user_id' => $user->id,
+            'camp_id' => $campaign->id,
+            'slot_id' => $slot->id,
+            'status' => 'pending',
+        ]);
+
+        app(IntegrationSettingsService::class)->save(array_merge(
+            app(IntegrationSettingsService::class)->defaults(),
+            [
+                'mail_mailer' => 'smtp',
+                'mail_host' => 'smtp.example.com',
+                'mail_port' => 587,
+                'mail_from_address' => 'clinic@example.com',
+                'mail_from_name' => 'RSU Clinic',
+                'line_messaging_enabled' => true,
+                'line_channel_access_token' => 'line-token',
+                'campaign_booking_cancelled_line_enabled' => true,
+                'campaign_booking_cancelled_email_enabled' => true,
+            ]
+        ));
+
+        Livewire::actingAs($admin, 'admin');
+
+        Livewire::test(\App\Livewire\Admin\BookingManager::class)
+            ->call('cancel', $booking->id);
+
+        $this->assertDatabaseHas('camp_bookings', [
+            'id' => $booking->id,
+            'status' => 'cancelled',
+        ]);
+
+        $this->assertDatabaseHas('sys_email_logs', [
+            'user_id' => $user->id,
+            'recipient' => 'cancel-target@example.com',
+            'status' => 'sent',
+        ]);
+
+        $this->assertDatabaseHas('sys_activity_logs', [
+            'clinic_id' => $clinic->id,
+            'action' => 'campaign.booking_cancelled_notification_sent',
+        ]);
+
+        Mail::assertSent(BookingCancelledMail::class);
+        Http::assertSent(fn ($request) => $request->url() === 'https://api.line.me/v2/bot/message/push');
+    }
+
+    public function test_admin_booking_approve_sends_notifications_based_on_rules(): void
+    {
+        Mail::fake();
+        Http::fake([
+            'https://api.line.me/v2/bot/message/push' => Http::response(['ok' => true], 200),
+        ]);
+
+        $clinic = Clinic::create([
+            'name' => 'RSU Medical Clinic',
+            'slug' => 'medical',
+            'code' => 'RSU-MED',
+            'status' => 'active',
+        ]);
+
+        $admin = Admin::create([
+            'clinic_id' => $clinic->id,
+            'name' => 'Approve Admin',
+            'email' => 'approve-admin@example.com',
+            'google_id' => 'google-admin-approve',
+            'module_permissions' => ['campaign'],
+        ]);
+
+        $user = User::create([
+            'clinic_id' => $clinic->id,
+            'name' => 'Approve Target',
+            'full_name' => 'Approve Target',
+            'student_personnel_id' => '6600888',
+            'phone_number' => '0888888888',
+            'department' => 'Medicine',
+            'email' => 'approve-target@example.com',
+            'line_user_id' => 'U-approve-target',
+            'password' => 'password',
+        ]);
+
+        $campaign = Campaign::create([
+            'clinic_id' => $clinic->id,
+            'title' => 'Health Check 2026',
+            'description' => 'Campaign',
+            'total_capacity' => 20,
+            'status' => 'active',
+        ]);
+
+        $slot = Slot::create([
+            'camp_id' => $campaign->id,
+            'date' => now()->addDay()->toDateString(),
+            'start_time' => '10:00',
+            'end_time' => '11:00',
+            'max_slots' => 20,
+            'status' => 'available',
+        ]);
+
+        $booking = Booking::create([
+            'clinic_id' => $clinic->id,
+            'user_id' => $user->id,
+            'camp_id' => $campaign->id,
+            'slot_id' => $slot->id,
+            'status' => 'pending',
+        ]);
+
+        app(IntegrationSettingsService::class)->save(array_merge(
+            app(IntegrationSettingsService::class)->defaults(),
+            [
+                'mail_mailer' => 'smtp',
+                'mail_host' => 'smtp.example.com',
+                'mail_port' => 587,
+                'mail_from_address' => 'clinic@example.com',
+                'mail_from_name' => 'RSU Clinic',
+                'line_messaging_enabled' => true,
+                'line_channel_access_token' => 'line-token',
+                'campaign_booking_confirmed_line_enabled' => true,
+                'campaign_booking_confirmed_email_enabled' => true,
+            ]
+        ));
+
+        Livewire::actingAs($admin, 'admin');
+
+        Livewire::test(\App\Livewire\Admin\BookingManager::class)
+            ->call('approve', $booking->id);
+
+        $this->assertDatabaseHas('camp_bookings', [
+            'id' => $booking->id,
+            'status' => 'confirmed',
+        ]);
+
+        $this->assertDatabaseHas('sys_email_logs', [
+            'user_id' => $user->id,
+            'recipient' => 'approve-target@example.com',
+            'status' => 'sent',
+            'subject' => 'ยืนยันการจองนัดหมาย '.$booking->booking_code,
+        ]);
+
+        $this->assertDatabaseHas('sys_activity_logs', [
+            'clinic_id' => $clinic->id,
+            'action' => 'campaign.booking_confirmed_notification_sent',
+        ]);
+
+        Mail::assertSent(BookingConfirmedMail::class);
+        Http::assertSent(fn ($request) => $request->url() === 'https://api.line.me/v2/bot/message/push');
+    }
+
+    public function test_admin_borrow_approval_sends_notifications_based_on_rules(): void
+    {
+        Mail::fake();
+        Http::fake([
+            'https://api.line.me/v2/bot/message/push' => Http::response(['ok' => true], 200),
+        ]);
+
+        $clinic = Clinic::create([
+            'name' => 'RSU Medical Clinic',
+            'slug' => 'medical',
+            'code' => 'RSU-MED',
+            'status' => 'active',
+        ]);
+
+        $admin = Admin::create([
+            'clinic_id' => $clinic->id,
+            'name' => 'Borrow Notify Admin',
+            'email' => 'borrow-notify-admin@example.com',
+            'google_id' => 'google-borrow-notify-admin',
+            'module_permissions' => ['borrow'],
+        ]);
+
+        $user = User::create([
+            'clinic_id' => $clinic->id,
+            'name' => 'Borrow Notify User',
+            'full_name' => 'Borrow Notify User',
+            'student_personnel_id' => '6700111',
+            'phone_number' => '0866666666',
+            'department' => 'Science',
+            'email' => 'borrow-notify-user@example.com',
+            'line_user_id' => 'U-borrow-notify',
+            'password' => 'password',
+        ]);
+
+        $category = BorrowCategory::create([
+            'clinic_id' => $clinic->id,
+            'name' => 'Laptop',
+            'description' => 'Portable device',
+            'is_active' => true,
+        ]);
+
+        $item = BorrowItem::create([
+            'clinic_id' => $clinic->id,
+            'category_id' => $category->id,
+            'name' => 'Dell XPS',
+            'serial_number' => 'DX-1001',
+            'status' => 'available',
+        ]);
+
+        $record = BorrowRecord::create([
+            'clinic_id' => $clinic->id,
+            'category_id' => $category->id,
+            'borrower_user_id' => $user->id,
+            'quantity' => 1,
+            'reason' => 'Need for lab',
+            'borrowed_at' => now(),
+            'due_date' => now()->addDays(3)->toDateString(),
+            'approval_status' => 'pending',
+            'status' => 'borrowed',
+            'fine_status' => 'none',
+        ]);
+
+        app(IntegrationSettingsService::class)->save(array_merge(
+            app(IntegrationSettingsService::class)->defaults(),
+            [
+                'mail_mailer' => 'smtp',
+                'mail_host' => 'smtp.example.com',
+                'mail_port' => 587,
+                'mail_from_address' => 'clinic@example.com',
+                'mail_from_name' => 'RSU Clinic',
+                'line_messaging_enabled' => true,
+                'line_channel_access_token' => 'line-token',
+                'borrow_request_approved_line_enabled' => true,
+                'borrow_request_approved_email_enabled' => true,
+            ]
+        ));
+
+        Livewire::actingAs($admin, 'admin');
+
+        Livewire::test(\App\Livewire\Admin\BorrowRequestManager::class)
+            ->call('approve', $record->id);
+
+        $this->assertDatabaseHas('borrow_records', [
+            'id' => $record->id,
+            'approval_status' => 'approved',
+            'item_id' => $item->id,
+        ]);
+
+        $this->assertDatabaseHas('sys_email_logs', [
+            'user_id' => $user->id,
+            'recipient' => 'borrow-notify-user@example.com',
+            'status' => 'sent',
+            'subject' => 'แจ้งอนุมัติคำขอยืมอุปกรณ์',
+        ]);
+
+        $this->assertDatabaseHas('sys_activity_logs', [
+            'clinic_id' => $clinic->id,
+            'action' => 'borrow.request_approved_notification_sent',
+        ]);
+
+        Mail::assertSent(BorrowRequestApprovedMail::class);
+        Http::assertSent(fn ($request) => $request->url() === 'https://api.line.me/v2/bot/message/push');
+    }
+
+    public function test_campaign_reminder_command_sends_notifications_once_per_day(): void
+    {
+        Mail::fake();
+        Http::fake([
+            'https://api.line.me/v2/bot/message/push' => Http::response(['ok' => true], 200),
+        ]);
+
+        $clinic = Clinic::create([
+            'name' => 'RSU Medical Clinic',
+            'slug' => 'medical',
+            'code' => 'RSU-MED',
+            'status' => 'active',
+        ]);
+
+        $user = User::create([
+            'clinic_id' => $clinic->id,
+            'name' => 'Reminder User',
+            'full_name' => 'Reminder User',
+            'student_personnel_id' => '6600777',
+            'phone_number' => '0877777777',
+            'department' => 'Nursing',
+            'email' => 'reminder-user@example.com',
+            'line_user_id' => 'U-reminder-user',
+            'password' => 'password',
+        ]);
+
+        $campaign = Campaign::create([
+            'clinic_id' => $clinic->id,
+            'title' => 'Reminder Campaign',
+            'description' => 'Campaign',
+            'total_capacity' => 20,
+            'status' => 'active',
+        ]);
+
+        $slot = Slot::create([
+            'camp_id' => $campaign->id,
+            'date' => now()->addDay()->toDateString(),
+            'start_time' => '14:00',
+            'end_time' => '15:00',
+            'max_slots' => 20,
+            'status' => 'available',
+        ]);
+
+        $booking = Booking::create([
+            'clinic_id' => $clinic->id,
+            'user_id' => $user->id,
+            'camp_id' => $campaign->id,
+            'slot_id' => $slot->id,
+            'status' => 'confirmed',
+        ]);
+
+        app(IntegrationSettingsService::class)->save(array_merge(
+            app(IntegrationSettingsService::class)->defaults(),
+            [
+                'mail_mailer' => 'smtp',
+                'mail_host' => 'smtp.example.com',
+                'mail_port' => 587,
+                'mail_from_address' => 'clinic@example.com',
+                'mail_from_name' => 'RSU Clinic',
+                'line_messaging_enabled' => true,
+                'line_channel_access_token' => 'line-token',
+                'campaign_booking_reminder_line_enabled' => true,
+                'campaign_booking_reminder_email_enabled' => true,
+            ]
+        ));
+
+        Artisan::call('campaign:send-reminders', [
+            '--date' => now()->addDay()->toDateString(),
+        ]);
+
+        Artisan::call('campaign:send-reminders', [
+            '--date' => now()->addDay()->toDateString(),
+        ]);
+
+        $this->assertDatabaseHas('sys_email_logs', [
+            'user_id' => $user->id,
+            'recipient' => 'reminder-user@example.com',
+            'status' => 'sent',
+            'subject' => 'เตือนการนัดหมาย '.$booking->booking_code,
+        ]);
+
+        $this->assertDatabaseCount('sys_email_logs', 1);
+        $this->assertDatabaseHas('sys_activity_logs', [
+            'clinic_id' => $clinic->id,
+            'action' => 'campaign.booking_reminder_notification_sent',
+        ]);
+
+        Mail::assertSent(\App\Mail\BookingReminderMail::class, 1);
+        Http::assertSentCount(1);
     }
 }
 

@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\ActivityLog;
 use App\Models\BorrowItem;
 use App\Models\BorrowRecord;
+use App\Services\BorrowNotificationService;
 use Illuminate\Database\QueryException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -56,17 +57,21 @@ class BorrowRequestManager extends Component
         $this->selectedRecordDetails = null;
     }
 
-    public function approve(int $id): void
+    public function approve(int $id, BorrowNotificationService $notifications): void
     {
+        $this->authorizeAction('borrow.request.approve');
+
         if (! $this->tablesReady()) {
             session()->flash('message', 'ระบบ e-Borrow ยังไม่พร้อมใช้งานเต็มรูปแบบ กรุณารัน migration ก่อน');
+
             return;
         }
 
-        $record = BorrowRecord::with(['category', 'borrower'])->findOrFail($id);
+        $record = BorrowRecord::with(['category', 'borrower', 'item'])->findOrFail($id);
 
         if ($record->approval_status !== 'pending') {
             session()->flash('message', 'รายการนี้ไม่ได้อยู่ในสถานะรออนุมัติแล้ว');
+
             return;
         }
 
@@ -78,6 +83,7 @@ class BorrowRequestManager extends Component
 
         if (! $item) {
             session()->flash('message', 'ยังไม่มีอุปกรณ์ว่างสำหรับคำขอนี้');
+
             return;
         }
 
@@ -94,14 +100,19 @@ class BorrowRequestManager extends Component
             'borrow_item_name' => $item->name,
         ]);
 
+        $notifications->requestApproved($record->fresh(['borrower', 'category', 'item']));
+
         session()->flash('message', 'อนุมัติคำขอยืมเรียบร้อยแล้ว');
         $this->refreshDrawer($record->id);
     }
 
     public function reject(int $id): void
     {
+        $this->authorizeAction('borrow.request.approve');
+
         if (! $this->tablesReady()) {
             session()->flash('message', 'ระบบ e-Borrow ยังไม่พร้อมใช้งานเต็มรูปแบบ กรุณารัน migration ก่อน');
+
             return;
         }
 
@@ -109,6 +120,7 @@ class BorrowRequestManager extends Component
 
         if ($record->approval_status !== 'pending') {
             session()->flash('message', 'รายการนี้ไม่ได้อยู่ในสถานะรออนุมัติแล้ว');
+
             return;
         }
 
@@ -243,5 +255,10 @@ class BorrowRequestManager extends Component
             $existingNotes,
             '['.now()->format('Y-m-d H:i').'] '.$line,
         ])));
+    }
+
+    private function authorizeAction(string $action): void
+    {
+        abort_unless(Auth::guard('admin')->user()?->hasActionAccess($action), 403);
     }
 }

@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Models\Clinic;
-use App\Models\Campaign;
-use App\Models\Portal;
 use App\Models\Booking;
+use App\Models\Campaign;
+use App\Models\Clinic;
+use App\Models\Portal;
 use App\Models\Slot;
 use App\Models\Staff;
 use App\Models\User;
@@ -214,6 +214,29 @@ class AuthGuardsTest extends TestCase
             ->assertOk()
             ->assertSee('2. เลือกวันที่')
             ->assertSee(now()->addDay()->format('d'));
+    }
+
+    public function test_user_profile_page_posts_logout_to_user_guard(): void
+    {
+        $clinic = Clinic::create([
+            'name' => 'RSU Medical Clinic',
+            'slug' => 'medical',
+            'code' => 'RSU-MED',
+            'status' => 'active',
+        ]);
+
+        $user = User::create([
+            'clinic_id' => $clinic->id,
+            'name' => 'LINE User',
+            'email' => 'line-profile@example.com',
+            'line_user_id' => 'line-user-profile',
+            'password' => Hash::make('password'),
+        ]);
+
+        $this->actingAs($user, 'user')
+            ->get(route('user.profile'))
+            ->assertOk()
+            ->assertSee(route('user.logout'));
     }
 
     public function test_time_slot_picker_loads_slots_for_sqlite_date_column(): void

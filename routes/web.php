@@ -57,21 +57,21 @@ Route::post('/user/logout', [GuardLoginController::class, 'destroy'])->defaults(
 Route::get('/admin/dashboard', fn () => view('admin.dashboard'))->middleware('auth:admin')->name('admin.dashboard');
 Route::get('/admin/workspaces/campaign', fn () => view('admin.workspaces.campaign'))->middleware(['auth:admin', 'admin.module:campaign'])->name('admin.workspace.campaign');
 Route::get('/admin/workspaces/borrow', fn () => view('admin.workspaces.borrow'))->middleware(['auth:admin', 'admin.module:borrow'])->name('admin.workspace.borrow');
-Route::get('/admin/campaigns', fn () => view('admin.campaigns'))->middleware(['auth:admin', 'admin.module:campaign'])->name('admin.campaigns');
-Route::get('/admin/bookings', fn () => view('admin.bookings'))->middleware(['auth:admin', 'admin.module:campaign'])->name('admin.bookings');
-Route::get('/admin/borrow-requests', fn () => view('admin.borrow_requests'))->middleware(['auth:admin', 'admin.module:borrow'])->name('admin.borrow_requests');
-Route::get('/admin/inventory', fn () => view('admin.inventory'))->middleware(['auth:admin', 'admin.module:borrow'])->name('admin.inventory');
-Route::get('/admin/borrow-returns', fn () => view('admin.borrow_returns'))->middleware(['auth:admin', 'admin.module:borrow'])->name('admin.borrow_returns');
-Route::get('/admin/borrow-fines', fn () => view('admin.borrow_fines'))->middleware(['auth:admin', 'admin.module:borrow'])->name('admin.borrow_fines');
-Route::get('/admin/walk-in-borrow', fn () => view('admin.walk_in_borrow'))->middleware(['auth:admin', 'admin.module:borrow'])->name('admin.walk_in_borrow');
-Route::get('/admin/borrow-payments/{payment}/receipt', [BorrowReceiptController::class, 'show'])->middleware(['auth:admin', 'admin.module:borrow'])->name('admin.borrow_payments.receipt');
-Route::get('/admin/time-slots', fn () => view('admin.time_slots'))->middleware(['auth:admin', 'admin.module:campaign'])->name('admin.time_slots');
+Route::get('/admin/campaigns', fn () => view('admin.campaigns'))->middleware(['auth:admin', 'admin.module:campaign', 'admin.action:campaign.manage'])->name('admin.campaigns');
+Route::get('/admin/bookings', fn () => view('admin.bookings'))->middleware(['auth:admin', 'admin.module:campaign', 'admin.action:campaign.booking.manage'])->name('admin.bookings');
+Route::get('/admin/borrow-requests', fn () => view('admin.borrow_requests'))->middleware(['auth:admin', 'admin.module:borrow', 'admin.action:borrow.request.approve'])->name('admin.borrow_requests');
+Route::get('/admin/inventory', fn () => view('admin.inventory'))->middleware(['auth:admin', 'admin.module:borrow', 'admin.action:borrow.inventory.manage'])->name('admin.inventory');
+Route::get('/admin/borrow-returns', fn () => view('admin.borrow_returns'))->middleware(['auth:admin', 'admin.module:borrow', 'admin.action:borrow.return.process'])->name('admin.borrow_returns');
+Route::get('/admin/borrow-fines', fn () => view('admin.borrow_fines'))->middleware(['auth:admin', 'admin.module:borrow', 'admin.action:borrow.fine.collect'])->name('admin.borrow_fines');
+Route::get('/admin/walk-in-borrow', fn () => view('admin.walk_in_borrow'))->middleware(['auth:admin', 'admin.module:borrow', 'admin.action:borrow.inventory.manage'])->name('admin.walk_in_borrow');
+Route::get('/admin/borrow-payments/{payment}/receipt', [BorrowReceiptController::class, 'show'])->middleware(['auth:admin', 'admin.module:borrow', 'admin.action:borrow.fine.collect'])->name('admin.borrow_payments.receipt');
+Route::get('/admin/time-slots', fn () => view('admin.time_slots'))->middleware(['auth:admin', 'admin.module:campaign', 'admin.action:campaign.manage'])->name('admin.time_slots');
 Route::get('/admin/manage-staff', fn () => view('admin.manage_staff'))->middleware('auth:admin')->name('admin.manage_staff');
 Route::get('/admin/system-admins', fn () => view('admin.system_admins'))->middleware(['auth:admin', 'admin.platform'])->name('admin.system_admins');
 Route::get('/admin/system-settings', fn () => view('admin.system_settings'))->middleware(['auth:admin', 'admin.platform'])->name('admin.system_settings');
 Route::get('/admin/activity-logs', fn () => view('admin.activity_logs'))->middleware('auth:admin')->name('admin.activity_logs');
-Route::get('/admin/reports', fn () => view('admin.reports'))->middleware(['auth:admin', 'admin.module:campaign'])->name('admin.reports');
-Route::get('/admin/users', fn () => view('admin.users'))->middleware(['auth:admin', 'admin.module:campaign'])->name('admin.users');
+Route::get('/admin/reports', fn () => view('admin.reports'))->middleware(['auth:admin', 'admin.module:campaign', 'admin.action:campaign.manage'])->name('admin.reports');
+Route::get('/admin/users', fn () => view('admin.users'))->middleware(['auth:admin', 'admin.module:campaign', 'admin.action:campaign.manage'])->name('admin.users');
 Route::get('/dev-login', function () {
     $admin = \App\Models\Admin::firstOrCreate(
         ['email' => 'admin@test.com'],

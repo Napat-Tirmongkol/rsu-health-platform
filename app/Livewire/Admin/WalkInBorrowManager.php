@@ -30,6 +30,7 @@ class WalkInBorrowManager extends Component
 
     public function selectUser(int $userId): void
     {
+        $this->authorizeAction('borrow.inventory.manage');
         $this->selectedUserId = $userId;
         $this->userSearch = '';
     }
@@ -41,6 +42,8 @@ class WalkInBorrowManager extends Component
 
     public function addItem(int $itemId): void
     {
+        $this->authorizeAction('borrow.inventory.manage');
+
         if (! $this->tablesReady()) {
             session()->flash('message', 'ระบบ walk-in borrow ยังไม่พร้อมใช้งานเต็มรูปแบบ กรุณารัน migration ก่อน');
             return;
@@ -57,6 +60,7 @@ class WalkInBorrowManager extends Component
 
     public function removeItem(int $itemId): void
     {
+        $this->authorizeAction('borrow.inventory.manage');
         $this->cartItemIds = array_values(array_filter(
             $this->cartItemIds,
             fn (int $existingId) => $existingId !== $itemId
@@ -65,6 +69,8 @@ class WalkInBorrowManager extends Component
 
     public function submitWalkInBorrow(): void
     {
+        $this->authorizeAction('borrow.inventory.manage');
+
         if (! $this->tablesReady()) {
             session()->flash('message', 'ระบบ walk-in borrow ยังไม่พร้อมใช้งานเต็มรูปแบบ กรุณารัน migration ก่อน');
             return;
@@ -227,5 +233,10 @@ class WalkInBorrowManager extends Component
         }
 
         return true;
+    }
+
+    private function authorizeAction(string $action): void
+    {
+        abort_unless(Auth::guard('admin')->user()?->hasActionAccess($action), 403);
     }
 }

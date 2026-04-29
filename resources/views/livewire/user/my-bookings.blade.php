@@ -13,7 +13,7 @@
         <div class="flex gap-3 rounded-3xl border border-gray-100 bg-gray-50/80 p-4 shadow-sm backdrop-blur-md">
             <div class="flex-1 rounded-2xl border border-green-100/50 bg-white p-3 text-center shadow-sm">
                 <p class="text-xl font-black text-[#2e9e63]">{{ $stats['upcoming'] }}</p>
-                <p class="mt-0.5 text-[10px] font-bold uppercase tracking-wider text-gray-400">รอรับบริการ</p>
+                <p class="mt-0.5 text-[10px] font-bold uppercase tracking-wider text-gray-400">รอเข้ารับบริการ</p>
             </div>
             <div class="flex-1 rounded-2xl border border-gray-100 bg-white p-3 text-center shadow-sm">
                 <p class="text-xl font-black text-gray-900">{{ $stats['history'] }}</p>
@@ -21,7 +21,7 @@
             </div>
             <div class="flex-1 rounded-2xl border border-emerald-100/50 bg-white p-3 text-center shadow-sm">
                 <p class="text-xl font-black text-emerald-600">{{ $stats['checkin'] }}</p>
-                <p class="mt-0.5 text-[10px] font-bold uppercase tracking-wider text-gray-400">เช็คอินแล้ว</p>
+                <p class="mt-0.5 text-[10px] font-bold uppercase tracking-wider text-gray-400">เช็กอินแล้ว</p>
             </div>
         </div>
     </div>
@@ -171,7 +171,7 @@
                         </div>
                         <p class="text-base font-black {{ explode(' ', $cfg['bg'])[1] }}">{{ $cfg['label'] }}</p>
                         <p class="mt-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                            {{ $selectedBooking->status === 'confirmed' ? 'กรุณาแสดง QR Code ต่อเจ้าหน้าที่' : 'สถานะนัดหมายของคุณ' }}
+                            {{ $selectedBooking->status === 'confirmed' ? 'กรุณาแสดง Identity QR ต่อเจ้าหน้าที่เมื่อมาถึงคลินิก' : 'สถานะนัดหมายของคุณ' }}
                         </p>
                     </div>
 
@@ -242,8 +242,11 @@
                     @if($selectedBooking->status === 'confirmed')
                         <div class="text-center">
                             <div class="mb-4 inline-block rounded-[2.5rem] border-2 border-emerald-50 bg-white p-5 shadow-xl shadow-emerald-900/5">
-                                <div class="flex h-44 w-44 items-center justify-center rounded-2xl bg-slate-50 text-4xl text-slate-800">
-                                    <i class="fa-solid fa-qrcode"></i>
+                                <div class="flex h-44 w-44 items-center justify-center rounded-2xl bg-slate-50 text-center text-slate-500">
+                                    <div class="space-y-3">
+                                        <i class="fa-solid fa-qrcode text-4xl text-slate-700"></i>
+                                        <p class="px-4 text-[11px] font-bold leading-relaxed">ใช้ Identity QR จากแถบด้านบนเมื่อเจ้าหน้าที่เรียกตรวจสอบตัวตน</p>
+                                    </div>
                                 </div>
                             </div>
                             <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">REF: {{ $selectedBooking->booking_code }}</p>

@@ -44,6 +44,8 @@ class BorrowReturnManager extends Component
 
     public function openReturnModal(int $recordId): void
     {
+        $this->authorizeAction('borrow.return.process');
+
         if (! $this->tablesReady()) {
             return;
         }
@@ -70,6 +72,8 @@ class BorrowReturnManager extends Component
 
     public function processReturn(): void
     {
+        $this->authorizeAction('borrow.return.process');
+
         if (! $this->selectedRecord) {
             return;
         }
@@ -292,5 +296,10 @@ class BorrowReturnManager extends Component
             'ip_address' => request()->ip(),
             'user_agent' => (string) request()->userAgent(),
         ]);
+    }
+
+    private function authorizeAction(string $action): void
+    {
+        abort_unless(Auth::guard('admin')->user()?->hasActionAccess($action), 403);
     }
 }

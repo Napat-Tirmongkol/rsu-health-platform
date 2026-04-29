@@ -16,7 +16,7 @@
                     <div class="h-7 w-2 rounded-full bg-[#2e9e63]"></div>
                     <h2 class="text-2xl font-black tracking-tight text-slate-900">ประวัติการจอง</h2>
                 </div>
-                <p class="ml-5 text-sm font-bold text-slate-400">ตรวจสอบสถานะนัดหมายและดูรายละเอียดการจอง</p>
+                <p class="ml-5 text-sm font-bold text-slate-400">ตรวจสอบสถานะนัดหมาย ดูรายละเอียด และจัดการคิวที่ยังรอเข้ารับบริการ</p>
             </div>
 
             <livewire:user.my-bookings />

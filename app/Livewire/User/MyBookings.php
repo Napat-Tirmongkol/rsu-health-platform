@@ -25,8 +25,8 @@ class MyBookings extends Component
         $booking = Booking::where('user_id', Auth::guard('user')->id())
             ->findOrFail($bookingId);
 
-        if ($booking->status === 'completed') {
-            $this->dispatch('swal:error', message: 'ไม่สามารถยกเลิกนัดหมายที่เสร็จสิ้นแล้วได้');
+        if (in_array($booking->status, ['completed', 'attended'], true)) {
+            $this->dispatch('swal:error', message: 'ไม่สามารถยกเลิกนัดหมายที่เข้ารับบริการแล้วได้');
 
             return;
         }
@@ -64,26 +64,24 @@ class MyBookings extends Component
 
         $stats = [
             'upcoming' => $allBookings->filter(function ($booking) use ($today) {
-                return in_array($booking->status, ['pending', 'confirmed']) && $booking->slot && $booking->slot->date >= $today;
+                return in_array($booking->status, ['pending', 'confirmed'], true) && $booking->slot && $booking->slot->date >= $today;
             })->count(),
             'history' => $allBookings->filter(function ($booking) use ($today) {
-                return $booking->status === 'completed'
-                    || $booking->status === 'cancelled'
+                return in_array($booking->status, ['completed', 'attended', 'cancelled'], true)
                     || ($booking->slot && $booking->slot->date < $today);
             })->count(),
-            'checkin' => $allBookings->where('status', 'completed')->count(),
+            'checkin' => $allBookings->whereIn('status', ['completed', 'attended'])->count(),
         ];
 
         if ($this->tab === 'upcoming') {
             $bookings = $allBookings->filter(function ($booking) use ($today) {
-                return in_array($booking->status, ['pending', 'confirmed']) && $booking->slot && $booking->slot->date >= $today;
+                return in_array($booking->status, ['pending', 'confirmed'], true) && $booking->slot && $booking->slot->date >= $today;
             })->sortBy(function ($booking) {
                 return $booking->slot->date.' '.$booking->slot->start_time;
             });
         } else {
             $bookings = $allBookings->filter(function ($booking) use ($today) {
-                return $booking->status === 'completed'
-                    || $booking->status === 'cancelled'
+                return in_array($booking->status, ['completed', 'attended', 'cancelled'], true)
                     || ($booking->slot && $booking->slot->date < $today);
             })->sortByDesc(function ($booking) {
                 return optional($booking->slot)->date ?? $booking->created_at;

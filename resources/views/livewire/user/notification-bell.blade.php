@@ -1,8 +1,8 @@
 <div>
-    <button wire:click="toggle" class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors relative active:scale-90 transition-all">
+    <button wire:click="toggle" class="relative flex h-10 w-10 items-center justify-center text-slate-400 transition-all hover:text-slate-600 active:scale-90">
         <i class="fa-solid fa-bell text-lg"></i>
         @if($unreadCount > 0)
-            <span class="absolute top-1.5 right-1.5 w-4 h-4 bg-red-500 text-white text-[9px] font-black rounded-full border-2 border-white flex items-center justify-center">
+            <span class="absolute right-1.5 top-1.5 flex h-4 w-4 items-center justify-center rounded-full border-2 border-white bg-red-500 text-[9px] font-black text-white">
                 {{ $unreadCount }}
             </span>
         @endif
@@ -10,60 +10,60 @@
 
     @if($isOpen)
         <div class="fixed inset-0 z-[9999] flex items-end justify-center bg-slate-900/60" wire:click.self="close">
-            <div class="w-full max-w-md max-h-[85vh] overflow-hidden rounded-t-[2.5rem] bg-white shadow-2xl flex flex-col">
-                <div class="px-8 pt-8 pb-4 flex items-center justify-between border-b border-slate-50">
+            <div class="flex max-h-[85vh] w-full max-w-md flex-col overflow-hidden rounded-t-[2.5rem] bg-white shadow-2xl">
+                <div class="flex items-center justify-between border-b border-slate-50 px-8 pb-4 pt-8">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-500">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-rose-50 text-rose-500">
                             <i class="fa-solid fa-bell"></i>
                         </div>
                         <div>
-                            <h3 class="text-slate-900 font-black text-lg leading-tight">การแจ้งเตือน</h3>
-                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{{ $unreadCount }} รายการยังไม่ได้อ่าน</p>
+                            <h3 class="text-lg font-black leading-tight text-slate-900">การแจ้งเตือน</h3>
+                            <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">{{ $unreadCount }} รายการยังไม่ได้อ่าน</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
                         @if($unreadCount > 0)
-                            <button wire:click="markAllAsRead" class="px-3 py-2 bg-slate-50 rounded-full text-[10px] font-black uppercase tracking-widest text-slate-500">
+                            <button wire:click="markAllAsRead" class="rounded-full bg-slate-50 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-slate-500">
                                 อ่านทั้งหมด
                             </button>
                         @endif
-                        <button wire:click="close" class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400">
+                        <button wire:click="close" class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-50 text-slate-400">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                     </div>
                 </div>
 
-                <div class="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+                <div class="custom-scrollbar flex-1 space-y-4 overflow-y-auto p-6">
                     @forelse($announcements as $notif)
-                        <div class="rounded-3xl p-5 border transition-all group {{ $notif->reads->isEmpty() ? 'bg-emerald-50/60 border-emerald-100' : 'bg-slate-50 border-slate-100 hover:bg-white hover:shadow-md' }}">
+                        <div class="group rounded-3xl border p-5 transition-all {{ $notif->reads->isEmpty() ? 'border-emerald-100 bg-emerald-50/60' : 'border-slate-100 bg-slate-50 hover:bg-white hover:shadow-md' }}">
                             <div class="flex gap-4">
-                                <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-green-600 border border-slate-100 group-hover:scale-110 transition-transform">
+                                <div class="flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-100 bg-white text-green-600 transition-transform group-hover:scale-110">
                                     <i class="fa-solid fa-bullhorn text-sm"></i>
                                 </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-center justify-between gap-3 mb-1">
-                                        <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">{{ $notif->created_at->diffForHumans() }}</p>
+                                <div class="min-w-0 flex-1">
+                                    <div class="mb-1 flex items-center justify-between gap-3">
+                                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">{{ $notif->created_at->diffForHumans() }}</p>
                                         @if($notif->reads->isEmpty())
-                                            <span class="px-2.5 py-1 rounded-full bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest">ใหม่</span>
+                                            <span class="rounded-full bg-emerald-500 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-white">ใหม่</span>
                                         @endif
                                     </div>
-                                    <h4 class="text-slate-800 font-black text-sm leading-tight mb-1.5">{{ $notif->title }}</h4>
-                                    <p class="text-slate-500 text-[11px] leading-relaxed line-clamp-2">{{ $notif->content }}</p>
+                                    <h4 class="mb-1.5 text-sm font-black leading-tight text-slate-800">{{ $notif->title }}</h4>
+                                    <p class="line-clamp-2 text-[11px] leading-relaxed text-slate-500">{{ $notif->content }}</p>
                                 </div>
                             </div>
                         </div>
                     @empty
                         <div class="py-20 text-center opacity-40">
-                            <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center text-slate-300 mx-auto mb-4">
+                            <div class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 text-slate-300">
                                 <i class="fa-solid fa-bell-slash text-3xl"></i>
                             </div>
-                            <p class="text-sm font-bold text-slate-400 tracking-wide">ยังไม่มีการแจ้งเตือนในขณะนี้</p>
+                            <p class="text-sm font-bold tracking-wide text-slate-400">ยังไม่มีการแจ้งเตือนในขณะนี้</p>
                         </div>
                     @endforelse
                 </div>
 
-                <div class="p-6 border-t border-slate-50 bg-slate-50/50">
-                    <button wire:click="close" class="w-full h-16 bg-slate-900 text-white font-black rounded-2xl shadow-xl active:scale-95 transition-all">
+                <div class="border-t border-slate-50 bg-slate-50/50 p-6">
+                    <button wire:click="close" class="h-16 w-full rounded-2xl bg-slate-900 font-black text-white shadow-xl transition-all active:scale-95">
                         ปิดการแจ้งเตือน
                     </button>
                 </div>

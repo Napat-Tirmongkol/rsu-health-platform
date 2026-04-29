@@ -12,55 +12,57 @@
         function hideInsurance() { document.getElementById('insDetailModal').classList.add('hidden'); }
     </script>
 
-    <main class="px-6 pt-8 space-y-8">
+    <main class="space-y-8 px-6 pt-8">
         <div class="px-1">
-            <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] mb-2 opacity-70">
+            <p class="mb-2 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 opacity-70">
                 {{ $thaiDate }}
             </p>
             <div class="flex items-end justify-between">
-                <h2 class="text-3xl font-black text-slate-900 tracking-tight">Health Hub</h2>
+                <h2 class="text-3xl font-black tracking-tight text-slate-900">Health Hub</h2>
             </div>
         </div>
 
         <div onclick="window.location.href='{{ route('user.profile') }}'"
-            class="relative overflow-hidden bg-gradient-to-br from-[#2e9e63] via-[#10b981] to-[#2e9e63] rounded-[3rem] p-8 shadow-[0_25px_50px_-12px_rgba(46,158,99,0.3)] group active:scale-[0.97] transition-all cursor-pointer">
-            <div class="absolute -right-6 -top-6 w-48 h-48 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
-            <div class="absolute -left-12 -bottom-12 w-56 h-56 bg-emerald-400/20 rounded-full blur-3xl"></div>
+            class="group relative cursor-pointer overflow-hidden rounded-[3rem] bg-gradient-to-br from-[#2e9e63] via-[#10b981] to-[#2e9e63] p-8 shadow-[0_25px_50px_-12px_rgba(46,158,99,0.3)] transition-all active:scale-[0.97]">
+            <div class="absolute -right-6 -top-6 h-48 w-48 rounded-full bg-white/10 blur-3xl transition-transform duration-1000 group-hover:scale-150"></div>
+            <div class="absolute -bottom-12 -left-12 h-56 w-56 rounded-full bg-emerald-400/20 blur-3xl"></div>
 
             <div class="relative z-10">
-                <div class="flex items-center gap-5 mb-10">
+                <div class="mb-10 flex items-center gap-5">
                     <div class="relative">
-                        <div class="w-20 h-20 rounded-[2rem] overflow-hidden border-2 border-white/20 shadow-2xl bg-white/20 flex items-center justify-center">
+                        <div class="flex h-20 w-20 items-center justify-center overflow-hidden rounded-[2rem] border-2 border-white/20 bg-white/20 shadow-2xl">
                             @if($user->profile_photo_path)
-                                <img src="{{ Storage::url($user->profile_photo_path) }}" class="w-full h-full object-cover">
+                                <img src="{{ Storage::url($user->profile_photo_path) }}" class="h-full w-full object-cover">
                             @else
                                 <i class="fa-solid fa-user text-3xl text-white/50"></i>
                             @endif
                         </div>
-                        <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-400 rounded-full border-4 border-[#237a4c] animate-pulse"></div>
+                        <div class="absolute -bottom-1 -right-1 h-6 w-6 animate-pulse rounded-full border-4 border-[#237a4c] bg-emerald-400"></div>
                     </div>
-                    <div class="flex-1 min-w-0 text-left">
-                        <p class="text-emerald-50 text-sm font-bold mb-1">สวัสดีครับ</p>
-                        <h3 class="text-white text-2xl font-black tracking-tight leading-tight mb-1 truncate">
+                    <div class="min-w-0 flex-1 text-left">
+                        <p class="mb-1 text-sm font-bold text-emerald-50">สวัสดีครับ</p>
+                        <h3 class="mb-1 truncate text-2xl font-black leading-tight tracking-tight text-white">
                             {{ $user->name }}
                         </h3>
-                        <p class="text-emerald-100/60 text-[11px] font-black uppercase tracking-[0.1em]">ID: {{ $user->username }}</p>
+                        <p class="text-[11px] font-black uppercase tracking-[0.1em] text-emerald-100/80">
+                            {{ $user->identity_label }}: {{ $user->identity_value }}
+                        </p>
                     </div>
-                    <div class="w-12 h-12 bg-white/15 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/20 shadow-xl group-hover:translate-x-1 transition-transform">
-                        <i class="fa-solid fa-chevron-right text-white text-sm"></i>
+                    <div class="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/20 bg-white/15 shadow-xl backdrop-blur-xl transition-transform group-hover:translate-x-1">
+                        <i class="fa-solid fa-chevron-right text-sm text-white"></i>
                     </div>
                 </div>
 
-                <div class="relative flex items-center justify-between pt-6 border-t border-white/10">
+                <div class="relative flex items-center justify-between border-t border-white/10 pt-6">
                     <div class="flex items-center gap-3 text-white">
-                        <i class="fa-solid fa-graduation-cap text-emerald-200 text-sm"></i>
-                        <p class="text-emerald-50 text-[11px] font-bold tracking-wide truncate max-w-[200px]">
+                        <i class="fa-solid fa-hospital text-sm text-emerald-200"></i>
+                        <p class="max-w-[200px] truncate text-[11px] font-bold tracking-wide text-emerald-50">
                             RSU Medical Clinic · Verified
                         </p>
                     </div>
-                    <div class="bg-emerald-400/20 border border-emerald-400/30 rounded-full px-4 py-1.5 backdrop-blur-md flex items-center gap-2">
-                        <i class="fa-solid fa-circle-check text-emerald-300 text-[10px]"></i>
-                        <span class="text-emerald-200 text-[9px] font-black uppercase tracking-[0.15em]">ACTIVE</span>
+                    <div class="flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/20 px-4 py-1.5 backdrop-blur-md">
+                        <i class="fa-solid fa-circle-check text-[10px] text-emerald-300"></i>
+                        <span class="text-[9px] font-black uppercase tracking-[0.15em] text-emerald-200">Active</span>
                     </div>
                 </div>
             </div>
@@ -68,78 +70,78 @@
 
         <div class="grid grid-cols-2 gap-4">
             <button onclick="window.location.href='{{ route('user.history') }}'"
-                class="bg-white rounded-[2.5rem] p-6 border border-slate-100 shadow-[0_15px_30px_rgba(0,0,0,0.03)] flex flex-col items-center text-center active:scale-95 transition-all group">
-                <div class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                    <i class="fa-solid fa-calendar-check text-green-600 text-lg"></i>
+                class="group flex flex-col items-center rounded-[2.5rem] border border-slate-100 bg-white p-6 text-center shadow-[0_15px_30px_rgba(0,0,0,0.03)] transition-all active:scale-95">
+                <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-green-50 transition-transform group-hover:scale-110">
+                    <i class="fa-solid fa-calendar-check text-lg text-green-600"></i>
                 </div>
-                <p class="font-black text-xl text-slate-900 mb-0.5">{{ $bookingList->count() }}</p>
-                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">การเข้ารับบริการ</p>
+                <p class="mb-0.5 text-xl font-black text-slate-900">{{ $bookingList->count() }}</p>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">รายการนัดหมาย</p>
             </button>
             <button onclick="window.location.href='{{ route('user.borrow.history') }}'"
-                class="bg-white rounded-[2.5rem] p-6 border border-slate-100 shadow-[0_15px_30px_rgba(0,0,0,0.03)] flex flex-col items-center text-center active:scale-95 transition-all group">
-                <div class="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                    <i class="fa-solid fa-boxes-stacked text-orange-600 text-lg"></i>
+                class="group flex flex-col items-center rounded-[2.5rem] border border-slate-100 bg-white p-6 text-center shadow-[0_15px_30px_rgba(0,0,0,0.03)] transition-all active:scale-95">
+                <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 transition-transform group-hover:scale-110">
+                    <i class="fa-solid fa-boxes-stacked text-lg text-orange-600"></i>
                 </div>
-                <p class="font-black text-xl text-slate-900 mb-0.5">{{ $borrowCount }}</p>
-                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">รายการยืมของ</p>
+                <p class="mb-0.5 text-xl font-black text-slate-900">{{ $borrowCount }}</p>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">รายการยืมของ</p>
             </button>
         </div>
 
         <div class="space-y-4">
             <div class="flex items-center justify-between px-1">
-                <h3 class="text-slate-900 font-black text-sm uppercase tracking-widest">Main Menu</h3>
-                <button class="text-green-600 text-[10px] font-black uppercase tracking-widest bg-green-50 px-3 py-1.5 rounded-full">All Services</button>
+                <h3 class="text-sm font-black uppercase tracking-widest text-slate-900">Main Menu</h3>
+                <button class="rounded-full bg-green-50 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-green-600">All Services</button>
             </div>
 
-            <div class="bg-white rounded-[3rem] border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.04)] p-6 pt-8">
-                <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="rounded-[3rem] border border-slate-100 bg-white p-6 pt-8 shadow-[0_20px_50px_rgba(0,0,0,0.04)]">
+                <div class="mb-8 grid grid-cols-2 gap-4">
                     <a href="{{ route('user.booking') }}"
-                        class="relative flex flex-col items-start p-6 rounded-[2.2rem] bg-[#2e9e63] shadow-[0_15px_30px_rgba(46,158,99,0.25)] active:scale-95 transition-all text-white overflow-hidden text-left group">
-                        <div class="absolute -right-4 -top-4 w-16 h-16 bg-white/10 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
-                        <div class="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center mb-4 border border-white/20">
-                            <i class="fa-solid fa-calendar-plus text-white text-base"></i>
+                        class="group relative flex flex-col items-start overflow-hidden rounded-[2.2rem] bg-[#2e9e63] p-6 text-left text-white shadow-[0_15px_30px_rgba(46,158,99,0.25)] transition-all active:scale-95">
+                        <div class="absolute -right-4 -top-4 h-16 w-16 rounded-full bg-white/10 blur-xl transition-transform group-hover:scale-150"></div>
+                        <div class="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl border border-white/20 bg-white/20">
+                            <i class="fa-solid fa-calendar-plus text-base text-white"></i>
                         </div>
                         <p class="text-[13px] font-black leading-tight tracking-wide">จองคิว /<br>แคมเปญ</p>
                     </a>
 
                     <a href="{{ route('user.borrow.index') }}"
-                        class="relative flex flex-col items-start p-6 rounded-[2.2rem] bg-indigo-50 border border-indigo-100 shadow-sm active:scale-95 transition-all text-indigo-600 group">
+                        class="group relative flex flex-col items-start rounded-[2.2rem] border border-indigo-100 bg-indigo-50 p-6 text-indigo-600 shadow-sm transition-all active:scale-95">
                         @if($borrowCount > 0)
-                            <span class="absolute top-4 right-4 w-6 h-6 bg-red-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-lg animate-bounce">{{ $borrowCount }}</span>
+                            <span class="absolute right-4 top-4 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-red-500 text-[10px] font-black text-white shadow-lg animate-bounce">{{ $borrowCount }}</span>
                         @endif
-                        <div class="w-11 h-11 rounded-2xl bg-white flex items-center justify-center mb-4 shadow-sm border border-indigo-50 group-hover:scale-110 transition-transform">
-                            <i class="fa-solid fa-box-open text-indigo-500 text-base"></i>
+                        <div class="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl border border-indigo-50 bg-white shadow-sm transition-transform group-hover:scale-110">
+                            <i class="fa-solid fa-box-open text-base text-indigo-500"></i>
                         </div>
                         <p class="text-[13px] font-black leading-tight tracking-wide text-slate-800">ยืมอุปกรณ์<br>และติดตามรายการ</p>
                     </a>
                 </div>
 
-                <div class="pt-6 border-t border-slate-50">
-                    <p class="text-slate-400 text-[9px] font-black uppercase tracking-[0.3em] mb-5 text-center">External Services</p>
+                <div class="border-t border-slate-50 pt-6">
+                    <p class="mb-5 text-center text-[9px] font-black uppercase tracking-[0.3em] text-slate-400">External Services</p>
                     <div class="grid grid-cols-4 gap-4">
-                        <a href="https://page.line.me/641mrzwm?oat_content=url&openQrModal=true" target="_blank" rel="noopener noreferrer" class="flex flex-col items-center gap-2 active:scale-90 transition-all">
-                            <div class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 shadow-sm">
+                        <a href="https://page.line.me/641mrzwm?oat_content=url&openQrModal=true" target="_blank" rel="noopener noreferrer" class="flex flex-col items-center gap-2 transition-all active:scale-90">
+                            <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-50 text-purple-600 shadow-sm">
                                 <i class="fa-solid fa-comment-dots text-lg"></i>
                             </div>
-                            <span class="text-slate-500 text-[8px] font-black text-center leading-tight uppercase tracking-widest">Counseling</span>
+                            <span class="text-center text-[8px] font-black uppercase leading-tight tracking-widest text-slate-500">Counseling</span>
                         </a>
-                        <a href="{{ route('user.services.ncd-clinic') }}" class="flex flex-col items-center gap-2 active:scale-90 transition-all">
-                            <div class="w-12 h-12 bg-cyan-50 rounded-2xl flex items-center justify-center text-cyan-600 shadow-sm">
+                        <a href="{{ route('user.services.ncd-clinic') }}" class="flex flex-col items-center gap-2 transition-all active:scale-90">
+                            <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-50 text-cyan-600 shadow-sm">
                                 <i class="fa-solid fa-heart-pulse text-lg"></i>
                             </div>
-                            <span class="text-slate-500 text-[8px] font-black text-center leading-tight uppercase tracking-widest">NCD Clinic</span>
+                            <span class="text-center text-[8px] font-black uppercase leading-tight tracking-widest text-slate-500">NCD Clinic</span>
                         </a>
-                        <a href="{{ route('user.services.contact') }}" class="flex flex-col items-center gap-2 active:scale-90 transition-all">
-                            <div class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 shadow-sm">
+                        <a href="{{ route('user.services.contact') }}" class="flex flex-col items-center gap-2 transition-all active:scale-90">
+                            <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 shadow-sm">
                                 <i class="fa-solid fa-phone-flip text-base"></i>
                             </div>
-                            <span class="text-slate-500 text-[8px] font-black text-center leading-tight uppercase tracking-widest">Contact</span>
+                            <span class="text-center text-[8px] font-black uppercase leading-tight tracking-widest text-slate-500">Contact</span>
                         </a>
-                        <a href="{{ route('user.services.help') }}" class="flex flex-col items-center gap-2 active:scale-90 transition-all">
-                            <div class="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 shadow-sm">
+                        <a href="{{ route('user.services.help') }}" class="flex flex-col items-center gap-2 transition-all active:scale-90">
+                            <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-orange-600 shadow-sm">
                                 <i class="fa-solid fa-circle-question text-lg"></i>
                             </div>
-                            <span class="text-slate-500 text-[8px] font-black text-center leading-tight uppercase tracking-widest">Help</span>
+                            <span class="text-center text-[8px] font-black uppercase leading-tight tracking-widest text-slate-500">Help</span>
                         </a>
                     </div>
                 </div>
@@ -147,133 +149,147 @@
         </div>
 
         <div class="space-y-4">
-            <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] px-1 text-left">Upcoming Appointments</p>
-            <div class="bg-white rounded-[3rem] border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.04)] overflow-hidden">
-                <div class="flex items-center justify-between px-7 pt-7 pb-4 border-b border-slate-50">
-                    <h3 class="text-slate-900 font-black text-xs uppercase tracking-widest">Latest Queue</h3>
-                    <span class="bg-green-50 text-green-600 text-[9px] font-black px-3 py-1 rounded-full uppercase">{{ $upcomingCount }} Active</span>
+            <p class="px-1 text-left text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Upcoming Appointments</p>
+            <div class="overflow-hidden rounded-[3rem] border border-slate-100 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.04)]">
+                <div class="flex items-center justify-between border-b border-slate-50 px-7 pb-4 pt-7">
+                    <h3 class="text-xs font-black uppercase tracking-widest text-slate-900">Latest Queue</h3>
+                    <span class="rounded-full bg-green-50 px-3 py-1 text-[9px] font-black uppercase text-green-600">{{ $upcomingCount }} Active</span>
                 </div>
-                <div class="p-6 space-y-4">
+                <div class="space-y-4 p-6">
                     @forelse($bookingList->whereIn('status', ['pending', 'confirmed'])->take(2) as $booking)
-                        <div class="bg-slate-50/50 rounded-[2.2rem] p-6 border border-slate-100 relative group active:scale-[0.98] transition-all text-left">
-                            <div class="flex items-start justify-between mb-5">
+                        <div class="group relative rounded-[2.2rem] border border-slate-100 bg-slate-50/50 p-6 text-left transition-all active:scale-[0.98]">
+                            <div class="mb-5 flex items-start justify-between">
                                 <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm text-green-600 border border-slate-100">
-                                        <i class="fa-solid fa-calendar-check text-base"></i>
+                                    <div class="flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-100 bg-white text-base text-green-600 shadow-sm">
+                                        <i class="fa-solid fa-calendar-check"></i>
                                     </div>
                                     <div>
-                                        <h4 class="text-slate-900 font-black text-sm leading-tight mb-1.5">{{ $booking->campaign->title }}</h4>
+                                        <h4 class="mb-1.5 text-sm font-black leading-tight text-slate-900">{{ $booking->campaign->title }}</h4>
                                         <div class="flex items-center gap-2">
-                                            <span class="w-1.5 h-1.5 {{ $booking->status === 'confirmed' ? 'bg-green-500' : 'bg-amber-500' }} rounded-full"></span>
-                                            <p class="text-slate-400 text-[9px] font-black uppercase tracking-[0.1em]">{{ $booking->status }} Slot</p>
+                                            <span class="h-1.5 w-1.5 rounded-full {{ $booking->status === 'confirmed' ? 'bg-green-500' : 'bg-amber-500' }}"></span>
+                                            <p class="text-[9px] font-black uppercase tracking-[0.1em] text-slate-400">{{ $booking->status }} slot</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="grid grid-cols-2 gap-4">
-                                <div class="bg-white p-4 rounded-2xl border border-slate-100/50 shadow-sm flex items-center gap-3">
-                                    <i class="fa-regular fa-calendar text-green-500 text-xs"></i>
+                                <div class="flex items-center gap-3 rounded-2xl border border-slate-100/50 bg-white p-4 shadow-sm">
+                                    <i class="fa-regular fa-calendar text-xs text-green-500"></i>
                                     <div>
-                                        <p class="text-slate-400 text-[8px] font-black uppercase tracking-widest leading-none mb-1">Date</p>
-                                        <p class="text-slate-800 font-black text-xs leading-none">{{ $booking->slot->date->format('d M Y') }}</p>
+                                        <p class="mb-1 text-[8px] font-black uppercase leading-none tracking-widest text-slate-400">Date</p>
+                                        <p class="text-xs font-black leading-none text-slate-800">{{ $booking->slot->date->format('d M Y') }}</p>
                                     </div>
                                 </div>
-                                <div class="bg-white p-4 rounded-2xl border border-slate-100/50 shadow-sm flex items-center gap-3">
-                                    <i class="fa-regular fa-clock text-green-500 text-xs"></i>
+                                <div class="flex items-center gap-3 rounded-2xl border border-slate-100/50 bg-white p-4 shadow-sm">
+                                    <i class="fa-regular fa-clock text-xs text-green-500"></i>
                                     <div>
-                                        <p class="text-slate-400 text-[8px] font-black uppercase tracking-widest leading-none mb-1">Time</p>
-                                        <p class="text-slate-800 font-black text-xs leading-none">{{ \Carbon\Carbon::parse($booking->slot->start_time)->format('H:i') }}</p>
+                                        <p class="mb-1 text-[8px] font-black uppercase leading-none tracking-widest text-slate-400">Time</p>
+                                        <p class="text-xs font-black leading-none text-slate-800">{{ \Carbon\Carbon::parse($booking->slot->start_time)->format('H:i') }}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     @empty
-                        <div class="py-12 text-center text-slate-300 font-bold text-sm italic">ยังไม่มีนัดหมายที่กำลังจะมาถึง</div>
+                        <div class="py-12 text-center text-sm font-bold italic text-slate-300">ยังไม่มีนัดหมายที่กำลังจะมาถึง</div>
                     @endforelse
                 </div>
             </div>
         </div>
 
         <div class="space-y-4">
-            <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] px-1 text-left">Medical Coverage</p>
+            <p class="px-1 text-left text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Latest Announcements</p>
+            <div class="rounded-[3rem] border border-slate-100 bg-white p-6 shadow-[0_20px_50px_rgba(0,0,0,0.04)]">
+                <div class="space-y-4">
+                    @forelse($announcements->take(3) as $announcement)
+                        <div class="rounded-[2rem] border border-slate-100 bg-slate-50/80 p-5">
+                            <p class="mb-1 text-[10px] font-black uppercase tracking-widest text-slate-400">{{ $announcement->created_at->diffForHumans() }}</p>
+                            <h4 class="text-sm font-black text-slate-900">{{ $announcement->title }}</h4>
+                            <p class="mt-1 text-[11px] leading-relaxed text-slate-500">{{ $announcement->content }}</p>
+                        </div>
+                    @empty
+                        <div class="py-8 text-center text-sm font-bold text-slate-300">ยังไม่มีประกาศใหม่ในขณะนี้</div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <p class="px-1 text-left text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Medical Coverage</p>
 
             @if($insurance)
-                <div class="bg-slate-900 rounded-[3rem] p-8 shadow-2xl relative overflow-hidden premium-shadow text-left">
-                    <div class="absolute -right-8 -bottom-8 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
-                    <div class="flex items-start justify-between mb-8">
+                <div class="premium-shadow relative overflow-hidden rounded-[3rem] bg-slate-900 p-8 text-left shadow-2xl">
+                    <div class="absolute -bottom-8 -right-8 h-40 w-40 rounded-full bg-white/5 blur-3xl"></div>
+                    <div class="mb-8 flex items-start justify-between">
                         <div>
-                            <h4 class="text-white font-black text-sm tracking-tight">Health Insurance</h4>
-                            <p class="text-white/30 text-[9px] font-black uppercase tracking-[0.2em] mt-1.5 leading-none">{{ $insurance->member_status }}</p>
+                            <h4 class="text-sm font-black tracking-tight text-white">Health Insurance</h4>
+                            <p class="mt-1.5 text-[9px] font-black uppercase leading-none tracking-[0.2em] text-white/30">{{ $insurance->member_status }}</p>
                         </div>
-                        <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest {{ $insurance->insurance_status === 'Active' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400' }}">
+                        <span class="rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-widest {{ $insurance->insurance_status === 'Active' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400' }}">
                             {{ $insurance->insurance_status }}
                         </span>
                     </div>
                     <div class="mb-6">
-                        <p class="text-white/30 text-[9px] font-black uppercase tracking-[0.2em] mb-1">Policy No.</p>
-                        <p class="text-white/70 text-xs font-black tracking-widest">{{ $insurance->policy_number ?? 'RSU-INS-7782' }}</p>
+                        <p class="mb-1 text-[9px] font-black uppercase tracking-[0.2em] text-white/30">Policy No.</p>
+                        <p class="text-xs font-black tracking-widest text-white/70">{{ $insurance->policy_number ?? 'RSU-INS-7782' }}</p>
                     </div>
-                    <div class="flex items-end justify-between pt-6 border-t border-white/10 relative z-10">
+                    <div class="relative z-10 flex items-end justify-between border-t border-white/10 pt-6">
                         <div>
-                            <p class="text-white/30 text-[8px] font-black uppercase tracking-[0.2em] mb-1.5">Primary Holder</p>
-                            <p class="text-white text-[11px] font-black uppercase tracking-wider truncate max-w-[180px]">{{ $user->name }}</p>
+                            <p class="mb-1.5 text-[8px] font-black uppercase tracking-[0.2em] text-white/30">Primary Holder</p>
+                            <p class="max-w-[180px] truncate text-[11px] font-black uppercase tracking-wider text-white">{{ $user->name }}</p>
                         </div>
                         <div class="text-right">
-                            <p class="text-white/30 text-[8px] font-black uppercase tracking-[0.2em] mb-1.5">Coverage</p>
-                            <p class="text-white text-[11px] font-black uppercase tracking-widest">Active</p>
+                            <p class="mb-1.5 text-[8px] font-black uppercase tracking-[0.2em] text-white/30">Coverage</p>
+                            <p class="text-[11px] font-black uppercase tracking-widest text-white">Active</p>
                         </div>
                     </div>
                 </div>
             @else
-                <div class="bg-slate-900 rounded-[3rem] p-8 shadow-2xl relative overflow-hidden premium-shadow text-left">
-                    <div class="absolute -right-8 -bottom-8 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
-                    <div class="flex flex-col items-center justify-center py-6 text-center gap-3">
-                        <div class="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center text-white/30 text-2xl">
+                <div class="premium-shadow relative overflow-hidden rounded-[3rem] bg-slate-900 p-8 text-left shadow-2xl">
+                    <div class="absolute -bottom-8 -right-8 h-40 w-40 rounded-full bg-white/5 blur-3xl"></div>
+                    <div class="flex flex-col items-center justify-center gap-3 py-6 text-center">
+                        <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 text-2xl text-white/30">
                             <i class="fa-solid fa-shield-xmark"></i>
                         </div>
-                        <p class="text-white/50 text-xs font-black uppercase tracking-widest">ไม่พบข้อมูลประกันในระบบ</p>
+                        <p class="text-xs font-black uppercase tracking-widest text-white/50">ไม่พบข้อมูลประกันในระบบ</p>
                     </div>
                 </div>
             @endif
 
-            <button onclick="showInsurance()" class="w-full bg-[#2e9e63] rounded-[2.2rem] p-6 shadow-xl shadow-green-100 relative overflow-hidden group cursor-pointer text-left">
-                <div class="absolute -right-4 -top-4 w-20 h-20 bg-white/10 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
-                <div class="flex items-center gap-4 relative z-10">
-                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-white shrink-0">
+            <button onclick="showInsurance()" class="group relative w-full cursor-pointer overflow-hidden rounded-[2.2rem] bg-[#2e9e63] p-6 text-left shadow-xl shadow-green-100">
+                <div class="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-white/10 blur-xl transition-transform group-hover:scale-150"></div>
+                <div class="relative z-10 flex items-center gap-4">
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/20 text-white">
                         <i class="fa-solid fa-shield-heart"></i>
                     </div>
                     <div class="flex-1">
-                        <h5 class="text-white font-black text-xs uppercase tracking-widest">ความคุ้มครองและวิธีใช้สิทธิ์</h5>
-                        <p class="text-white/70 text-[11px] mt-0.5">กดเพื่อดูรายละเอียดประกันและช่องทางติดต่อ</p>
+                        <h5 class="text-xs font-black uppercase tracking-widest text-white">ความคุ้มครองและวิธีใช้สิทธิ์</h5>
+                        <p class="mt-0.5 text-[11px] text-white/70">กดเพื่อดูรายละเอียดประกันและช่องทางติดต่อ</p>
                     </div>
-                    <i class="fa-solid fa-chevron-right text-white/50 text-xs shrink-0"></i>
+                    <i class="fa-solid fa-chevron-right shrink-0 text-xs text-white/50"></i>
                 </div>
             </button>
         </div>
 
-        <footer class="pt-10 pb-16 text-center space-y-2 opacity-30">
-            <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">© 2568 RSU Medical Services</p>
+        <footer class="space-y-2 pb-16 pt-10 text-center opacity-30">
+            <p class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">© 2569 RSU Medical Services</p>
             <div class="flex items-center justify-center gap-3">
-                <span class="w-1 h-1 bg-slate-400 rounded-full"></span>
-                <p class="text-slate-400 text-[9px] font-bold uppercase tracking-widest">Hospital OS v3.2</p>
-                <span class="w-1 h-1 bg-slate-400 rounded-full"></span>
+                <span class="h-1 w-1 rounded-full bg-slate-400"></span>
+                <p class="text-[9px] font-bold uppercase tracking-widest text-slate-400">Hospital OS v3.2</p>
+                <span class="h-1 w-1 rounded-full bg-slate-400"></span>
             </div>
         </footer>
     </main>
 
-    <div id="insDetailModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6">
+    <div id="insDetailModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-6">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="hideInsurance()"></div>
-        <div class="relative bg-white w-full max-w-[340px] rounded-[3rem] p-8 shadow-2xl overflow-y-auto max-h-[80vh]">
-            <h3 class="text-xl font-black mb-4">รายละเอียดความคุ้มครอง</h3>
+        <div class="relative max-h-[80vh] w-full max-w-[340px] overflow-y-auto rounded-[3rem] bg-white p-8 shadow-2xl">
+            <h3 class="mb-4 text-xl font-black">รายละเอียดความคุ้มครอง</h3>
             <div class="space-y-4 text-left text-sm text-slate-600">
                 <p>- คุ้มครองอุบัติเหตุ 24 ชั่วโมง</p>
                 <p>- วงเงินค่ารักษาพยาบาลตามสิทธิ์</p>
                 <p>- แสดงบัตรนี้พร้อมบัตรประชาชนเพื่อใช้สิทธิ์</p>
             </div>
-            <button onclick="hideInsurance()" class="w-full mt-8 py-4 bg-slate-900 text-white font-black rounded-2xl">รับทราบ</button>
+            <button onclick="hideInsurance()" class="mt-8 w-full rounded-2xl bg-slate-900 py-4 font-black text-white">รับทราบ</button>
         </div>
     </div>
-
-    @if($announcements->count() > 0)
-    @endif
 </x-user-layout>

@@ -5,7 +5,7 @@ return [
         'campaign' => [
             'name' => 'e-Campaign',
             'label' => 'บริการคลินิก',
-            'description' => 'จัดการแคมเปญ การจอง และงานบริการของคลินิกในที่เดียว',
+            'description' => 'จัดการแคมเปญ การจอง การเช็กอิน และงานบริการผู้ป่วยในบริบทเดียว',
             'route' => 'admin.workspace.campaign',
             'icon' => 'fa-calendar-check',
             'patterns' => [
@@ -20,7 +20,7 @@ return [
         'borrow' => [
             'name' => 'e-Borrow',
             'label' => 'ยืมอุปกรณ์และคลัง',
-            'description' => 'ดูแลคำขอยืม สต็อก การคืนอุปกรณ์ และค่าปรับ',
+            'description' => 'ดูคำขอยืม สต็อก การคืน ค่าปรับ และงานหน้าจุดบริการในที่เดียว',
             'route' => 'admin.workspace.borrow',
             'icon' => 'fa-box-open',
             'patterns' => [
@@ -34,69 +34,111 @@ return [
             ],
         ],
     ],
+    'actions' => [
+        'campaign' => [
+            'label' => 'สิทธิ์ฝั่ง e-Campaign',
+            'actions' => [
+                [
+                    'key' => 'campaign.manage',
+                    'label' => 'จัดการแคมเปญและรอบเวลา',
+                    'description' => 'เข้าถึงแคมเปญ รอบเวลา รายงาน และประวัติผู้รับบริการของคลินิก',
+                ],
+                [
+                    'key' => 'campaign.booking.manage',
+                    'label' => 'จัดการรายการจอง',
+                    'description' => 'อนุมัติ ยกเลิก หรือดูแลรายการจองของผู้รับบริการ',
+                ],
+            ],
+        ],
+        'borrow' => [
+            'label' => 'สิทธิ์ฝั่ง e-Borrow',
+            'actions' => [
+                [
+                    'key' => 'borrow.request.approve',
+                    'label' => 'อนุมัติคำขอยืม',
+                    'description' => 'พิจารณาอนุมัติหรือปฏิเสธคำขอยืมอุปกรณ์',
+                ],
+                [
+                    'key' => 'borrow.inventory.manage',
+                    'label' => 'จัดการคลังและจุดบริการ',
+                    'description' => 'เพิ่มแก้ไขอุปกรณ์ จัดการหมวดหมู่ และสร้างรายการยืมแบบ walk-in',
+                ],
+                [
+                    'key' => 'borrow.return.process',
+                    'label' => 'รับคืนอุปกรณ์',
+                    'description' => 'บันทึกการคืน คำนวณค่าปรับ และปิดรายการยืม',
+                ],
+                [
+                    'key' => 'borrow.fine.collect',
+                    'label' => 'จัดเก็บค่าปรับ',
+                    'description' => 'บันทึกรับชำระค่าปรับและออกใบเสร็จ',
+                ],
+            ],
+        ],
+    ],
     'sections' => [
         'platform' => [
             [
-                'title' => 'พื้นที่ทำงาน',
+                'title' => 'Workspace',
                 'items' => [
-                    ['route' => 'admin.dashboard', 'label' => 'หน้าหลักแพลตฟอร์ม', 'icon' => 'fa-table-cells-large'],
+                    ['route' => 'admin.dashboard', 'label' => 'Platform Home', 'icon' => 'fa-table-cells-large'],
                     ['route' => 'admin.workspace.campaign', 'label' => 'บริการคลินิก', 'icon' => 'fa-calendar-check'],
                     ['route' => 'admin.workspace.borrow', 'label' => 'ยืมอุปกรณ์และคลัง', 'icon' => 'fa-box-open'],
                 ],
             ],
             [
-                'title' => 'การดูแลระบบส่วนกลาง',
+                'title' => 'Platform Control',
                 'items' => [
-                    ['route' => 'admin.system_admins', 'label' => 'ผู้ดูแลระบบ', 'icon' => 'fa-user-shield'],
+                    ['route' => 'admin.system_admins', 'label' => 'System Admins', 'icon' => 'fa-user-shield'],
                     ['route' => 'admin.system_settings', 'label' => 'Integration Settings', 'icon' => 'fa-sliders'],
                     ['route' => 'admin.manage_staff', 'label' => 'ทีมเจ้าหน้าที่', 'icon' => 'fa-user-gear'],
-                    ['route' => 'admin.activity_logs', 'label' => 'บันทึกกิจกรรม', 'icon' => 'fa-list-check'],
+                    ['route' => 'admin.activity_logs', 'label' => 'Activity Logs', 'icon' => 'fa-list-check'],
                 ],
             ],
         ],
         'campaign' => [
             [
-                'title' => 'งานคลินิก',
+                'title' => 'Clinic Services',
                 'items' => [
-                    ['route' => 'admin.workspace.campaign', 'label' => 'หน้าหลักโมดูล', 'icon' => 'fa-compass'],
-                    ['route' => 'admin.campaigns', 'label' => 'แคมเปญ', 'icon' => 'fa-calendar-check'],
-                    ['route' => 'admin.bookings', 'label' => 'รายการจอง', 'icon' => 'fa-users-viewfinder'],
-                    ['route' => 'admin.time_slots', 'label' => 'รอบเวลา', 'icon' => 'fa-clock-rotate-left'],
-                    ['route' => 'admin.users', 'label' => 'ประวัติผู้ใช้', 'icon' => 'fa-id-card'],
-                    ['route' => 'admin.reports', 'label' => 'รายงาน', 'icon' => 'fa-chart-line'],
+                    ['route' => 'admin.workspace.campaign', 'label' => 'Workspace Overview', 'icon' => 'fa-compass'],
+                    ['route' => 'admin.campaigns', 'label' => 'Campaigns', 'icon' => 'fa-calendar-check'],
+                    ['route' => 'admin.bookings', 'label' => 'Bookings', 'icon' => 'fa-users-viewfinder'],
+                    ['route' => 'admin.time_slots', 'label' => 'Time Slots', 'icon' => 'fa-clock-rotate-left'],
+                    ['route' => 'admin.users', 'label' => 'User History', 'icon' => 'fa-id-card'],
+                    ['route' => 'admin.reports', 'label' => 'Reports', 'icon' => 'fa-chart-line'],
                 ],
             ],
             [
-                'title' => 'การดูแลระบบส่วนกลาง',
+                'title' => 'Shared Admin',
                 'items' => [
-                    ['route' => 'admin.dashboard', 'label' => 'หน้าหลักแพลตฟอร์ม', 'icon' => 'fa-table-cells-large'],
-                    ['route' => 'admin.system_admins', 'label' => 'ผู้ดูแลระบบ', 'icon' => 'fa-user-shield'],
+                    ['route' => 'admin.dashboard', 'label' => 'Platform Home', 'icon' => 'fa-table-cells-large'],
+                    ['route' => 'admin.system_admins', 'label' => 'System Admins', 'icon' => 'fa-user-shield'],
                     ['route' => 'admin.system_settings', 'label' => 'Integration Settings', 'icon' => 'fa-sliders'],
                     ['route' => 'admin.manage_staff', 'label' => 'ทีมเจ้าหน้าที่', 'icon' => 'fa-user-gear'],
-                    ['route' => 'admin.activity_logs', 'label' => 'บันทึกกิจกรรม', 'icon' => 'fa-list-check'],
+                    ['route' => 'admin.activity_logs', 'label' => 'Activity Logs', 'icon' => 'fa-list-check'],
                 ],
             ],
         ],
         'borrow' => [
             [
-                'title' => 'งานยืมอุปกรณ์',
+                'title' => 'Borrow Operations',
                 'items' => [
-                    ['route' => 'admin.workspace.borrow', 'label' => 'หน้าหลักโมดูล', 'icon' => 'fa-compass'],
-                    ['route' => 'admin.borrow_requests', 'label' => 'คำขอยืม', 'icon' => 'fa-box-open'],
-                    ['route' => 'admin.inventory', 'label' => 'คลังอุปกรณ์', 'icon' => 'fa-boxes-stacked'],
-                    ['route' => 'admin.borrow_returns', 'label' => 'รับคืนอุปกรณ์', 'icon' => 'fa-rotate-left'],
-                    ['route' => 'admin.borrow_fines', 'label' => 'ค่าปรับและการชำระเงิน', 'icon' => 'fa-file-invoice-dollar'],
-                    ['route' => 'admin.walk_in_borrow', 'label' => 'ยืมหน้าเคาน์เตอร์', 'icon' => 'fa-cart-plus'],
+                    ['route' => 'admin.workspace.borrow', 'label' => 'Workspace Overview', 'icon' => 'fa-compass'],
+                    ['route' => 'admin.borrow_requests', 'label' => 'Borrow Requests', 'icon' => 'fa-box-open'],
+                    ['route' => 'admin.inventory', 'label' => 'Inventory', 'icon' => 'fa-boxes-stacked'],
+                    ['route' => 'admin.borrow_returns', 'label' => 'Returns', 'icon' => 'fa-rotate-left'],
+                    ['route' => 'admin.borrow_fines', 'label' => 'Fines & Payments', 'icon' => 'fa-file-invoice-dollar'],
+                    ['route' => 'admin.walk_in_borrow', 'label' => 'Walk-In Borrow', 'icon' => 'fa-cart-plus'],
                 ],
             ],
             [
-                'title' => 'การดูแลระบบส่วนกลาง',
+                'title' => 'Shared Admin',
                 'items' => [
-                    ['route' => 'admin.dashboard', 'label' => 'หน้าหลักแพลตฟอร์ม', 'icon' => 'fa-table-cells-large'],
-                    ['route' => 'admin.system_admins', 'label' => 'ผู้ดูแลระบบ', 'icon' => 'fa-user-shield'],
+                    ['route' => 'admin.dashboard', 'label' => 'Platform Home', 'icon' => 'fa-table-cells-large'],
+                    ['route' => 'admin.system_admins', 'label' => 'System Admins', 'icon' => 'fa-user-shield'],
                     ['route' => 'admin.system_settings', 'label' => 'Integration Settings', 'icon' => 'fa-sliders'],
                     ['route' => 'admin.manage_staff', 'label' => 'ทีมเจ้าหน้าที่', 'icon' => 'fa-user-gear'],
-                    ['route' => 'admin.activity_logs', 'label' => 'บันทึกกิจกรรม', 'icon' => 'fa-list-check'],
+                    ['route' => 'admin.activity_logs', 'label' => 'Activity Logs', 'icon' => 'fa-list-check'],
                 ],
             ],
         ],

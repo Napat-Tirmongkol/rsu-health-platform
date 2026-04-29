@@ -9,7 +9,7 @@
         </div>
     </div>
 
-    <div class="flex-1 space-y-4 overflow-y-auto p-6 scroll-smooth" x-ref="chatbox">
+    <div class="custom-scrollbar flex-1 space-y-4 overflow-y-auto p-6 scroll-smooth" x-ref="chatbox">
         @forelse($messages as $msg)
             @php $isUser = is_null($msg->staff_id); @endphp
             <div class="flex {{ $isUser ? 'justify-end' : 'justify-start' }}">

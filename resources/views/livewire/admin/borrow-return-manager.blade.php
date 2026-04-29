@@ -1,3 +1,7 @@
+@php
+    $adminUser = Auth::guard('admin')->user();
+    $canProcessReturns = ! $adminUser || $adminUser->hasActionAccess('borrow.return.process');
+@endphp
 <div class="space-y-8 animate-in fade-in duration-700">
     @if (session()->has('message'))
         <div class="rounded-[2rem] border border-emerald-100 bg-emerald-50 px-6 py-4 text-sm font-bold text-emerald-700 shadow-sm">
@@ -152,7 +156,7 @@
         </div>
     </div>
 
-    @if($showReturnModal && $selectedRecord)
+    @if($canProcessReturns && $showReturnModal && $selectedRecord)
         @php
             $modalOverdueDays = $this->overdueDays($selectedRecord);
             $modalFineAmount = $this->calculatedFineAmount($selectedRecord);
