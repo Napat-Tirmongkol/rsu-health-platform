@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Mail\BookingCancelledMail;
+use App\Mail\BookingCheckedInMail;
 use App\Mail\BookingConfirmedMail;
 use App\Mail\BookingReminderMail;
 use App\Mail\BookingSubmittedMail;
@@ -65,6 +66,40 @@ class NotificationDeliveryService
         return $this->sendLineText(
             $lineUserId,
             "รับคำขอจองนัดหมายแล้ว\nรหัสการจอง: {$booking->booking_code}\nบริการ: {$booking->campaign?->title}\nวันที่: {$date} เวลา {$time} น.\nสถานะ: รอการยืนยัน"
+        );
+    }
+
+    public function sendBookingCheckedInEmail(Booking $booking): void
+    {
+        $email = $booking->user?->email;
+
+        if (blank($email)) {
+            return;
+        }
+
+        $this->sendMailWithLogging(
+            clinicId: $booking->clinic_id,
+            userId: $booking->user_id,
+            recipient: $email,
+            subject: 'ยืนยัน Check-in สำเร็จ '.$booking->booking_code,
+            callback: fn () => Mail::mailer($this->mailerName())->to($email)->send(new BookingCheckedInMail($booking))
+        );
+    }
+
+    public function sendBookingCheckedInLine(Booking $booking): array
+    {
+        $lineUserId = $booking->user?->line_user_id;
+
+        if (blank($lineUserId)) {
+            return ['skipped' => true, 'reason' => 'missing_line_user_id'];
+        }
+
+        $date = $booking->slot?->date?->format('d/m/Y') ?? '-';
+        $time = $booking->slot ? substr((string) $booking->slot->start_time, 0, 5) : '-';
+
+        return $this->sendLineText(
+            $lineUserId,
+            "✅ Check-in สำเร็จแล้ว\nรหัสการจอง: {$booking->booking_code}\nบริการ: {$booking->campaign?->title}\nวันที่: {$date} เวลา {$time} น.\nขอบคุณที่มารับบริการครับ/ค่ะ"
         );
     }
 

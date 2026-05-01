@@ -125,7 +125,7 @@ class AuthGuardsTest extends TestCase
         ]);
 
         SiteSetting::create([
-            'clinic_id' => 0,
+            'clinic_id' => $clinic->id,
             'key' => 'site_name',
             'value' => 'RSU Medical Hub',
             'type' => 'string',

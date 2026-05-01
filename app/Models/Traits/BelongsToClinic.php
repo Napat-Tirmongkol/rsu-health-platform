@@ -12,7 +12,7 @@ trait BelongsToClinic
         static::addGlobalScope(new TenantScope());
 
         static::creating(function (Model $model) {
-            if (empty($model->clinic_id)) {
+            if (is_null($model->clinic_id)) {
                 $model->clinic_id = currentClinicId();
             }
         });

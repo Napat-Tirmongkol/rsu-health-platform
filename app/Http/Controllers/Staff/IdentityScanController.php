@@ -7,6 +7,7 @@ use App\Models\ActivityLog;
 use App\Models\Booking;
 use App\Models\Campaign;
 use App\Models\User;
+use App\Services\CampaignNotificationService;
 use App\Services\IdentityQrCode;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -164,6 +165,11 @@ class IdentityScanController extends Controller
             'ip_address' => $request->ip(),
             'user_agent' => (string) $request->userAgent(),
         ]);
+
+        try {
+            app(CampaignNotificationService::class)->bookingCheckedIn($booking);
+        } catch (\Throwable) {
+        }
 
         return response()->json([
             'message' => 'Check-in completed.',

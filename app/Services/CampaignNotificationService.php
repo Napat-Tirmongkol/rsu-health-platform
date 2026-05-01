@@ -14,6 +14,18 @@ class CampaignNotificationService
     ) {
     }
 
+    public function bookingCheckedIn(Booking $booking): void
+    {
+        $this->deliver(
+            event: 'booking_checked_in',
+            actionPrefix: 'campaign.booking_checked_in',
+            label: 'check-in',
+            booking: $booking,
+            sendEmail: fn () => $this->delivery->sendBookingCheckedInEmail($booking),
+            sendLine: fn () => $this->delivery->sendBookingCheckedInLine($booking),
+        );
+    }
+
     public function bookingSubmitted(Booking $booking): void
     {
         $this->deliver(

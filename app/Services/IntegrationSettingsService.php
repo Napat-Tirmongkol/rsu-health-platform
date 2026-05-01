@@ -53,6 +53,8 @@ class IntegrationSettingsService
                 'fields' => [
                     'campaign_booking_submitted_line_enabled' => ['label' => 'ส่งคำขอจองสำเร็จ -> LINE', 'type' => 'toggle', 'rules' => 'nullable|boolean', 'toggle_label' => 'ส่ง LINE เมื่อผู้ใช้จองคิวสำเร็จ'],
                     'campaign_booking_submitted_email_enabled' => ['label' => 'ส่งคำขอจองสำเร็จ -> Email', 'type' => 'toggle', 'rules' => 'nullable|boolean', 'toggle_label' => 'ส่งอีเมลยืนยันเมื่อผู้ใช้จองคิวสำเร็จ'],
+                    'campaign_booking_checked_in_line_enabled' => ['label' => 'Check-in สำเร็จ -> LINE', 'type' => 'toggle', 'rules' => 'nullable|boolean', 'toggle_label' => 'ส่ง LINE เมื่อผู้ใช้ check-in สำเร็จ'],
+                    'campaign_booking_checked_in_email_enabled' => ['label' => 'Check-in สำเร็จ -> Email', 'type' => 'toggle', 'rules' => 'nullable|boolean', 'toggle_label' => 'ส่งอีเมลยืนยันเมื่อผู้ใช้ check-in สำเร็จ'],
                     'campaign_booking_cancelled_line_enabled' => ['label' => 'การจองถูกยกเลิก -> LINE', 'type' => 'toggle', 'rules' => 'nullable|boolean', 'toggle_label' => 'ส่ง LINE เมื่อมีการยกเลิกการจอง'],
                     'campaign_booking_cancelled_email_enabled' => ['label' => 'การจองถูกยกเลิก -> Email', 'type' => 'toggle', 'rules' => 'nullable|boolean', 'toggle_label' => 'ส่งอีเมลเมื่อมีการยกเลิกการจอง'],
                     'campaign_booking_confirmed_line_enabled' => ['label' => 'การจองได้รับการยืนยัน -> LINE', 'type' => 'toggle', 'rules' => 'nullable|boolean', 'toggle_label' => 'ส่ง LINE เมื่อยืนยันการจอง'],
