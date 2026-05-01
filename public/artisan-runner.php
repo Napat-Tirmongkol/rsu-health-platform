@@ -13,18 +13,36 @@ if ($secret !== SECRET) {
     die(json_encode(['error' => 'Unauthorized']));
 }
 
+$php = PHP_BINARY;
+
 $allowed = [
-    'migrate'         => ['php', 'artisan', 'migrate', '--force'],
-    'migrate:status'  => ['php', 'artisan', 'migrate:status'],
-    'seed'            => ['php', 'artisan', 'db:seed', '--force'],
-    'migrate+seed'    => null, // handled separately
-    'key:generate'    => ['php', 'artisan', 'key:generate', '--force'],
-    'optimize:clear'  => ['php', 'artisan', 'optimize:clear'],
-    'config:cache'    => ['php', 'artisan', 'config:cache'],
-    'route:cache'     => ['php', 'artisan', 'route:cache'],
-    'view:cache'      => ['php', 'artisan', 'view:cache'],
-    'storage:link'    => ['php', 'artisan', 'storage:link'],
+    'migrate'         => [$php, 'artisan', 'migrate', '--force', '--no-interaction'],
+    'migrate:status'  => [$php, 'artisan', 'migrate:status'],
+    'seed'            => [$php, 'artisan', 'db:seed', '--force', '--no-interaction'],
+    'migrate+seed'    => null,
+    'key:generate'    => [$php, 'artisan', 'key:generate', '--force'],
+    'optimize:clear'  => [$php, 'artisan', 'optimize:clear'],
+    'config:cache'    => [$php, 'artisan', 'config:cache'],
+    'route:cache'     => [$php, 'artisan', 'route:cache'],
+    'view:cache'      => [$php, 'artisan', 'view:cache'],
+    'storage:link'    => [$php, 'artisan', 'storage:link'],
 ];
+
+$diag = $_GET['diag'] ?? null;
+if ($diag !== null) {
+    header('Content-Type: application/json');
+    $disabledFunctions = array_map('trim', explode(',', ini_get('disable_functions')));
+    echo json_encode([
+        'PHP_BINARY'        => PHP_BINARY,
+        'php_version'       => PHP_VERSION,
+        'base_path'         => BASE_PATH,
+        'artisan_exists'    => file_exists(BASE_PATH . '/artisan'),
+        'exec_available'    => function_exists('exec') && !in_array('exec', $disabledFunctions),
+        'disable_functions' => ini_get('disable_functions'),
+        'cwd'               => getcwd(),
+    ], JSON_PRETTY_PRINT);
+    exit;
+}
 
 $run = $_GET['run'] ?? $_POST['run'] ?? null;
 
@@ -42,11 +60,18 @@ if ($run !== null) {
     $output = [];
     $exitCode = 0;
 
+    if (!function_exists('exec') || in_array('exec', array_map('trim', explode(',', ini_get('disable_functions'))))) {
+        echo json_encode(['error' => 'exec() ถูก disable บนเซิร์ฟเวอร์นี้']);
+        exit;
+    }
+
     if ($run === 'migrate+seed') {
-        exec('php artisan migrate --force 2>&1', $output, $exitCode);
+        $migrateCmd = implode(' ', array_map('escapeshellarg', [$php, 'artisan', 'migrate', '--force', '--no-interaction'])) . ' 2>&1';
+        exec($migrateCmd, $output, $exitCode);
         if ($exitCode === 0) {
             $seedOutput = [];
-            exec('php artisan db:seed --force 2>&1', $seedOutput, $exitCode);
+            $seedCmd = implode(' ', array_map('escapeshellarg', [$php, 'artisan', 'db:seed', '--force', '--no-interaction'])) . ' 2>&1';
+            exec($seedCmd, $seedOutput, $exitCode);
             $output = array_merge($output, ['--- db:seed ---'], $seedOutput);
         }
     } else {
