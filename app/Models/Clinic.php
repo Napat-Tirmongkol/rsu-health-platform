@@ -17,6 +17,11 @@ class Clinic extends Model
         'code',
         'domain',
         'status',
+        'description',
+        'logo_url',
+        'primary_color',
+        'contact_email',
+        'contact_phone',
     ];
 
     /**

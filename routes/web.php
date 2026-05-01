@@ -9,6 +9,7 @@ use App\Http\Controllers\User\HubController;
 use App\Http\Controllers\User\ServiceController;
 use App\Http\Controllers\Portal\PortalDashboardController;
 use App\Http\Controllers\Portal\PortalChatbotController;
+use App\Models\Clinic;
 use App\Models\User;
 use App\Models\Portal;
 use Illuminate\Support\Facades\Auth;
@@ -120,8 +121,8 @@ Route::post('/staff/scan/verify', [IdentityScanController::class, 'verify'])->mi
 Route::post('/staff/scan/check-in', [IdentityScanController::class, 'checkIn'])->middleware('auth:staff')->name('staff.scan.check-in');
 Route::middleware('auth:portal')->prefix('portal')->name('portal.')->group(function () {
     Route::get('/dashboard', [PortalDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/clinics', [PortalDashboardController::class, 'clinics'])->name('clinics');
-    Route::get('/settings', [PortalDashboardController::class, 'settings'])->name('settings');
+    Route::get('/clinics', fn () => view('portal.clinics'))->name('clinics');
+    Route::get('/settings', fn () => view('portal.settings'))->name('settings');
     Route::get('/chatbot/faqs', [PortalChatbotController::class, 'faqs'])->name('chatbot.faqs');
     Route::post('/chatbot/faqs', [PortalChatbotController::class, 'storeFaq'])->name('chatbot.faqs.store');
     Route::put('/chatbot/faqs/{faqId}', [PortalChatbotController::class, 'updateFaq'])->name('chatbot.faqs.update');
@@ -131,6 +132,22 @@ Route::middleware('auth:portal')->prefix('portal')->name('portal.')->group(funct
     Route::get('/activity-logs', fn () => view('portal.activity_logs'))->name('activity_logs');
     Route::get('/clinic-data',   fn () => view('portal.clinic_data'))->name('clinic_data');
     Route::get('/maintenance',   fn () => view('portal.maintenance'))->name('maintenance');
+
+    Route::post('/impersonate/{clinic}', function (Clinic $clinic) {
+        session([
+            'portal_impersonating_clinic_id'   => $clinic->id,
+            'portal_impersonating_clinic_name' => $clinic->name,
+            'clinic_id'                        => $clinic->id,
+        ]);
+        return redirect()->route('portal.clinics')->with('clinic_msg', "กำลัง Impersonate คลินิก: {$clinic->name}");
+    })->name('impersonate');
+
+    Route::post('/stop-impersonate', function () {
+        $originalClinicId = \App\Models\Clinic::where('slug', explode('.', request()->getHost())[0])->value('id') ?? 1;
+        session()->forget(['portal_impersonating_clinic_id', 'portal_impersonating_clinic_name']);
+        session(['clinic_id' => $originalClinicId]);
+        return redirect()->route('portal.clinics');
+    })->name('stop-impersonate');
 });
 
 Route::middleware('auth:user')->group(function () {

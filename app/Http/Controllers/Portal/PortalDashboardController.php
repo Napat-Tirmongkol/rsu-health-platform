@@ -68,27 +68,4 @@ class PortalDashboardController extends Controller
         ]);
     }
 
-    public function clinics()
-    {
-        $clinics = Clinic::query()
-            ->withCount(['users', 'staff'])
-            ->orderBy('name')
-            ->paginate(20);
-
-        return view('portal.clinics', [
-            'clinics' => $clinics,
-        ]);
-    }
-
-    public function settings()
-    {
-        $globalSettings = SiteSetting::withoutGlobalScope(TenantScope::class)
-            ->where('clinic_id', 0)
-            ->orderBy('key')
-            ->paginate(20);
-
-        return view('portal.settings', [
-            'globalSettings' => $globalSettings,
-        ]);
-    }
 }
