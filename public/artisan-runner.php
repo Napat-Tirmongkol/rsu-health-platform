@@ -79,18 +79,31 @@ if ($run !== null) {
         exit;
     }
 
+    $isWindows = stripos(PHP_OS, 'WIN') === 0;
+    $buildCmd = function (array $parts) use ($isWindows) {
+        $cmd = implode(' ', array_map('escapeshellarg', $parts)) . ' 2>&1';
+        return $isWindows ? '"' . $cmd . '"' : $cmd;
+    };
+
     if ($run === 'migrate+seed') {
-        $migrateCmd = implode(' ', array_map('escapeshellarg', [$php, 'artisan', 'migrate', '--force', '--no-interaction'])) . ' 2>&1';
+        $migrateCmd = $buildCmd([$php, 'artisan', 'migrate', '--force', '--no-interaction']);
         exec($migrateCmd, $output, $exitCode);
         if ($exitCode === 0) {
             $seedOutput = [];
-            $seedCmd = implode(' ', array_map('escapeshellarg', [$php, 'artisan', 'db:seed', '--force', '--no-interaction'])) . ' 2>&1';
+            $seedCmd = $buildCmd([$php, 'artisan', 'db:seed', '--force', '--no-interaction']);
             exec($seedCmd, $seedOutput, $exitCode);
             $output = array_merge($output, ['--- db:seed ---'], $seedOutput);
         }
     } else {
-        $cmd = implode(' ', array_map('escapeshellarg', $allowed[$run])) . ' 2>&1';
+        $cmd = $buildCmd($allowed[$run]);
         exec($cmd, $output, $exitCode);
+    }
+
+    if (empty($output)) {
+        $output[] = '(ไม่มี output — debug info)';
+        $output[] = 'php cli: ' . $php;
+        $output[] = 'cwd: ' . getcwd();
+        $output[] = 'cmd: ' . ($cmd ?? $migrateCmd ?? '?');
     }
 
     echo json_encode([
