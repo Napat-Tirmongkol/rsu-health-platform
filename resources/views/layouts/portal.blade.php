@@ -152,7 +152,7 @@
                     {{-- Logo --}}
                     <div :class="sidebarCollapsed ? 'mb-6 justify-center' : 'mb-8'" class="flex items-center gap-4">
                         <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl shadow-lg" style="background: linear-gradient(135deg, #7c3aed, #6d28d9);">
-                            <i class="fa-solid fa-shield-halved text-white text-lg"></i>
+                            <i class="fa-solid fa-shield-halved text-lg text-white"></i>
                         </div>
                         <div x-show="! sidebarCollapsed" x-transition.opacity.duration.200ms>
                             <h1 class="text-lg font-black leading-tight text-white">RSU Medical Hub</h1>

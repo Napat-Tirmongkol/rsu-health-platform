@@ -5,21 +5,30 @@ return [
         [
             'title' => 'Overview',
             'items' => [
-                ['route' => 'portal.dashboard', 'icon' => 'fa-gauge-high',   'label' => 'KPI Dashboard'],
+                ['route' => 'portal.dashboard', 'icon' => 'fa-gauge-high', 'label' => 'Dashboard'],
             ],
         ],
         [
-            'title' => 'จัดการระบบ',
+            'title' => 'Clinic Management',
             'items' => [
-                ['route' => 'portal.admins',        'icon' => 'fa-user-shield',  'label' => 'จัดการ Admin'],
-                ['route' => 'portal.activity_logs', 'icon' => 'fa-list-check',   'label' => 'Activity Logs'],
+                ['route' => 'portal.clinics',      'icon' => 'fa-hospital',      'label' => 'Clinics'],
+                ['route' => 'portal.admins',        'icon' => 'fa-user-shield',   'label' => 'Admins'],
+                ['route' => 'portal.activity_logs', 'icon' => 'fa-list-check',    'label' => 'Activity Logs'],
             ],
         ],
         [
-            'title' => 'ข้อมูล & ตั้งค่า',
+            'title' => 'Settings',
             'items' => [
-                ['route' => 'portal.clinic_data',  'icon' => 'fa-hospital',  'label' => 'ข้อมูลคลินิก'],
-                ['route' => 'portal.maintenance',  'icon' => 'fa-gears',     'label' => 'Maintenance'],
+                ['route' => 'portal.clinic_data',        'icon' => 'fa-sliders',      'label' => 'Per-Clinic Settings'],
+                ['route' => 'portal.settings',           'icon' => 'fa-gear',         'label' => 'Global Settings'],
+                ['route' => 'portal.maintenance',        'icon' => 'fa-gears',        'label' => 'Maintenance'],
+            ],
+        ],
+        [
+            'title' => 'Chatbot',
+            'items' => [
+                ['route' => 'portal.chatbot.faqs',     'icon' => 'fa-comments',     'label' => 'FAQ Manager'],
+                ['route' => 'portal.chatbot.settings', 'icon' => 'fa-robot',        'label' => 'Chatbot Settings'],
             ],
         ],
     ],

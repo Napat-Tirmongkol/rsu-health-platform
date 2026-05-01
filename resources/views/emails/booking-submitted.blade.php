@@ -1,22 +1,32 @@
 @extends('emails.layout')
 
-@section('title', 'แจ้งเตือนนัดหมายพรุ่งนี้')
+@section('title', 'รับคำขอจองนัดหมาย')
 
-@section('headline', 'แจ้งเตือนนัดหมายพรุ่งนี้')
+@section('headline', 'รับคำขอจองนัดหมายแล้ว')
 
 @section('content')
 <p style="margin:0 0 24px;font-size:15px;color:#475569;">
     เรียน <strong>{{ $booking->user?->name ?? 'ผู้รับบริการ' }}</strong>,
 </p>
 <p style="margin:0 0 28px;font-size:15px;color:#475569;line-height:1.7;">
-    ขอเตือนว่าคุณมีนัดหมายในวันพรุ่งนี้ กรุณาเตรียมตัวให้พร้อม
+    เราได้รับคำขอจองนัดหมายของคุณแล้ว กรุณารอการยืนยันจากเจ้าหน้าที่คลินิก
 </p>
 
-{{-- Reminder badge --}}
+{{-- Booking code badge --}}
+<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
+    <tr>
+        <td style="background:linear-gradient(135deg,#0c4a6e,#0369a1);border-radius:12px;padding:20px 24px;text-align:center;">
+            <p style="margin:0 0 4px;font-size:11px;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;color:rgba(186,230,253,0.8);">รหัสการจอง</p>
+            <p style="margin:0;font-size:28px;font-weight:900;color:#ffffff;letter-spacing:0.12em;">{{ $booking->booking_code }}</p>
+        </td>
+    </tr>
+</table>
+
+{{-- Status badge --}}
 <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
     <tr>
         <td style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:16px 24px;text-align:center;">
-            <p style="margin:0;font-size:13px;font-weight:700;color:#d97706;letter-spacing:0.12em;text-transform:uppercase;">⏰ นัดหมายพรุ่งนี้</p>
+            <p style="margin:0;font-size:13px;font-weight:700;color:#d97706;letter-spacing:0.12em;text-transform:uppercase;">⏳ รอการยืนยัน</p>
         </td>
     </tr>
 </table>
@@ -24,11 +34,7 @@
 {{-- Detail rows --}}
 <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-bottom:28px;">
     <tr>
-        <td width="36%" style="background:#f8fafc;padding:14px 20px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#64748b;border-bottom:1px solid #e2e8f0;">รหัสการจอง</td>
-        <td style="background:#ffffff;padding:14px 20px;font-size:14px;font-weight:700;color:#0f172a;letter-spacing:0.06em;border-bottom:1px solid #e2e8f0;">{{ $booking->booking_code }}</td>
-    </tr>
-    <tr>
-        <td style="background:#f8fafc;padding:14px 20px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#64748b;border-bottom:1px solid #e2e8f0;">บริการ</td>
+        <td width="36%" style="background:#f8fafc;padding:14px 20px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#64748b;border-bottom:1px solid #e2e8f0;">บริการ</td>
         <td style="background:#ffffff;padding:14px 20px;font-size:14px;font-weight:600;color:#0f172a;border-bottom:1px solid #e2e8f0;">{{ $booking->campaign?->title ?? '-' }}</td>
     </tr>
     <tr>
@@ -42,6 +48,6 @@
 </table>
 
 <p style="margin:0;font-size:13px;color:#94a3b8;line-height:1.7;">
-    กรุณานำรหัสการจองนี้แสดงต่อเจ้าหน้าที่ในวันที่รับบริการ
+    คุณจะได้รับการแจ้งเตือนอีกครั้งเมื่อการจองได้รับการยืนยัน
 </p>
 @endsection

@@ -14,6 +14,18 @@ class CampaignNotificationService
     ) {
     }
 
+    public function bookingSubmitted(Booking $booking): void
+    {
+        $this->deliver(
+            event: 'booking_submitted',
+            actionPrefix: 'campaign.booking_submitted',
+            label: 'submitted booking',
+            booking: $booking,
+            sendEmail: fn () => $this->delivery->sendBookingSubmittedEmail($booking),
+            sendLine: fn () => $this->delivery->sendBookingSubmittedLine($booking),
+        );
+    }
+
     public function bookingCancelled(Booking $booking): void
     {
         $this->deliver(

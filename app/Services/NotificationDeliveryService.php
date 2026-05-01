@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Mail\BookingCancelledMail;
 use App\Mail\BookingConfirmedMail;
 use App\Mail\BookingReminderMail;
+use App\Mail\BookingSubmittedMail;
 use App\Mail\BorrowRequestApprovedMail;
 use App\Mail\IntegrationTestMail;
 use App\Models\Booking;
@@ -31,6 +32,40 @@ class NotificationDeliveryService
             'from_address' => (string) config('mail.from.address'),
             'from_name' => (string) config('mail.from.name'),
         ];
+    }
+
+    public function sendBookingSubmittedEmail(Booking $booking): void
+    {
+        $email = $booking->user?->email;
+
+        if (blank($email)) {
+            return;
+        }
+
+        $this->sendMailWithLogging(
+            clinicId: $booking->clinic_id,
+            userId: $booking->user_id,
+            recipient: $email,
+            subject: 'รับคำขอจองนัดหมาย '.$booking->booking_code,
+            callback: fn () => Mail::mailer($this->mailerName())->to($email)->send(new BookingSubmittedMail($booking))
+        );
+    }
+
+    public function sendBookingSubmittedLine(Booking $booking): array
+    {
+        $lineUserId = $booking->user?->line_user_id;
+
+        if (blank($lineUserId)) {
+            return ['skipped' => true, 'reason' => 'missing_line_user_id'];
+        }
+
+        $date = $booking->slot?->date?->format('d/m/Y') ?? '-';
+        $time = $booking->slot ? substr((string) $booking->slot->start_time, 0, 5) : '-';
+
+        return $this->sendLineText(
+            $lineUserId,
+            "รับคำขอจองนัดหมายแล้ว\nรหัสการจอง: {$booking->booking_code}\nบริการ: {$booking->campaign?->title}\nวันที่: {$date} เวลา {$time} น.\nสถานะ: รอการยืนยัน"
+        );
     }
 
     public function sendBookingCancelledEmail(Booking $booking): void

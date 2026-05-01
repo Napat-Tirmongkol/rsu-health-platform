@@ -4,6 +4,7 @@ namespace App\Livewire\User;
 
 use App\Models\Booking;
 use App\Models\Slot;
+use App\Services\CampaignNotificationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\On;
@@ -44,7 +45,7 @@ class TimeSlotPicker extends Component
             'selectedSlotId' => 'required|exists:camp_slots,id',
         ]);
 
-        $created = DB::transaction(function () {
+        $booking = DB::transaction(function () {
             $slot = Slot::whereKey($this->selectedSlotId)
                 ->where('camp_id', $this->campaignId)
                 ->whereDate('date', $this->date)
@@ -52,24 +53,28 @@ class TimeSlotPicker extends Component
                 ->firstOrFail();
 
             if ($slot->isFull()) {
-                return false;
+                return null;
             }
 
-            Booking::create([
+            return Booking::create([
                 'clinic_id' => currentClinicId(),
                 'user_id' => Auth::guard('user')->id(),
                 'camp_id' => $this->campaignId,
                 'slot_id' => $this->selectedSlotId,
                 'status' => 'pending',
             ]);
-
-            return true;
         });
 
-        if (! $created) {
+        if (! $booking) {
             session()->flash('error', 'ช่วงเวลานี้เต็มแล้ว กรุณาเลือกช่วงเวลาอื่น');
 
             return;
+        }
+
+        try {
+            $booking->load(['user', 'campaign', 'slot']);
+            app(CampaignNotificationService::class)->bookingSubmitted($booking);
+        } catch (\Throwable) {
         }
 
         session()->flash('message', 'จองคิวนัดหมายเรียบร้อยแล้ว');

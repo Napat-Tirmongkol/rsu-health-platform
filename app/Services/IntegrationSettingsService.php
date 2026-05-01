@@ -51,6 +51,8 @@ class IntegrationSettingsService
                 'title' => 'Notification Rules · e-Campaign',
                 'description' => 'กำหนดได้ว่าเหตุการณ์ใดใน e-Campaign ควรส่งแจ้งเตือนผ่าน LINE หรืออีเมล โดยไม่ต้องแก้โค้ดทุกครั้ง',
                 'fields' => [
+                    'campaign_booking_submitted_line_enabled' => ['label' => 'ส่งคำขอจองสำเร็จ -> LINE', 'type' => 'toggle', 'rules' => 'nullable|boolean', 'toggle_label' => 'ส่ง LINE เมื่อผู้ใช้จองคิวสำเร็จ'],
+                    'campaign_booking_submitted_email_enabled' => ['label' => 'ส่งคำขอจองสำเร็จ -> Email', 'type' => 'toggle', 'rules' => 'nullable|boolean', 'toggle_label' => 'ส่งอีเมลยืนยันเมื่อผู้ใช้จองคิวสำเร็จ'],
                     'campaign_booking_cancelled_line_enabled' => ['label' => 'การจองถูกยกเลิก -> LINE', 'type' => 'toggle', 'rules' => 'nullable|boolean', 'toggle_label' => 'ส่ง LINE เมื่อมีการยกเลิกการจอง'],
                     'campaign_booking_cancelled_email_enabled' => ['label' => 'การจองถูกยกเลิก -> Email', 'type' => 'toggle', 'rules' => 'nullable|boolean', 'toggle_label' => 'ส่งอีเมลเมื่อมีการยกเลิกการจอง'],
                     'campaign_booking_confirmed_line_enabled' => ['label' => 'การจองได้รับการยืนยัน -> LINE', 'type' => 'toggle', 'rules' => 'nullable|boolean', 'toggle_label' => 'ส่ง LINE เมื่อยืนยันการจอง'],
