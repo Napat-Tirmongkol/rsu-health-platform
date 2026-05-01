@@ -20,20 +20,8 @@ class IntegrationSettingsTest extends TestCase
 
     public function test_full_platform_admin_can_access_integration_settings_page(): void
     {
-        $clinic = Clinic::create([
-            'name' => 'RSU Medical Clinic',
-            'slug' => 'medical',
-            'code' => 'RSU-MED',
-            'status' => 'active',
-        ]);
-
-        $admin = Admin::create([
-            'clinic_id' => $clinic->id,
-            'name' => 'Platform Admin',
-            'email' => 'platform-admin@example.com',
-            'google_id' => 'google-platform-admin',
-            'module_permissions' => ['*'],
-        ]);
+        $clinic = $this->createClinic();
+        $admin = $this->createAdmin($clinic, ['*'], 'platform-admin@example.com');
 
         $this->actingAs($admin, 'admin')
             ->withSession(['clinic_id' => $clinic->id])
@@ -48,20 +36,8 @@ class IntegrationSettingsTest extends TestCase
 
     public function test_non_platform_admin_cannot_access_integration_settings_page(): void
     {
-        $clinic = Clinic::create([
-            'name' => 'RSU Medical Clinic',
-            'slug' => 'medical',
-            'code' => 'RSU-MED',
-            'status' => 'active',
-        ]);
-
-        $admin = Admin::create([
-            'clinic_id' => $clinic->id,
-            'name' => 'Borrow Admin',
-            'email' => 'borrow-admin@example.com',
-            'google_id' => 'google-borrow-admin',
-            'module_permissions' => ['borrow'],
-        ]);
+        $clinic = $this->createClinic();
+        $admin = $this->createAdmin($clinic, ['borrow'], 'borrow-admin@example.com');
 
         $this->actingAs($admin, 'admin')
             ->withSession(['clinic_id' => $clinic->id])
@@ -71,20 +47,8 @@ class IntegrationSettingsTest extends TestCase
 
     public function test_integration_settings_are_saved_with_encrypted_sensitive_values_and_notification_rules(): void
     {
-        $clinic = Clinic::create([
-            'name' => 'RSU Medical Clinic',
-            'slug' => 'medical',
-            'code' => 'RSU-MED',
-            'status' => 'active',
-        ]);
-
-        $admin = Admin::create([
-            'clinic_id' => $clinic->id,
-            'name' => 'Platform Admin',
-            'email' => 'platform-admin-save@example.com',
-            'google_id' => 'google-platform-admin-save',
-            'module_permissions' => ['*'],
-        ]);
+        $clinic = $this->createClinic();
+        $admin = $this->createAdmin($clinic, ['*'], 'platform-admin-save@example.com');
 
         $this->actingAs($admin, 'admin')->withSession(['clinic_id' => $clinic->id]);
         Livewire::actingAs($admin, 'admin');
@@ -121,7 +85,7 @@ class IntegrationSettingsTest extends TestCase
             ->set('settings.borrow_fine_created_line_enabled', false)
             ->set('settings.borrow_fine_created_email_enabled', true)
             ->call('save')
-            ->assertSee('บันทึกค่า Integration Settings และ Notification Rules เรียบร้อยแล้ว');
+            ->assertSee('บันทึก Integration Settings และ Notification Rules เรียบร้อยแล้ว');
 
         $mailPassword = SiteSetting::withoutGlobalScopes()->where('key', 'mail_password')->firstOrFail();
         $lineSecret = SiteSetting::withoutGlobalScopes()->where('key', 'line_channel_secret')->firstOrFail();
@@ -166,20 +130,8 @@ class IntegrationSettingsTest extends TestCase
     {
         Mail::fake();
 
-        $clinic = Clinic::create([
-            'name' => 'RSU Medical Clinic',
-            'slug' => 'medical',
-            'code' => 'RSU-MED',
-            'status' => 'active',
-        ]);
-
-        $admin = Admin::create([
-            'clinic_id' => $clinic->id,
-            'name' => 'Platform Admin',
-            'email' => 'platform-admin-mail@example.com',
-            'google_id' => 'google-platform-admin-mail',
-            'module_permissions' => ['*'],
-        ]);
+        $clinic = $this->createClinic();
+        $admin = $this->createAdmin($clinic, ['*'], 'platform-admin-mail@example.com');
 
         app(IntegrationSettingsService::class)->save(array_merge(
             app(IntegrationSettingsService::class)->defaults(),
@@ -198,7 +150,7 @@ class IntegrationSettingsTest extends TestCase
         Livewire::test(IntegrationSettingsManager::class)
             ->set('testEmailRecipient', 'test-recipient@example.com')
             ->call('sendTestEmail')
-            ->assertSee('ส่งอีเมลทดสอบเรียบร้อยแล้ว');
+            ->assertSee('ส่งอีเมลทดสอบเรียบร้อยแล้ว ผ่าน smtp');
 
         Mail::assertSent(IntegrationTestMail::class);
     }
@@ -209,20 +161,8 @@ class IntegrationSettingsTest extends TestCase
             'https://api.line.me/v2/bot/message/push' => Http::response(['ok' => true], 200),
         ]);
 
-        $clinic = Clinic::create([
-            'name' => 'RSU Medical Clinic',
-            'slug' => 'medical',
-            'code' => 'RSU-MED',
-            'status' => 'active',
-        ]);
-
-        $admin = Admin::create([
-            'clinic_id' => $clinic->id,
-            'name' => 'Platform Admin',
-            'email' => 'platform-admin-line@example.com',
-            'google_id' => 'google-platform-admin-line',
-            'module_permissions' => ['*'],
-        ]);
+        $clinic = $this->createClinic();
+        $admin = $this->createAdmin($clinic, ['*'], 'platform-admin-line@example.com');
 
         app(IntegrationSettingsService::class)->save(array_merge(
             app(IntegrationSettingsService::class)->defaults(),
@@ -241,5 +181,87 @@ class IntegrationSettingsTest extends TestCase
             ->assertSee('ส่ง LINE ทดสอบเรียบร้อยแล้ว');
 
         Http::assertSent(fn ($request) => $request->url() === 'https://api.line.me/v2/bot/message/push');
+    }
+
+    public function test_test_email_reports_log_mailer_clearly(): void
+    {
+        Mail::fake();
+
+        $clinic = $this->createClinic();
+        $admin = $this->createAdmin($clinic, ['*'], 'platform-admin-log-mail@example.com');
+
+        $this->actingAs($admin, 'admin')->withSession(['clinic_id' => $clinic->id]);
+        Livewire::actingAs($admin, 'admin');
+
+        Livewire::test(IntegrationSettingsManager::class)
+            ->set('settings.mail_mailer', 'log')
+            ->set('testEmailRecipient', 'test-recipient@example.com')
+            ->call('sendTestEmail')
+            ->assertSee('ระบบบันทึกอีเมลทดสอบลง laravel.log แล้ว เพราะ Mailer ยังเป็น log');
+
+        Mail::assertSent(IntegrationTestMail::class);
+    }
+
+    public function test_admin_can_send_test_gemini_from_integration_center(): void
+    {
+        Http::fake([
+            'https://generativelanguage.googleapis.com/*' => Http::response([
+                'candidates' => [
+                    [
+                        'content' => [
+                            'parts' => [
+                                ['text' => 'RSU Health Platform Gemini test OK'],
+                            ],
+                        ],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $clinic = $this->createClinic();
+        $admin = $this->createAdmin($clinic, ['*'], 'platform-admin-gemini@example.com');
+
+        app(IntegrationSettingsService::class)->save(array_merge(
+            app(IntegrationSettingsService::class)->defaults(),
+            [
+                'gemini_enabled' => true,
+                'gemini_api_key' => 'test-gemini-key',
+                'gemini_model' => 'gemini-1.5-flash',
+                'gemini_base_url' => 'https://generativelanguage.googleapis.com',
+                'gemini_system_prompt' => 'You are the clinic assistant.',
+            ]
+        ));
+
+        $this->actingAs($admin, 'admin')->withSession(['clinic_id' => $clinic->id]);
+        Livewire::actingAs($admin, 'admin');
+
+        Livewire::test(IntegrationSettingsManager::class)
+            ->call('sendTestGemini')
+            ->assertSee('เชื่อมต่อ Gemini API สำเร็จแล้ว')
+            ->assertSee('gemini-1.5-flash')
+            ->assertSee('RSU Health Platform Gemini test OK');
+
+        Http::assertSent(fn ($request) => str_contains($request->url(), 'v1beta/models/gemini-1.5-flash:generateContent'));
+    }
+
+    private function createClinic(): Clinic
+    {
+        return Clinic::create([
+            'name' => 'RSU Medical Clinic',
+            'slug' => 'medical',
+            'code' => 'RSU-MED',
+            'status' => 'active',
+        ]);
+    }
+
+    private function createAdmin(Clinic $clinic, array $permissions, string $email): Admin
+    {
+        return Admin::create([
+            'clinic_id' => $clinic->id,
+            'name' => 'Platform Admin',
+            'email' => $email,
+            'google_id' => 'google-'.md5($email),
+            'module_permissions' => $permissions,
+        ]);
     }
 }

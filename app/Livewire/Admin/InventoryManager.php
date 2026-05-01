@@ -9,11 +9,14 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 class InventoryManager extends Component
 {
+    use WithFileUploads;
     use WithPagination;
 
     public string $categorySearch = '';
@@ -29,6 +32,8 @@ class InventoryManager extends Component
     public string $categoryName = '';
     public string $categoryDescription = '';
     public bool $categoryIsActive = true;
+    public $categoryImage = null;
+    public ?string $existingCategoryImagePath = null;
 
     public ?int $itemCategoryId = null;
     public string $itemName = '';
@@ -52,6 +57,7 @@ class InventoryManager extends Component
             'categoryName' => ['required', 'string', 'max:255'],
             'categoryDescription' => ['nullable', 'string', 'max:1000'],
             'categoryIsActive' => ['boolean'],
+            'categoryImage' => ['nullable', 'image', 'max:2048'],
             'itemCategoryId' => ['required', 'integer'],
             'itemName' => ['required', 'string', 'max:255'],
             'itemDescription' => ['nullable', 'string', 'max:1000'],
@@ -90,41 +96,63 @@ class InventoryManager extends Component
     public function openEditCategory(int $categoryId): void
     {
         $this->authorizeAction('borrow.inventory.manage');
+
         $category = BorrowCategory::findOrFail($categoryId);
 
         $this->editingCategoryId = $category->id;
         $this->categoryName = $category->name;
         $this->categoryDescription = $category->description ?? '';
         $this->categoryIsActive = (bool) $category->is_active;
+        $this->existingCategoryImagePath = $category->image_path;
+        $this->categoryImage = null;
         $this->showCategoryModal = true;
     }
 
     public function saveCategory(): void
     {
         $this->authorizeAction('borrow.inventory.manage');
-        $this->validateOnly('categoryName');
 
         if (! $this->tablesReady()) {
             session()->flash('message', 'ระบบ inventory ยังไม่พร้อมใช้งานเต็มรูปแบบ กรุณารัน migration ก่อน');
+
             return;
         }
 
-        $payload = [
-            'name' => $this->categoryName,
-            'description' => $this->categoryDescription ?: null,
-            'is_active' => $this->categoryIsActive,
-        ];
+        $validated = $this->validate([
+            'categoryName' => ['required', 'string', 'max:255'],
+            'categoryDescription' => ['nullable', 'string', 'max:1000'],
+            'categoryIsActive' => ['boolean'],
+            'categoryImage' => ['nullable', 'image', 'max:2048'],
+        ]);
 
-        $category = BorrowCategory::updateOrCreate(
-            ['id' => $this->editingCategoryId],
-            $payload
-        );
+        $isEditing = $this->editingCategoryId !== null;
+        $category = $isEditing
+            ? BorrowCategory::findOrFail($this->editingCategoryId)
+            : new BorrowCategory();
+
+        $category->fill([
+            'name' => $validated['categoryName'],
+            'description' => $validated['categoryDescription'] ?: null,
+            'is_active' => $validated['categoryIsActive'],
+        ]);
+
+        if ($this->categoryImage) {
+            $newImagePath = $this->categoryImage->store('borrow-categories', 'public');
+
+            if ($category->image_path && Storage::disk('public')->exists($category->image_path)) {
+                Storage::disk('public')->delete($category->image_path);
+            }
+
+            $category->image_path = $newImagePath;
+        }
+
+        $category->save();
 
         $this->syncCategoryCounts($category);
         $this->showCategoryModal = false;
         $this->resetCategoryForm();
 
-        session()->flash('message', $this->editingCategoryId ? 'อัปเดตหมวดอุปกรณ์เรียบร้อยแล้ว' : 'เพิ่มหมวดอุปกรณ์เรียบร้อยแล้ว');
+        session()->flash('message', $isEditing ? 'อัปเดตหมวดอุปกรณ์เรียบร้อยแล้ว' : 'เพิ่มหมวดอุปกรณ์เรียบร้อยแล้ว');
     }
 
     public function openCreateItem(): void
@@ -138,6 +166,7 @@ class InventoryManager extends Component
     public function openEditItem(int $itemId): void
     {
         $this->authorizeAction('borrow.inventory.manage');
+
         $item = BorrowItem::findOrFail($itemId);
 
         $this->editingItemId = $item->id;
@@ -152,8 +181,10 @@ class InventoryManager extends Component
     public function saveItem(): void
     {
         $this->authorizeAction('borrow.inventory.manage');
+
         if (! $this->tablesReady()) {
             session()->flash('message', 'ระบบ inventory ยังไม่พร้อมใช้งานเต็มรูปแบบ กรุณารัน migration ก่อน');
+
             return;
         }
 
@@ -167,6 +198,7 @@ class InventoryManager extends Component
 
         $existingItem = $this->editingItemId ? BorrowItem::findOrFail($this->editingItemId) : null;
         $previousCategoryId = $existingItem?->category_id;
+        $isEditing = $this->editingItemId !== null;
 
         $item = BorrowItem::updateOrCreate(
             ['id' => $this->editingItemId],
@@ -183,6 +215,7 @@ class InventoryManager extends Component
 
         if ($previousCategoryId && $previousCategoryId !== $item->category_id) {
             $previousCategory = BorrowCategory::find($previousCategoryId);
+
             if ($previousCategory) {
                 $this->syncCategoryCounts($previousCategory);
             }
@@ -191,21 +224,26 @@ class InventoryManager extends Component
         $this->showItemModal = false;
         $this->resetItemForm();
 
-        session()->flash('message', $this->editingItemId ? 'อัปเดตรายการอุปกรณ์เรียบร้อยแล้ว' : 'เพิ่มอุปกรณ์เรียบร้อยแล้ว');
+        session()->flash('message', $isEditing ? 'อัปเดตรายการอุปกรณ์เรียบร้อยแล้ว' : 'เพิ่มอุปกรณ์เรียบร้อยแล้ว');
     }
 
     public function deleteItem(int $itemId): void
     {
         $this->authorizeAction('borrow.inventory.manage');
+
         if (! $this->tablesReady()) {
             session()->flash('message', 'ระบบ inventory ยังไม่พร้อมใช้งานเต็มรูปแบบ กรุณารัน migration ก่อน');
+
             return;
         }
 
-        $item = BorrowItem::withCount(['records as active_records_count' => fn ($query) => $query->where('status', 'borrowed')])->findOrFail($itemId);
+        $item = BorrowItem::withCount([
+            'records as active_records_count' => fn ($query) => $query->where('status', 'borrowed'),
+        ])->findOrFail($itemId);
 
         if ($item->active_records_count > 0 || $item->status === 'borrowed') {
             session()->flash('message', 'ไม่สามารถลบอุปกรณ์ที่กำลังถูกยืมอยู่ได้');
+
             return;
         }
 
@@ -239,6 +277,7 @@ class InventoryManager extends Component
                 ])
                 ->when($this->categorySearch, function ($query) {
                     $term = '%'.$this->categorySearch.'%';
+
                     return $query->where('name', 'like', $term)->orWhere('description', 'like', $term);
                 })
                 ->orderBy('name');
@@ -249,6 +288,7 @@ class InventoryManager extends Component
                 ->when($this->itemCategoryFilter !== 'all', fn ($query) => $query->where('category_id', $this->itemCategoryFilter))
                 ->when($this->itemSearch, function ($query) {
                     $term = '%'.$this->itemSearch.'%';
+
                     return $query->where(function ($itemQuery) use ($term) {
                         $itemQuery
                             ->where('name', 'like', $term)
@@ -312,6 +352,8 @@ class InventoryManager extends Component
         $this->categoryName = '';
         $this->categoryDescription = '';
         $this->categoryIsActive = true;
+        $this->categoryImage = null;
+        $this->existingCategoryImagePath = null;
     }
 
     private function resetItemForm(): void

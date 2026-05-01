@@ -1,0 +1,201 @@
+# แผนดำเนินการ: LINE Healthcare AI Chatbot (Laravel + Gemini API)
+
+## 1. ภาพรวมระบบ (Architecture)
+
+```
+[ผู้ใช้ LINE] 
+   ↓ ส่งข้อความ
+[LINE Platform] 
+   ↓ Webhook (POST)
+[Laravel Backend] ── verify signature
+   ↓
+[ChatbotController]
+   ↓
+   ├─→ [IntentClassifier] (rule-based + Gemini)
+   ├─→ [ClinicKnowledgeBase] (DB: FAQ, hours, services)
+   ├─→ [SymptomScreener] (Gemini API + system prompt)
+   └─→ [ConversationContext] (DB: เก็บ session 10 ข้อความล่าสุด)
+   ↓
+[LINE Messaging API] ── reply message
+   ↓
+[ผู้ใช้ LINE]
+```
+
+---
+
+## 2. Tech Stack & Packages
+
+| Layer | Technology |
+|-------|-----------|
+| Backend | Laravel 11 (โปรเจกต์ปัจจุบัน) |
+| LINE SDK | `linecorp/line-bot-sdk` (composer) |
+| AI | Google Gemini API (`gemini-2.5-flash` หรือ `gemini-2.5-pro`) |
+| HTTP Client | Laravel `Http` facade |
+| Queue | Laravel Queue (database driver) — สำหรับเรียก Gemini แบบ async |
+| Cache | Redis/Database — rate limiting + session context |
+| DB | MySQL (multi-tenant `clinic_id`) |
+
+```bash
+composer require linecorp/line-bot-sdk
+```
+
+---
+
+## 3. โครงสร้างฐานข้อมูล (Migration)
+
+| Table | คำอธิบาย |
+|-------|---------|
+| `chatbot_conversations` | เก็บ session: `id, clinic_id, line_user_id, last_active_at` |
+| `chatbot_messages` | ประวัติแชต: `id, conversation_id, role(user/assistant), content, intent, tokens_used, created_at` |
+| `chatbot_faqs` | คำถามที่พบบ่อย: `id, clinic_id, question, answer, keywords, is_active` |
+| `chatbot_symptom_logs` | log การคัดกรองอาการ: `id, clinic_id, line_user_id, symptoms, severity, recommendation, created_at` |
+| `chatbot_settings` | ต่อ clinic: `clinic_id, system_prompt, model, temperature, daily_quota` |
+
+ทุกตาราง scope ด้วย `clinic_id` ตาม multi-tenant pattern
+
+---
+
+## 4. โครงสร้างโค้ด Laravel
+
+```
+app/
+├── Http/Controllers/
+│   └── LineWebhookController.php     # รับ webhook + verify signature
+├── Services/
+│   ├── Line/
+│   │   ├── LineMessagingService.php  # ส่ง reply/push
+│   │   └── LineSignatureVerifier.php
+│   ├── Chatbot/
+│   │   ├── ChatbotOrchestrator.php   # main router
+│   │   ├── IntentClassifier.php      # คัดประเภทคำถาม
+│   │   ├── SymptomScreener.php       # คัดกรองอาการ
+│   │   ├── FaqAnswerer.php           # ตอบคำถามคลินิก
+│   │   └── ConversationManager.php   # จัดการ context
+│   └── Gemini/
+│       ├── GeminiClient.php          # wrap REST API
+│       └── PromptBuilder.php         # ประกอบ system prompt
+├── Jobs/
+│   └── ProcessLineMessage.php        # async job
+├── Models/
+│   ├── ChatbotConversation.php
+│   ├── ChatbotMessage.php
+│   ├── ChatbotFaq.php
+│   └── ChatbotSymptomLog.php
+└── Enums/
+    └── ChatIntent.php                # FAQ, SYMPTOM, BOOKING, GREETING, FALLBACK
+```
+
+---
+
+## 5. ขอบเขตของ Bot (Scope & Intents)
+
+### Intent ที่รองรับ
+1. **GREETING** — "สวัสดี" → ทักทาย + แสดงเมนู
+2. **FAQ** — เวลาเปิด-ปิด, ที่ตั้ง, บริการ, ค่ารักษา, การติดต่อ
+3. **SYMPTOM_SCREENING** — คัดกรองอาการเบื้องต้น (ไข้ ไอ ปวดหัว ฯลฯ)
+4. **BOOKING_INFO** — ลิงก์ไปจองคิว (ส่ง URL ระบบ booking เดิม)
+5. **EMERGENCY** — ตรวจคำสำคัญ (เจ็บหน้าอก, หายใจไม่ออก) → แนะนำโทร 1669 ทันที
+6. **FALLBACK** — ส่งต่อ staff หรือแสดง quick reply menu
+
+### กฎสำคัญสำหรับ Symptom Screener
+- **ไม่วินิจฉัยโรค** — เป็นการคัดกรองเบื้องต้นเท่านั้น
+- ทุกคำตอบต้อง **disclaimer**: "ข้อมูลนี้เป็นเพียงคำแนะนำเบื้องต้น ไม่ใช่การวินิจฉัยทางการแพทย์ โปรดพบแพทย์เพื่อการตรวจที่แม่นยำ"
+- ตรวจจับ red flags → แนะนำพบแพทย์ทันที/โทร 1669
+
+---
+
+## 6. Gemini Integration Design
+
+### System Prompt Structure
+```
+[ROLE] คุณเป็นผู้ช่วยคัดกรองสุขภาพของคลินิก {clinic_name}
+[CONSTRAINTS]
+- ห้ามวินิจฉัยโรค ใช้คำว่า "อาจเกี่ยวข้องกับ" เท่านั้น
+- หากพบ red flags (เจ็บหน้าอก, หายใจลำบาก, เลือดออกมาก) → แนะนำ ER ทันที
+- ตอบเป็นภาษาไทย กระชับ ไม่เกิน 4 ประโยค
+[CONTEXT]
+- เวลาเปิด: {hours}
+- บริการ: {services}
+- เบอร์โทร: {phone}
+[CONVERSATION HISTORY]
+{last_5_messages}
+```
+
+### Safety Layer
+- Pre-filter: regex จับคำต้องห้าม/เคสฉุกเฉิน → ตอบ template โดยไม่เรียก Gemini
+- Post-filter: ตรวจคำตอบ Gemini ห้ามมีคำว่า "วินิจฉัย" "แน่นอน" "100%"
+- Rate limit: 20 messages/user/วัน, 1000/clinic/วัน
+
+---
+
+## 7. Flow การทำงาน
+
+1. LINE → POST `/api/line/webhook`
+2. `LineWebhookController` verify `X-Line-Signature` (HMAC-SHA256)
+3. ตอบ HTTP 200 ทันที + dispatch `ProcessLineMessage` job (เพื่อไม่ให้ LINE timeout)
+4. Job ทำ:
+   - ดึง/สร้าง `ChatbotConversation`
+   - บันทึก user message
+   - `IntentClassifier` → enum
+   - Route ไปยัง service ที่ตรงกับ intent
+   - เรียก Gemini API (ถ้าจำเป็น) พร้อม conversation history
+   - บันทึก assistant message + token usage
+   - ส่ง reply ผ่าน `LineMessagingService`
+
+---
+
+## 8. Configuration & Secrets
+
+`.env`:
+```
+LINE_CHANNEL_ACCESS_TOKEN=
+LINE_CHANNEL_SECRET=
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-2.5-flash
+CHATBOT_DAILY_QUOTA_PER_USER=20
+```
+
+`config/services.php` เพิ่ม blocks `line` และ `gemini`
+
+---
+
+## 9. ขั้นตอนการสร้าง (Implementation Order)
+
+| ขั้น | งาน | เวลา (โดยประมาณ) |
+|------|-----|------|
+| 1 | สร้าง LINE Official Account + Channel (Messaging API) | 1 วัน |
+| 2 | Migrations + Models 5 ตาราง | 1 วัน |
+| 3 | `LineWebhookController` + signature verify | 1 วัน |
+| 4 | `LineMessagingService` (reply/push/quick reply) | 1 วัน |
+| 5 | `GeminiClient` + `PromptBuilder` | 1 วัน |
+| 6 | `IntentClassifier` (rule-based ก่อน) | 1 วัน |
+| 7 | `FaqAnswerer` + seed FAQ คลินิก | 1 วัน |
+| 8 | `SymptomScreener` + safety filters + emergency keywords | 2 วัน |
+| 9 | `ConversationManager` (context window 5–10 turns) | 1 วัน |
+| 10 | Queue job + retry logic | 1 วัน |
+| 11 | Admin panel: ดู logs, จัดการ FAQ, ตั้ง system prompt ต่อ clinic | 2 วัน |
+| 12 | Testing (Pest): unit + webhook integration + multi-tenant isolation | 2 วัน |
+| 13 | Deploy (ngrok ทดสอบ → Plesk production + SSL) | 1 วัน |
+
+**รวม ~16 วันทำงาน**
+
+---
+
+## 10. ความเสี่ยงที่ต้องระวัง
+
+1. **กฎหมาย/จริยธรรมการแพทย์** — ต้องมี disclaimer ชัดเจน, log ทุกการคัดกรองเพื่อ audit
+2. **PDPA** — ข้อความผู้ป่วยถือเป็นข้อมูลส่วนบุคคล → encrypt at rest, retention policy (ลบหลัง 90 วัน)
+3. **LINE Webhook timeout 1 วินาที** — ต้องใช้ queue job เสมอ ห้ามเรียก Gemini sync ใน controller
+4. **ค่าใช้จ่าย Gemini** — ตั้ง quota + cache คำตอบ FAQ ที่ซ้ำ
+5. **Prompt Injection** — sanitize user input, ห้ามให้ user override system prompt
+6. **Multi-tenant isolation** — ทุก query ต้อง scope `clinic_id` ตาม `BelongsToClinic` trait
+
+---
+
+## คำถามก่อนเริ่ม Implement
+
+1. ต้องการรองรับ **clinic เดียว** (RSU) ก่อน หรือ **multi-tenant** ตั้งแต่แรก?
+2. มี **LINE Official Account + Channel ID/Secret** พร้อมแล้วหรือยัง?
+3. มี **Gemini API Key** แล้วหรือยัง? (ใช้ AI Studio ฟรี หรือ Vertex AI ผ่าน GCP?)
+4. ขอบเขต Symptom Screener — เอาแค่ **triage แนะนำว่าควรพบแพทย์ไหม** หรือต้องการให้ถาม follow-up หลายรอบ?
+5. ต้องการให้บอท **เชื่อมระบบจองคิวเดิม** เลยไหม (สร้าง booking ผ่าน chat) หรือแค่ส่งลิงก์?

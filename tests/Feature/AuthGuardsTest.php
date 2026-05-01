@@ -6,6 +6,7 @@ use App\Models\Booking;
 use App\Models\Campaign;
 use App\Models\Clinic;
 use App\Models\Portal;
+use App\Models\SiteSetting;
 use App\Models\Slot;
 use App\Models\Staff;
 use App\Models\User;
@@ -76,6 +77,75 @@ class AuthGuardsTest extends TestCase
         $response->assertRedirect('/portal/dashboard');
         $this->assertAuthenticatedAs($portal, 'portal');
         $this->assertSame($portal->id, session('portal_id'));
+    }
+
+    public function test_portal_entry_route_redirects_to_login_or_dashboard(): void
+    {
+        $this->get('/portal')
+            ->assertRedirect(route('portal.login'));
+
+        $portal = Portal::create([
+            'name' => 'Portal Entry Admin',
+            'email' => 'portal-entry@example.com',
+            'password' => Hash::make('password'),
+        ]);
+
+        $this->actingAs($portal, 'portal')
+            ->get('/portal')
+            ->assertRedirect(route('portal.dashboard'));
+    }
+
+    public function test_local_portal_dev_login_creates_account_and_redirects(): void
+    {
+        $response = $this->get(route('dev.login.portal'));
+
+        $response->assertRedirect(route('portal.dashboard'));
+        $this->assertAuthenticated('portal');
+        $this->assertDatabaseHas('sys_portals', [
+            'email' => 'portal@test.com',
+            'name' => 'Developer Portal',
+        ]);
+    }
+
+    public function test_portal_pages_render_for_portal_guard(): void
+    {
+        $clinic = Clinic::create([
+            'name' => 'RSU Medical Clinic',
+            'slug' => 'medical',
+            'code' => 'RSU-MED',
+            'status' => 'active',
+        ]);
+
+        Campaign::create([
+            'clinic_id' => $clinic->id,
+            'title' => 'Flu Vaccine 2026',
+            'description' => 'Seasonal campaign',
+            'total_capacity' => 20,
+            'status' => 'active',
+        ]);
+
+        SiteSetting::create([
+            'clinic_id' => 0,
+            'key' => 'site_name',
+            'value' => 'RSU Medical Hub',
+            'type' => 'string',
+        ]);
+
+        $portal = Portal::create([
+            'name' => 'Portal Admin',
+            'email' => 'portal-pages@example.com',
+            'password' => Hash::make('password'),
+        ]);
+
+        foreach ([
+            'portal.dashboard',
+            'portal.clinics',
+            'portal.settings',
+        ] as $route) {
+            $this->actingAs($portal, 'portal')
+                ->get(route($route))
+                ->assertOk();
+        }
     }
 
     public function test_inactive_staff_cannot_login(): void

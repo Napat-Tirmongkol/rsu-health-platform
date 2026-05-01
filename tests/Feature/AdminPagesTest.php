@@ -17,10 +17,13 @@ use App\Mail\BookingConfirmedMail;
 use App\Mail\BorrowRequestApprovedMail;
 use App\Services\IntegrationSettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class AdminPagesTest extends TestCase
@@ -374,6 +377,8 @@ class AdminPagesTest extends TestCase
 
     public function test_admin_can_manage_inventory_categories_and_items(): void
     {
+        Storage::fake('public');
+
         $clinic = Clinic::create([
             'name' => 'RSU Medical Clinic',
             'slug' => 'medical',
@@ -401,11 +406,14 @@ class AdminPagesTest extends TestCase
             ->set('categoryName', 'Tablet')
             ->set('categoryDescription', 'Devices for patient education')
             ->set('categoryIsActive', true)
+            ->set('categoryImage', UploadedFile::fake()->image('tablet.png', 600, 600))
             ->call('saveCategory');
 
         $category = BorrowCategory::firstWhere('name', 'Tablet');
 
         $this->assertNotNull($category);
+        $this->assertNotNull($category->image_path);
+        Storage::disk('public')->assertExists($category->image_path);
 
         Livewire::test(\App\Livewire\Admin\InventoryManager::class)
             ->call('openCreateItem')
@@ -428,6 +436,20 @@ class AdminPagesTest extends TestCase
             'total_quantity' => 1,
             'available_quantity' => 1,
         ]);
+
+        $viewer = User::create([
+            'clinic_id' => $clinic->id,
+            'name' => 'Borrow Viewer',
+            'email' => 'borrow-viewer@example.com',
+            'line_user_id' => 'line-borrow-viewer',
+            'password' => Hash::make('password'),
+        ]);
+
+        $this->actingAs($viewer, 'user')
+            ->withSession(['clinic_id' => $clinic->id])
+            ->get(route('user.borrow.index'))
+            ->assertOk()
+            ->assertSee(Storage::disk('public')->url($category->image_path), false);
     }
 
     public function test_admin_can_process_borrow_return_with_fine_payment(): void
