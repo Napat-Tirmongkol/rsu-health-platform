@@ -28,6 +28,7 @@ foreach ($cliCandidates as $candidate) {
 }
 
 $allowed = [
+    'php:test'        => [$php, '-v'],
     'migrate'         => [$php, 'artisan', 'migrate', '--force', '--no-interaction'],
     'migrate:status'  => [$php, 'artisan', 'migrate:status'],
     'seed'            => [$php, 'artisan', 'db:seed', '--force', '--no-interaction'],
@@ -74,28 +75,24 @@ if ($run !== null) {
     $output = [];
     $exitCode = 0;
 
-    if (!function_exists('proc_open')) {
-        echo json_encode(['error' => 'proc_open() ถูก disable บนเซิร์ฟเวอร์นี้']);
-        exit;
-    }
-
-    $runProc = function (array $parts) {
-        $descriptors = [
-            0 => ['pipe', 'r'],
-            1 => ['pipe', 'w'],
-            2 => ['pipe', 'w'],
-        ];
-        $proc = proc_open($parts, $descriptors, $pipes, BASE_PATH, null);
-        if (!is_resource($proc)) {
-            return ['stdout' => '', 'stderr' => 'proc_open failed', 'code' => -1];
+    $runViaFile = function (array $parts) {
+        $tmpDir = sys_get_temp_dir();
+        $outFile = tempnam($tmpDir, 'art_out_');
+        $errFile = tempnam($tmpDir, 'art_err_');
+        $cmdLine = implode(' ', array_map('escapeshellarg', $parts))
+                 . ' > ' . escapeshellarg($outFile)
+                 . ' 2> ' . escapeshellarg($errFile);
+        if (stripos(PHP_OS, 'WIN') === 0) {
+            $cmdLine = '"' . $cmdLine . '"';
         }
-        fclose($pipes[0]);
-        $stdout = stream_get_contents($pipes[1]);
-        $stderr = stream_get_contents($pipes[2]);
-        fclose($pipes[1]);
-        fclose($pipes[2]);
-        $code = proc_close($proc);
-        return ['stdout' => $stdout, 'stderr' => $stderr, 'code' => $code];
+        $code = 0;
+        $ignored = [];
+        exec($cmdLine, $ignored, $code);
+        $stdout = @file_get_contents($outFile);
+        $stderr = @file_get_contents($errFile);
+        @unlink($outFile);
+        @unlink($errFile);
+        return ['stdout' => (string)$stdout, 'stderr' => (string)$stderr, 'code' => $code];
     };
 
     $combine = function (array $r) {
@@ -106,27 +103,30 @@ if ($run !== null) {
     };
 
     if ($run === 'migrate+seed') {
-        $r1 = $runProc([$php, 'artisan', 'migrate', '--force', '--no-interaction']);
+        $r1 = $runViaFile([$php, 'artisan', 'migrate', '--force', '--no-interaction']);
         $combined = $combine($r1);
         $exitCode = $r1['code'];
         if ($exitCode === 0) {
-            $r2 = $runProc([$php, 'artisan', 'db:seed', '--force', '--no-interaction']);
+            $r2 = $runViaFile([$php, 'artisan', 'db:seed', '--force', '--no-interaction']);
             $combined .= "\n--- db:seed ---\n" . $combine($r2);
             $exitCode = $r2['code'];
         }
         $output = [$combined];
     } else {
-        $r = $runProc($allowed[$run]);
+        $r = $runViaFile($allowed[$run]);
         $exitCode = $r['code'];
         $output = [$combine($r)];
     }
 
     if (trim(implode("\n", $output)) === '') {
         $output = [
-            '(ไม่มี output — debug info)',
+            '(ไม่มี output แม้ redirect ลงไฟล์)',
+            'exit code: ' . $exitCode,
             'php cli: ' . $php,
             'php exists: ' . (file_exists($php) ? 'yes' : 'NO'),
             'cwd: ' . BASE_PATH,
+            'temp dir: ' . sys_get_temp_dir(),
+            'temp writable: ' . (is_writable(sys_get_temp_dir()) ? 'yes' : 'NO'),
             'cmd parts: ' . json_encode($allowed[$run] ?? null),
         ];
     }
