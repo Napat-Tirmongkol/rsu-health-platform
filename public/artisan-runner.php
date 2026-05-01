@@ -14,6 +14,18 @@ if ($secret !== SECRET) {
 }
 
 $php = PHP_BINARY;
+$cliCandidates = [
+    str_ireplace('php-cgi.exe', 'php.exe', $php),
+    str_ireplace('php-cgi', 'php', $php),
+    dirname($php) . DIRECTORY_SEPARATOR . 'php.exe',
+    dirname($php) . DIRECTORY_SEPARATOR . 'php',
+];
+foreach ($cliCandidates as $candidate) {
+    if ($candidate !== $php && @is_file($candidate)) {
+        $php = $candidate;
+        break;
+    }
+}
 
 $allowed = [
     'migrate'         => [$php, 'artisan', 'migrate', '--force', '--no-interaction'],
@@ -34,6 +46,8 @@ if ($diag !== null) {
     $disabledFunctions = array_map('trim', explode(',', ini_get('disable_functions')));
     echo json_encode([
         'PHP_BINARY'        => PHP_BINARY,
+        'resolved_php_cli'  => $php,
+        'is_cgi'            => stripos(PHP_BINARY, 'cgi') !== false,
         'php_version'       => PHP_VERSION,
         'base_path'         => BASE_PATH,
         'artisan_exists'    => file_exists(BASE_PATH . '/artisan'),
