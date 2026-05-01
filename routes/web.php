@@ -7,15 +7,19 @@ use App\Http\Controllers\Staff\IdentityScanController;
 use App\Http\Controllers\User\BorrowController;
 use App\Http\Controllers\User\HubController;
 use App\Http\Controllers\User\ServiceController;
+use App\Http\Controllers\Portal\PortalDashboardController;
+use App\Http\Controllers\Portal\PortalChatbotController;
 use App\Models\User;
+use App\Models\Portal;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-if (app()->isLocal()) {
+if (app()->environment(['local', 'testing'])) {
     Route::get('/test-user-login', function () {
         $user = User::where('email', 'patient@example.com')->first();
 
@@ -27,6 +31,22 @@ if (app()->isLocal()) {
 
         return redirect()->route('user.hub');
     });
+
+    Route::get('/dev-login/portal', function () {
+        $portal = Portal::firstOrCreate(
+            ['email' => 'portal@test.com'],
+            [
+                'name' => 'Developer Portal',
+                'password' => Hash::make('password123'),
+            ]
+        );
+
+        Auth::guard('portal')->login($portal);
+
+        session(['portal_id' => $portal->id]);
+
+        return redirect()->route('portal.dashboard');
+    })->name('dev.login.portal');
 }
 
 Route::prefix('auth')->group(function () {
@@ -43,6 +63,12 @@ Route::middleware('guest:staff')->group(function () {
     Route::get('/staff/login', [GuardLoginController::class, 'show'])->defaults('guard', 'staff')->name('staff.login');
     Route::post('/staff/login', [GuardLoginController::class, 'store'])->defaults('guard', 'staff')->name('staff.login.store');
 });
+
+Route::get('/portal', function () {
+    return Auth::guard('portal')->check()
+        ? redirect()->route('portal.dashboard')
+        : redirect()->route('portal.login');
+})->name('portal');
 
 Route::middleware('guest:portal')->group(function () {
     Route::get('/portal/login', [GuardLoginController::class, 'show'])->defaults('guard', 'portal')->name('portal.login');
@@ -93,7 +119,14 @@ Route::get('/staff/scan/campaign/{campaign}', [IdentityScanController::class, 's
 Route::post('/staff/scan/verify', [IdentityScanController::class, 'verify'])->middleware('auth:staff')->name('staff.scan.verify');
 Route::post('/staff/scan/check-in', [IdentityScanController::class, 'checkIn'])->middleware('auth:staff')->name('staff.scan.check-in');
 Route::middleware('auth:portal')->prefix('portal')->name('portal.')->group(function () {
-    Route::get('/dashboard',     fn () => view('portal.dashboard'))->name('dashboard');
+    Route::get('/dashboard', [PortalDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/clinics', [PortalDashboardController::class, 'clinics'])->name('clinics');
+    Route::get('/settings', [PortalDashboardController::class, 'settings'])->name('settings');
+    Route::get('/chatbot/faqs', [PortalChatbotController::class, 'faqs'])->name('chatbot.faqs');
+    Route::post('/chatbot/faqs', [PortalChatbotController::class, 'storeFaq'])->name('chatbot.faqs.store');
+    Route::put('/chatbot/faqs/{faqId}', [PortalChatbotController::class, 'updateFaq'])->name('chatbot.faqs.update');
+    Route::get('/chatbot/settings', [PortalChatbotController::class, 'settings'])->name('chatbot.settings');
+    Route::post('/chatbot/settings', [PortalChatbotController::class, 'updateSettings'])->name('chatbot.settings.update');
     Route::get('/admins',        fn () => view('portal.admins'))->name('admins');
     Route::get('/activity-logs', fn () => view('portal.activity_logs'))->name('activity_logs');
     Route::get('/clinic-data',   fn () => view('portal.clinic_data'))->name('clinic_data');

@@ -79,15 +79,15 @@ return [
     'sections' => [
         'platform' => [
             [
-                'title' => 'Workspace',
+                'title' => 'ภาพรวมระบบ',
                 'items' => [
-                    ['route' => 'admin.dashboard', 'label' => 'Platform Home', 'icon' => 'fa-table-cells-large'],
+                    ['route' => 'admin.dashboard', 'label' => 'หน้าหลักแพลตฟอร์ม', 'icon' => 'fa-house'],
                     ['route' => 'admin.workspace.campaign', 'label' => 'บริการคลินิก', 'icon' => 'fa-calendar-check'],
                     ['route' => 'admin.workspace.borrow', 'label' => 'ยืมอุปกรณ์และคลัง', 'icon' => 'fa-box-open'],
                 ],
             ],
             [
-                'title' => 'Platform Control',
+                'title' => 'ส่วนควบคุมกลาง',
                 'items' => [
                     ['route' => 'admin.system_admins', 'label' => 'System Admins', 'icon' => 'fa-user-shield'],
                     ['route' => 'admin.system_settings', 'label' => 'Integration Settings', 'icon' => 'fa-sliders'],
@@ -98,18 +98,18 @@ return [
         ],
         'campaign' => [
             [
-                'title' => 'Clinic Services',
+                'title' => 'บริการคลินิก',
                 'items' => [
-                    ['route' => 'admin.workspace.campaign', 'label' => 'Workspace Overview', 'icon' => 'fa-compass'],
-                    ['route' => 'admin.campaigns', 'label' => 'Campaigns', 'icon' => 'fa-calendar-check'],
-                    ['route' => 'admin.bookings', 'label' => 'Bookings', 'icon' => 'fa-users-viewfinder'],
-                    ['route' => 'admin.time_slots', 'label' => 'Time Slots', 'icon' => 'fa-clock-rotate-left'],
+                    ['route' => 'admin.workspace.campaign', 'label' => 'ภาพรวม workspace', 'icon' => 'fa-house'],
+                    ['route' => 'admin.campaigns', 'label' => 'Campaigns', 'icon' => 'fa-syringe'],
+                    ['route' => 'admin.bookings', 'label' => 'Bookings', 'icon' => 'fa-calendar-days'],
+                    ['route' => 'admin.time_slots', 'label' => 'Time Slots', 'icon' => 'fa-clock'],
                     ['route' => 'admin.users', 'label' => 'User History', 'icon' => 'fa-id-card'],
                     ['route' => 'admin.reports', 'label' => 'Reports', 'icon' => 'fa-chart-line'],
                 ],
             ],
             [
-                'title' => 'Shared Admin',
+                'title' => 'เมนูส่วนกลาง',
                 'items' => [
                     ['route' => 'admin.dashboard', 'label' => 'Platform Home', 'icon' => 'fa-table-cells-large'],
                     ['route' => 'admin.system_admins', 'label' => 'System Admins', 'icon' => 'fa-user-shield'],
@@ -121,10 +121,10 @@ return [
         ],
         'borrow' => [
             [
-                'title' => 'Borrow Operations',
+                'title' => 'ยืมอุปกรณ์และคลัง',
                 'items' => [
-                    ['route' => 'admin.workspace.borrow', 'label' => 'Workspace Overview', 'icon' => 'fa-compass'],
-                    ['route' => 'admin.borrow_requests', 'label' => 'Borrow Requests', 'icon' => 'fa-box-open'],
+                    ['route' => 'admin.workspace.borrow', 'label' => 'ภาพรวม workspace', 'icon' => 'fa-house'],
+                    ['route' => 'admin.borrow_requests', 'label' => 'Borrow Requests', 'icon' => 'fa-inbox'],
                     ['route' => 'admin.inventory', 'label' => 'Inventory', 'icon' => 'fa-boxes-stacked'],
                     ['route' => 'admin.borrow_returns', 'label' => 'Returns', 'icon' => 'fa-rotate-left'],
                     ['route' => 'admin.borrow_fines', 'label' => 'Fines & Payments', 'icon' => 'fa-file-invoice-dollar'],
@@ -132,7 +132,7 @@ return [
                 ],
             ],
             [
-                'title' => 'Shared Admin',
+                'title' => 'เมนูส่วนกลาง',
                 'items' => [
                     ['route' => 'admin.dashboard', 'label' => 'Platform Home', 'icon' => 'fa-table-cells-large'],
                     ['route' => 'admin.system_admins', 'label' => 'System Admins', 'icon' => 'fa-user-shield'],

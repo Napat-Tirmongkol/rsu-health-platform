@@ -13,6 +13,7 @@ use App\Models\EmailLog;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class NotificationDeliveryService
 {
@@ -20,10 +21,16 @@ class NotificationDeliveryService
     {
     }
 
-    public function sendTestEmail(string $recipient): void
+    public function sendTestEmail(string $recipient): array
     {
         $this->applyMailConfiguration();
         Mail::mailer($this->mailerName())->to($recipient)->send(new IntegrationTestMail());
+
+        return [
+            'mailer' => $this->mailerName(),
+            'from_address' => (string) config('mail.from.address'),
+            'from_name' => (string) config('mail.from.name'),
+        ];
     }
 
     public function sendBookingCancelledEmail(Booking $booking): void
@@ -97,6 +104,58 @@ class NotificationDeliveryService
     public function sendTestLine(string $lineUserId): array
     {
         return $this->sendLineText($lineUserId, 'LINE Messaging API test from RSU Health Platform');
+    }
+
+    public function sendTestGemini(): array
+    {
+        $settings = $this->settings->load();
+
+        if (! ($settings['gemini_enabled'] ?? false)) {
+            throw new \RuntimeException('Gemini API ยังไม่ได้เปิดใช้งาน');
+        }
+
+        $apiKey = trim((string) ($settings['gemini_api_key'] ?? ''));
+        $model = trim((string) ($settings['gemini_model'] ?? 'gemini-1.5-flash'));
+        $baseUrl = rtrim((string) ($settings['gemini_base_url'] ?: 'https://generativelanguage.googleapis.com'), '/');
+        $instruction = trim((string) ($settings['gemini_system_prompt'] ?? ''));
+
+        if ($apiKey === '') {
+            throw new \RuntimeException('ยังไม่ได้กำหนด Gemini API key');
+        }
+
+        $payload = [
+            'contents' => [
+                [
+                    'role' => 'user',
+                    'parts' => [
+                        ['text' => 'Reply with exactly: RSU Health Platform Gemini test OK'],
+                    ],
+                ],
+            ],
+        ];
+
+        if ($instruction !== '') {
+            $payload['systemInstruction'] = [
+                'parts' => [
+                    ['text' => $instruction],
+                ],
+            ];
+        }
+
+        $response = Http::acceptJson()
+            ->timeout(20)
+            ->post("{$baseUrl}/v1beta/models/{$model}:generateContent?key={$apiKey}", $payload);
+
+        if ($response->failed()) {
+            throw new \RuntimeException('Gemini request failed: '.$response->body());
+        }
+
+        $text = data_get($response->json(), 'candidates.0.content.parts.0.text', '');
+
+        return [
+            'model' => $model,
+            'text' => Str::limit(trim((string) $text), 140),
+        ];
     }
 
     public function sendBookingCancelledLine(Booking $booking): array
@@ -224,9 +283,19 @@ class NotificationDeliveryService
         Config::set('mail.mailers.smtp.port', (int) ($settings['mail_port'] ?: 2525));
         Config::set('mail.mailers.smtp.username', $settings['mail_username'] ?: null);
         Config::set('mail.mailers.smtp.password', $settings['mail_password'] ?: null);
-        Config::set('mail.mailers.smtp.scheme', $settings['mail_scheme'] ?: null);
+        Config::set('mail.mailers.smtp.scheme', $this->normalizeMailScheme($settings['mail_scheme'] ?? null));
         Config::set('mail.from.address', $settings['mail_from_address'] ?: 'hello@example.com');
         Config::set('mail.from.name', $settings['mail_from_name'] ?: config('app.name', 'RSU Health Platform'));
+    }
+
+    private function normalizeMailScheme(mixed $scheme): ?string
+    {
+        return match ((string) $scheme) {
+            'tls' => 'smtp',
+            'ssl' => 'smtps',
+            'smtp', 'smtps' => (string) $scheme,
+            default => null,
+        };
     }
 
     private function mailerName(): string

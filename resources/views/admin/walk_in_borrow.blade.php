@@ -1,5 +1,5 @@
 <x-admin-layout>
-    <x-slot name="title">Walk-In Borrow</x-slot>
+    <x-slot name="title">ยืมอุปกรณ์หน้างาน</x-slot>
 
     @livewire('admin.walk-in-borrow-manager')
 </x-admin-layout>

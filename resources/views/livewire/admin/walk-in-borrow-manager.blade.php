@@ -18,7 +18,7 @@
     <div class="grid grid-cols-1 gap-8 xl:grid-cols-[0.95fr,1.15fr]">
         <div class="rounded-[3rem] border border-slate-100 bg-white p-8 shadow-sm">
             <div class="mb-6">
-                <h3 class="text-xl font-black text-slate-800">Borrower</h3>
+                <h3 class="text-xl font-black text-slate-800">ผู้ยืม</h3>
                 <p class="mt-1 text-sm font-bold text-slate-400">ค้นหาผู้ยืมจากชื่อ รหัสนักศึกษา รหัสบุคลากร หรือ identity</p>
             </div>
 
@@ -61,7 +61,7 @@
             @endif
 
             <div class="mt-8 border-t border-slate-100 pt-8">
-                <h3 class="text-xl font-black text-slate-800">Borrow Setup</h3>
+                <h3 class="text-xl font-black text-slate-800">ตั้งค่าการยืม</h3>
                 <div class="mt-5 space-y-5">
                     <div>
                         <label class="mb-2 block text-xs font-black uppercase tracking-widest text-slate-500">กำหนดคืน</label>
@@ -82,7 +82,7 @@
             <div class="rounded-[3rem] border border-slate-100 bg-white p-8 shadow-sm">
                 <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                     <div>
-                        <h3 class="text-xl font-black text-slate-800">Available Equipment</h3>
+                <h3 class="text-xl font-black text-slate-800">อุปกรณ์ที่พร้อมให้ยืม</h3>
                         <p class="mt-1 text-sm font-bold text-slate-400">เลือกอุปกรณ์ที่พร้อมให้ยืม แล้วเพิ่มเข้ารายการด้านล่าง</p>
                     </div>
                 </div>
@@ -125,11 +125,11 @@
             <div class="rounded-[3rem] border border-slate-100 bg-white p-8 shadow-sm">
                 <div class="mb-6 flex items-center justify-between">
                     <div>
-                        <h3 class="text-xl font-black text-slate-800">Borrow Cart</h3>
+                <h3 class="text-xl font-black text-slate-800">รายการอุปกรณ์ที่เลือก</h3>
                         <p class="mt-1 text-sm font-bold text-slate-400">รายการอุปกรณ์ที่จะเปิดยืมแบบ walk-in</p>
                     </div>
                     <div class="rounded-full bg-slate-100 px-4 py-2 text-xs font-black uppercase tracking-widest text-slate-500">
-                        {{ count($cartItemIds) }} items
+                        {{ count($cartItemIds) }} รายการ
                     </div>
                 </div>
 
@@ -160,7 +160,7 @@
                 <div class="mt-8">
                     @if($canManageInventory)
                         <button wire:click="submitWalkInBorrow" class="w-full rounded-2xl bg-indigo-600 px-6 py-4 text-sm font-black uppercase tracking-widest text-white shadow-xl shadow-indigo-100 transition-all active:scale-95">
-                            Confirm Walk-In Borrow
+                            ยืนยันการยืมหน้างาน
                         </button>
                     @endif
                 </div>

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Traits\BelongsToClinic;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class BorrowCategory extends Model
 {
@@ -24,6 +25,15 @@ class BorrowCategory extends Model
     protected $casts = [
         'is_active' => 'boolean',
     ];
+
+    public function getImageUrlAttribute(): ?string
+    {
+        if (! $this->image_path) {
+            return null;
+        }
+
+        return Storage::disk('public')->url($this->image_path);
+    }
 
     public function items()
     {
