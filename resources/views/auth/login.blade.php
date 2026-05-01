@@ -12,6 +12,18 @@
             </div>
         @endsession
 
+        <div class="mb-6">
+            <a href="{{ route('auth.line') }}" class="inline-flex w-full items-center justify-center rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                {{ __('Continue with LINE') }}
+            </a>
+        </div>
+
+        <div class="mb-6 flex items-center gap-3">
+            <div class="h-px flex-1 bg-gray-200"></div>
+            <span class="text-xs font-medium uppercase text-gray-500">{{ __('or') }}</span>
+            <div class="h-px flex-1 bg-gray-200"></div>
+        </div>
+
         <form method="POST" action="{{ route('login') }}">
             @csrf
 

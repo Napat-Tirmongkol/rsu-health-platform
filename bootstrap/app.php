@@ -11,8 +11,13 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
-        //
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->append(\App\Http\Middleware\SetTenantFromSubdomain::class);
+        $middleware->alias([
+            'admin.module' => \App\Http\Middleware\EnsureAdminModuleAccess::class,
+            'admin.action' => \App\Http\Middleware\EnsureAdminActionAccess::class,
+            'admin.platform' => \App\Http\Middleware\EnsureFullPlatformAccess::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
