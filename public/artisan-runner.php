@@ -1,144 +1,111 @@
 <?php
 /**
  * ⚠️ DELETE THIS FILE IMMEDIATELY AFTER USE
- * For one-time deployment tasks only. Never commit with secret exposed.
+ * Runs artisan in-process via Laravel bootstrap (no exec/php.exe needed).
  */
 
 define('SECRET', 'rsu2026deploy');
 define('BASE_PATH', dirname(__DIR__));
 
+@set_time_limit(300);
+@ini_set('memory_limit', '512M');
+
 $secret = $_GET['secret'] ?? $_POST['secret'] ?? '';
 if ($secret !== SECRET) {
     http_response_code(403);
+    header('Content-Type: application/json');
     die(json_encode(['error' => 'Unauthorized']));
 }
 
-$php = PHP_BINARY;
-$cliCandidates = [
-    str_ireplace('php-cgi.exe', 'php.exe', $php),
-    str_ireplace('php-cgi', 'php', $php),
-    dirname($php) . DIRECTORY_SEPARATOR . 'php.exe',
-    dirname($php) . DIRECTORY_SEPARATOR . 'php',
-];
-foreach ($cliCandidates as $candidate) {
-    if ($candidate !== $php && @is_file($candidate)) {
-        $php = $candidate;
-        break;
-    }
-}
-
 $allowed = [
-    'php:test'        => [$php, '-v'],
-    'migrate'         => [$php, 'artisan', 'migrate', '--force', '--no-interaction'],
-    'migrate:status'  => [$php, 'artisan', 'migrate:status'],
-    'seed'            => [$php, 'artisan', 'db:seed', '--force', '--no-interaction'],
+    'migrate'         => ['migrate',        ['--force' => true]],
+    'migrate:status'  => ['migrate:status', []],
+    'seed'            => ['db:seed',        ['--force' => true]],
     'migrate+seed'    => null,
-    'key:generate'    => [$php, 'artisan', 'key:generate', '--force'],
-    'optimize:clear'  => [$php, 'artisan', 'optimize:clear'],
-    'config:cache'    => [$php, 'artisan', 'config:cache'],
-    'route:cache'     => [$php, 'artisan', 'route:cache'],
-    'view:cache'      => [$php, 'artisan', 'view:cache'],
-    'storage:link'    => [$php, 'artisan', 'storage:link'],
+    'key:generate'    => ['key:generate',   ['--force' => true]],
+    'optimize:clear'  => ['optimize:clear', []],
+    'config:cache'    => ['config:cache',   []],
+    'route:cache'     => ['route:cache',    []],
+    'view:cache'      => ['view:cache',     []],
+    'storage:link'    => ['storage:link',   []],
 ];
 
 $diag = $_GET['diag'] ?? null;
 if ($diag !== null) {
     header('Content-Type: application/json');
-    $disabledFunctions = array_map('trim', explode(',', ini_get('disable_functions')));
     echo json_encode([
-        'PHP_BINARY'        => PHP_BINARY,
-        'resolved_php_cli'  => $php,
-        'is_cgi'            => stripos(PHP_BINARY, 'cgi') !== false,
-        'php_version'       => PHP_VERSION,
-        'base_path'         => BASE_PATH,
-        'artisan_exists'    => file_exists(BASE_PATH . '/artisan'),
-        'exec_available'    => function_exists('exec') && !in_array('exec', $disabledFunctions),
-        'disable_functions' => ini_get('disable_functions'),
-        'cwd'               => getcwd(),
+        'php_version'        => PHP_VERSION,
+        'base_path'          => BASE_PATH,
+        'autoload_exists'    => file_exists(BASE_PATH . '/vendor/autoload.php'),
+        'bootstrap_exists'   => file_exists(BASE_PATH . '/bootstrap/app.php'),
+        'env_exists'         => file_exists(BASE_PATH . '/.env'),
+        'storage_writable'   => is_writable(BASE_PATH . '/storage'),
+        'bootstrap_writable' => is_writable(BASE_PATH . '/bootstrap/cache'),
     ], JSON_PRETTY_PRINT);
     exit;
 }
 
 $run = $_GET['run'] ?? $_POST['run'] ?? null;
+if ($run === null) {
+    goto render_ui;
+}
 
-if ($run !== null) {
-    header('Content-Type: application/json');
+header('Content-Type: application/json');
 
-    if (!array_key_exists($run, $allowed)) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Command not allowed']);
-        exit;
-    }
+if (!array_key_exists($run, $allowed)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Command not allowed']);
+    exit;
+}
 
-    chdir(BASE_PATH);
-
-    $output = [];
-    $exitCode = 0;
-
-    $runViaFile = function (array $parts) {
-        $tmpDir = sys_get_temp_dir();
-        $outFile = tempnam($tmpDir, 'art_out_');
-        $errFile = tempnam($tmpDir, 'art_err_');
-        $cmdLine = implode(' ', array_map('escapeshellarg', $parts))
-                 . ' > ' . escapeshellarg($outFile)
-                 . ' 2> ' . escapeshellarg($errFile);
-        if (stripos(PHP_OS, 'WIN') === 0) {
-            $cmdLine = '"' . $cmdLine . '"';
-        }
-        $code = 0;
-        $ignored = [];
-        exec($cmdLine, $ignored, $code);
-        $stdout = @file_get_contents($outFile);
-        $stderr = @file_get_contents($errFile);
-        @unlink($outFile);
-        @unlink($errFile);
-        return ['stdout' => (string)$stdout, 'stderr' => (string)$stderr, 'code' => $code];
-    };
-
-    $combine = function (array $r) {
-        $parts = [];
-        if (trim($r['stdout']) !== '') $parts[] = $r['stdout'];
-        if (trim($r['stderr']) !== '') $parts[] = "[stderr]\n" . $r['stderr'];
-        return implode("\n", $parts);
-    };
-
-    if ($run === 'migrate+seed') {
-        $r1 = $runViaFile([$php, 'artisan', 'migrate', '--force', '--no-interaction']);
-        $combined = $combine($r1);
-        $exitCode = $r1['code'];
-        if ($exitCode === 0) {
-            $r2 = $runViaFile([$php, 'artisan', 'db:seed', '--force', '--no-interaction']);
-            $combined .= "\n--- db:seed ---\n" . $combine($r2);
-            $exitCode = $r2['code'];
-        }
-        $output = [$combined];
-    } else {
-        $r = $runViaFile($allowed[$run]);
-        $exitCode = $r['code'];
-        $output = [$combine($r)];
-    }
-
-    if (trim(implode("\n", $output)) === '') {
-        $output = [
-            '(ไม่มี output แม้ redirect ลงไฟล์)',
-            'exit code: ' . $exitCode,
-            'php cli: ' . $php,
-            'php exists: ' . (file_exists($php) ? 'yes' : 'NO'),
-            'cwd: ' . BASE_PATH,
-            'temp dir: ' . sys_get_temp_dir(),
-            'temp writable: ' . (is_writable(sys_get_temp_dir()) ? 'yes' : 'NO'),
-            'cmd parts: ' . json_encode($allowed[$run] ?? null),
-        ];
-    }
-
+try {
+    require BASE_PATH . '/vendor/autoload.php';
+    $app = require BASE_PATH . '/bootstrap/app.php';
+    $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+    $kernel->bootstrap();
+} catch (\Throwable $e) {
     echo json_encode([
         'command'  => $run,
-        'output'   => implode("\n", $output),
-        'exitCode' => $exitCode,
+        'output'   => "Bootstrap failed: " . $e->getMessage() . "\n\n" . $e->getTraceAsString(),
+        'exitCode' => -1,
     ]);
     exit;
 }
 
+$callArtisan = function (string $command, array $params) use ($kernel) {
+    $buffer = new Symfony\Component\Console\Output\BufferedOutput();
+    $code = $kernel->call($command, $params, $buffer);
+    return ['output' => $buffer->fetch(), 'code' => $code];
+};
+
+if ($run === 'migrate+seed') {
+    $r1 = $callArtisan('migrate', ['--force' => true]);
+    $combined = $r1['output'];
+    $exitCode = $r1['code'];
+    if ($exitCode === 0) {
+        $r2 = $callArtisan('db:seed', ['--force' => true]);
+        $combined .= "\n--- db:seed ---\n" . $r2['output'];
+        $exitCode = $r2['code'];
+    }
+} else {
+    [$cmd, $params] = $allowed[$run];
+    $r = $callArtisan($cmd, $params);
+    $combined = $r['output'];
+    $exitCode = $r['code'];
+}
+
+if (trim($combined) === '') {
+    $combined = '(คำสั่งรันเสร็จ ไม่มี output)';
+}
+
+echo json_encode([
+    'command'  => $run,
+    'output'   => $combined,
+    'exitCode' => $exitCode,
+]);
+exit;
+
+render_ui:
 ?><!DOCTYPE html>
 <html lang="th">
 <head>
@@ -156,6 +123,7 @@ if ($run !== null) {
   button:hover { background:#2563eb; }
   button.danger { background:#ef4444; }
   button.danger:hover { background:#dc2626; }
+  button.muted  { background:#475569; }
   #status { color:#94a3b8; margin-bottom:.5rem; }
   #output {
     background:#000; color:#86efac; padding:1rem; border-radius:8px;
@@ -164,10 +132,11 @@ if ($run !== null) {
 </style>
 </head>
 <body>
-<h1>Artisan Runner</h1>
+<h1>Artisan Runner (in-process)</h1>
 <p class="warn">⚠ ลบไฟล์นี้ทันทีหลังใช้งาน!</p>
 
 <div class="btn-group">
+  <button class="muted" onclick="runDiag()">diag</button>
   <?php foreach (array_keys($allowed) as $cmd): ?>
     <button
       <?= $cmd === 'migrate+seed' ? 'class="danger"' : '' ?>
@@ -181,12 +150,13 @@ if ($run !== null) {
 <pre id="output"></pre>
 
 <script>
+const SECRET = <?= json_encode(SECRET) ?>;
+
 async function runCmd(cmd) {
   document.getElementById('status').textContent = 'คำสั่ง: ' + cmd;
   document.getElementById('output').textContent = 'กำลังรัน...';
-
   try {
-    const res = await fetch('?secret=<?= SECRET ?>&run=' + encodeURIComponent(cmd));
+    const res = await fetch('?secret=' + encodeURIComponent(SECRET) + '&run=' + encodeURIComponent(cmd));
     const data = await res.json();
     document.getElementById('output').textContent =
       data.output || data.error || '(ไม่มี output)';
@@ -195,6 +165,13 @@ async function runCmd(cmd) {
   } catch (e) {
     document.getElementById('output').textContent = 'Error: ' + e.message;
   }
+}
+
+async function runDiag() {
+  document.getElementById('status').textContent = 'diag';
+  document.getElementById('output').textContent = 'กำลังโหลด...';
+  const res = await fetch('?secret=' + encodeURIComponent(SECRET) + '&diag=1');
+  document.getElementById('output').textContent = await res.text();
 }
 </script>
 </body>
