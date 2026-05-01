@@ -10,6 +10,10 @@ define('BASE_PATH', dirname(__DIR__));
 @set_time_limit(300);
 @ini_set('memory_limit', '512M');
 
+if (function_exists('opcache_reset')) {
+    @opcache_reset();
+}
+
 $secret = $_GET['secret'] ?? $_POST['secret'] ?? '';
 if ($secret !== SECRET) {
     http_response_code(403);

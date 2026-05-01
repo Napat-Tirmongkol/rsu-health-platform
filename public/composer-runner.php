@@ -11,6 +11,10 @@ define('PHAR_PATH', BASE_PATH . '/composer.phar');
 @set_time_limit(900);
 @ini_set('memory_limit', '1536M');
 
+if (function_exists('opcache_reset')) {
+    @opcache_reset();
+}
+
 $secret = $_GET['secret'] ?? $_POST['secret'] ?? '';
 if ($secret !== SECRET) {
     http_response_code(403);
