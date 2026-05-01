@@ -74,36 +74,61 @@ if ($run !== null) {
     $output = [];
     $exitCode = 0;
 
-    if (!function_exists('exec') || in_array('exec', array_map('trim', explode(',', ini_get('disable_functions'))))) {
-        echo json_encode(['error' => 'exec() ถูก disable บนเซิร์ฟเวอร์นี้']);
+    if (!function_exists('proc_open')) {
+        echo json_encode(['error' => 'proc_open() ถูก disable บนเซิร์ฟเวอร์นี้']);
         exit;
     }
 
-    $isWindows = stripos(PHP_OS, 'WIN') === 0;
-    $buildCmd = function (array $parts) use ($isWindows) {
-        $cmd = implode(' ', array_map('escapeshellarg', $parts)) . ' 2>&1';
-        return $isWindows ? '"' . $cmd . '"' : $cmd;
+    $runProc = function (array $parts) {
+        $descriptors = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ];
+        $proc = proc_open($parts, $descriptors, $pipes, BASE_PATH, null);
+        if (!is_resource($proc)) {
+            return ['stdout' => '', 'stderr' => 'proc_open failed', 'code' => -1];
+        }
+        fclose($pipes[0]);
+        $stdout = stream_get_contents($pipes[1]);
+        $stderr = stream_get_contents($pipes[2]);
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+        $code = proc_close($proc);
+        return ['stdout' => $stdout, 'stderr' => $stderr, 'code' => $code];
+    };
+
+    $combine = function (array $r) {
+        $parts = [];
+        if (trim($r['stdout']) !== '') $parts[] = $r['stdout'];
+        if (trim($r['stderr']) !== '') $parts[] = "[stderr]\n" . $r['stderr'];
+        return implode("\n", $parts);
     };
 
     if ($run === 'migrate+seed') {
-        $migrateCmd = $buildCmd([$php, 'artisan', 'migrate', '--force', '--no-interaction']);
-        exec($migrateCmd, $output, $exitCode);
+        $r1 = $runProc([$php, 'artisan', 'migrate', '--force', '--no-interaction']);
+        $combined = $combine($r1);
+        $exitCode = $r1['code'];
         if ($exitCode === 0) {
-            $seedOutput = [];
-            $seedCmd = $buildCmd([$php, 'artisan', 'db:seed', '--force', '--no-interaction']);
-            exec($seedCmd, $seedOutput, $exitCode);
-            $output = array_merge($output, ['--- db:seed ---'], $seedOutput);
+            $r2 = $runProc([$php, 'artisan', 'db:seed', '--force', '--no-interaction']);
+            $combined .= "\n--- db:seed ---\n" . $combine($r2);
+            $exitCode = $r2['code'];
         }
+        $output = [$combined];
     } else {
-        $cmd = $buildCmd($allowed[$run]);
-        exec($cmd, $output, $exitCode);
+        $r = $runProc($allowed[$run]);
+        $exitCode = $r['code'];
+        $output = [$combine($r)];
     }
 
-    if (empty($output)) {
-        $output[] = '(ไม่มี output — debug info)';
-        $output[] = 'php cli: ' . $php;
-        $output[] = 'cwd: ' . getcwd();
-        $output[] = 'cmd: ' . ($cmd ?? $migrateCmd ?? '?');
+    if (trim(implode("\n", $output)) === '') {
+        $output = [
+            '(ไม่มี output — debug info)',
+            'php cli: ' . $php,
+            'php exists: ' . (file_exists($php) ? 'yes' : 'NO'),
+            'cwd: ' . BASE_PATH,
+            'cmd parts: ' . json_encode($allowed[$run] ?? null),
+        ];
     }
 
     echo json_encode([
