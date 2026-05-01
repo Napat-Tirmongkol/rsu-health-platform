@@ -92,7 +92,13 @@ Route::get('/staff/scan', [IdentityScanController::class, 'show'])->middleware('
 Route::get('/staff/scan/campaign/{campaign}', [IdentityScanController::class, 'show'])->middleware('auth:staff')->name('staff.scan.campaign');
 Route::post('/staff/scan/verify', [IdentityScanController::class, 'verify'])->middleware('auth:staff')->name('staff.scan.verify');
 Route::post('/staff/scan/check-in', [IdentityScanController::class, 'checkIn'])->middleware('auth:staff')->name('staff.scan.check-in');
-Route::get('/portal/dashboard', fn () => view('dashboard'))->middleware('auth:portal')->name('portal.dashboard');
+Route::middleware('auth:portal')->prefix('portal')->name('portal.')->group(function () {
+    Route::get('/dashboard',     fn () => view('portal.dashboard'))->name('dashboard');
+    Route::get('/admins',        fn () => view('portal.admins'))->name('admins');
+    Route::get('/activity-logs', fn () => view('portal.activity_logs'))->name('activity_logs');
+    Route::get('/clinic-data',   fn () => view('portal.clinic_data'))->name('clinic_data');
+    Route::get('/maintenance',   fn () => view('portal.maintenance'))->name('maintenance');
+});
 
 Route::middleware('auth:user')->group(function () {
     Route::get('/user/hub', [HubController::class, 'index'])->name('user.hub');
