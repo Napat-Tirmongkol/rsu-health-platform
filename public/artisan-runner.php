@@ -18,6 +18,7 @@ if ($secret !== SECRET) {
 }
 
 $allowed = [
+    'package:discover'=> ['package:discover', []],
     'migrate'         => ['migrate',        ['--force' => true]],
     'migrate:status'  => ['migrate:status', []],
     'seed'            => ['db:seed',        ['--force' => true]],
