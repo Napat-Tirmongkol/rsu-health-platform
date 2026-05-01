@@ -25,7 +25,7 @@ $allowed = [
     'dump-autoload'=> ['command' => 'dump-autoload','--optimize' => true],
     'show'         => ['command' => 'show'],
     'diagnose'     => ['command' => 'diagnose'],
-    '--version'    => ['command' => '--version'],
+    'about'        => ['command' => 'about'],
 ];
 
 $diag = $_GET['diag'] ?? null;
@@ -138,7 +138,7 @@ render_ui:
 
 <div class="btn-group">
   <button class="muted" onclick="runDiag()">diag</button>
-  <button onclick="runCmd('--version')">--version</button>
+  <button onclick="runCmd('about')">about</button>
   <button onclick="runCmd('diagnose')">diagnose</button>
   <button class="primary" onclick="runCmd('install')">install (production)</button>
   <button onclick="runCmd('install:dev')">install (with dev)</button>
