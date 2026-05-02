@@ -17,6 +17,17 @@ return [
                 'admin.reports',
             ],
         ],
+        'insurance' => [
+            'name' => 'e-Insurance',
+            'label' => 'ประกันสุขภาพ',
+            'description' => 'จัดการข้อมูลสมาชิกประกัน นำเข้าข้อมูลจากฝ่ายทะเบียน และรับเลขกรมธรรม์จากบริษัทประกัน',
+            'route' => 'admin.insurance',
+            'icon' => 'fa-shield-heart',
+            'patterns' => [
+                'admin.insurance',
+                'admin.insurance.export',
+            ],
+        ],
         'borrow' => [
             'name' => 'e-Borrow',
             'label' => 'ยืมอุปกรณ์และคลัง',
@@ -84,6 +95,7 @@ return [
                     ['route' => 'admin.dashboard', 'label' => 'หน้าหลักแพลตฟอร์ม', 'icon' => 'fa-house'],
                     ['route' => 'admin.workspace.campaign', 'label' => 'บริการคลินิก', 'icon' => 'fa-calendar-check'],
                     ['route' => 'admin.workspace.borrow', 'label' => 'ยืมอุปกรณ์และคลัง', 'icon' => 'fa-box-open'],
+                    ['route' => 'admin.insurance', 'label' => 'ประกันสุขภาพ', 'icon' => 'fa-shield-heart'],
                 ],
             ],
             [

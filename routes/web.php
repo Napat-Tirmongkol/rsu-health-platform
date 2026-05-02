@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\BorrowReceiptController;
+use App\Http\Controllers\Admin\InsuranceExportController;
 use App\Http\Controllers\Auth\GuardLoginController;
 use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\Staff\IdentityScanController;
@@ -99,6 +100,8 @@ Route::get('/admin/system-settings', fn () => view('admin.system_settings'))->mi
 Route::get('/admin/activity-logs', fn () => view('admin.activity_logs'))->middleware('auth:admin')->name('admin.activity_logs');
 Route::get('/admin/reports', fn () => view('admin.reports'))->middleware(['auth:admin', 'admin.module:campaign', 'admin.action:campaign.manage'])->name('admin.reports');
 Route::get('/admin/users', fn () => view('admin.users'))->middleware(['auth:admin', 'admin.module:campaign', 'admin.action:campaign.manage'])->name('admin.users');
+Route::get('/admin/insurance', fn () => view('admin.insurance'))->middleware(['auth:admin', 'admin.module:insurance'])->name('admin.insurance');
+Route::get('/admin/insurance/export', [InsuranceExportController::class, 'export'])->middleware(['auth:admin', 'admin.module:insurance'])->name('admin.insurance.export');
 Route::get('/dev-login', function () {
     $admin = \App\Models\Admin::firstOrCreate(
         ['email' => 'admin@test.com'],

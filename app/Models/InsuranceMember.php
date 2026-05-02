@@ -15,13 +15,22 @@ class InsuranceMember extends Model
     protected $fillable = [
         'clinic_id',
         'user_id',
+        'member_id',
+        'member_type',
+        'first_name',
+        'last_name',
+        'national_id',
+        'department',
+        'member_status',
+        'insurance_status',
         'policy_number',
         'provider_name',
+        'coverage_start_date',
         'expires_at',
-        'status',
     ];
 
     protected $casts = [
+        'coverage_start_date' => 'date',
         'expires_at' => 'date',
     ];
 
@@ -33,5 +42,15 @@ class InsuranceMember extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getFullNameAttribute(): string
+    {
+        return trim(($this->first_name ?? '') . ' ' . ($this->last_name ?? ''));
+    }
+
+    public function getMemberTypeLabeAttribute(): string
+    {
+        return $this->member_type === 'staff' ? 'บุคลากร' : 'นักศึกษา';
     }
 }

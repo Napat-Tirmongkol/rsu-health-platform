@@ -47,7 +47,7 @@ class HubController extends Controller
         $latestBooking = $upcomingBookings->first();
         $upcomingCount = $upcomingBookings->count();
 
-        $insurance = InsuranceMember::where('member_id', $user->username)->first();
+        $insurance = InsuranceMember::where('member_id', $user->student_personnel_id ?? $user->username)->first();
         $borrowCount = $this->resolveBorrowCount($user->id);
         $thaiDate = $this->formatThaiDate($today);
 
